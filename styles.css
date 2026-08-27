@@ -1,0 +1,164 @@
+/* ---------------------------------------------------------------------------
+   Kirill Snegur — welcome page
+   Ported from Figma: "— Kirill Snegur • site —>" / Development section (52:351).
+
+   The design is authored at two fixed widths:
+     mobile   430 x 932  (iPhone 15 Pro Max, clip content OFF, content overflows)
+     desktop  1920 x 1080 (clip content ON, content below the fold is hidden)
+
+   Every value below is a Figma design pixel multiplied by --u, so the mobile
+   layout scales to fill the viewport width and never re-wraps.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* 1 design pixel. Fills the screen up to 430px, then keeps scaling to a
+     1.2x cap so the column does not become oversized on small tablets. */
+  --u: min(calc(100vw / 430), 1.2px);
+
+  --edge: 0;      /* page left margin, design px */
+  --inset: 10;    /* side padding of the project grid, design px */
+  --pad-top: 3;
+  --pad-bottom: 97; /* NOT in the design — Figma frame ends flush with the last line */
+
+  --ink: #a9a9a9;
+  --ink-strong: #000;
+  --link: #7eb0ff;
+  --paper: #fff;
+
+  /* TODO: the Figma text is outlined, so the real family could not be read.
+     Confirm the typeface and swap this stack. */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --fs-body: 20;
+  --fs-caption: 14;
+
+  /* The Figma text is outlined, so the family is unknown. These two tracking
+     values reproduce the design's measured line widths with the fallback
+     stack: the intro block is untracked, everything else runs ~4% tighter.
+     Re-calibrate (probably to 0) once the real typeface is in. */
+  --track-intro: 0;
+  --track-body: -0.04em;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: calc(var(--fs-body) * var(--u));
+  line-height: calc(var(--fs-body) * var(--u));
+  -webkit-font-smoothing: antialiased;
+}
+
+p, h2 { margin: 0; font-size: inherit; font-weight: 400; }
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }          /* not in the design — affordance only */
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+.page {
+  width: calc(430 * var(--u));
+  margin-inline: auto;
+  padding: calc(var(--pad-top) * var(--u)) 0 calc(var(--pad-bottom) * var(--u))
+           calc(var(--edge) * var(--u));
+}
+
+/* --- masthead ------------------------------------------------------------ */
+
+.signature {
+  display: block;
+  width: calc(430 * var(--u));
+  height: auto;
+}
+
+.eyebrow { margin-top: calc(100.6 * var(--u)); letter-spacing: var(--track-intro); }
+.lede    { margin-top: calc(20 * var(--u)); letter-spacing: var(--track-intro); }
+
+.portrait {
+  display: block;
+  margin-top: calc(19 * var(--u));
+  width: calc(430 * var(--u));
+  height: calc(304 * var(--u));
+  object-fit: cover;
+}
+
+/* --- project blocks ------------------------------------------------------ */
+
+.content { padding-inline: calc(var(--inset) * var(--u)); }
+
+.block__title {
+  margin-top: calc(97 * var(--u));
+  letter-spacing: var(--track-body);
+}
+.block + .block { margin-top: calc(99 * var(--u)); }
+
+.grid {
+  margin-top: calc(19 * var(--u));
+  display: grid;
+  grid-template-columns: repeat(2, calc(202 * var(--u)));
+  column-gap: calc(6 * var(--u));
+  row-gap: calc(34 * var(--u));
+}
+
+.project { margin: 0; }
+
+.project img {
+  display: block;
+  width: 100%;
+  height: auto;              /* beats the height attribute's presentational hint */
+  aspect-ratio: 202 / 459;
+  object-fit: cover;
+}
+
+.project figcaption {
+  font-size: calc(var(--fs-caption) * var(--u));
+  line-height: calc(var(--fs-caption) * var(--u));
+  margin-top: calc(9 * var(--u));
+  letter-spacing: var(--track-body);
+}
+
+/* The design sets a tighter image-to-caption gap on the second row of each
+   block (5px vs 12px to the cap height). Kept for fidelity — see the notes in
+   README.md; delete this rule to normalise. */
+.project--row2 figcaption { margin-top: calc(2 * var(--u)); }
+
+/* --- afterword ----------------------------------------------------------- */
+
+.afterword {
+  margin-top: calc(99 * var(--u));
+  letter-spacing: var(--track-body);
+}
+.afterword p + p { margin-top: calc(20 * var(--u)); }
+
+/* --- desktop -------------------------------------------------------------
+   Same blocks, laid out as 410px columns from a 128px left margin, exactly as
+   the 1920 frame does. Design pixels become real pixels (--u: 1px).
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 1000px) {
+  :root {
+    --u: 1px;
+    --edge: 128;
+    --inset: 0;
+    --pad-top: 99;
+    --pad-bottom: 96;
+  }
+
+  .page { width: auto; margin-inline: 0; }
+
+  .content {
+    display: grid;
+    grid-template-columns: repeat(2, calc(410 * var(--u)));
+    column-gap: calc(32 * var(--u));
+    align-items: start;
+  }
+
+  .block + .block { margin-top: 0; }
+}
