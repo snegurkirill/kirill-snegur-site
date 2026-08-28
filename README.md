@@ -40,19 +40,23 @@ both breakpoints (the second content block sits 3px high — see *Inconsistencie
 
 ## Typeface
 
-**Source Sans 3**, self-hosted from `assets/source-sans-3-latin.woff2` — a 28KB
-latin-subset variable file (SIL OFL), so the page makes no third-party request.
+Both faces self-hosted from `assets/` — latin subsets, SIL OFL, 44KB together, so
+the page makes no third-party request.
 
 Mirrors the two text styles in the Figma typography library:
 
-| style | Figma | CSS |
+| style | spec | CSS |
 |---|---|---|
-| `Regular-20` | Source Sans 3 ExtraLight, 20, line-height 100%, tracking -4% | body default: weight 200, 20/20, -0.04em |
-| `Regular-14` | Source Sans **Pro** Regular, 14, line-height AUTO, tracking -5% | `figcaption`: weight 400, 14/normal, -0.05em |
+| `Regular-20` | Source Sans 3 Regular, **wght 420**, 20, line-height 100%, tracking -4% | body default |
+| `Regular-14` | Source Sans Pro Regular, 14, line-height AUTO, tracking -5% | `figcaption` |
 
-Two things to fix in the library: `Regular-14` still points at **Source Sans Pro**
-(the 2012 family) rather than Source Sans 3, and `Regular-20` is named "Regular"
-but is set in **ExtraLight**.
+`Source Sans 3` ships as the **variable** file, so wght 420 is a genuine
+interpolation, not a browser-synthesised weight (verified: 400 → 201.6px,
+420 → 202.2px, 700 → 212.7px for the same string).
+
+The page therefore loads two closely-related families — Source Sans 3 for body,
+Source Sans Pro for captions. That is what the styles specify; collapsing the
+captions onto Source Sans 3 would drop a 15KB request if you ever want to.
 
 ## Open — needs a decision
 
@@ -79,13 +83,12 @@ but is set in **ExtraLight**.
 
 ## Copy
 
-Current copy was supplied on 2026-08-28. Four corrections were applied to it and
-are worth confirming: `tecnhology` → technology, `I would glad` → I would be glad,
-`and own experience` → and my own experience, and `as dive into` → then dive into.
+Hi and Afterword copy was supplied on 2026-08-28; the Afterword is now three
+paragraphs. No corrections were needed to the latest version.
 
-Line breaks are no longer hard-coded. Text wraps naturally inside the fixed 410px
-measure, which is exactly what Figma does with the same width and font, so the two
-stay in step as copy changes.
+Line breaks are not hard-coded. Text wraps naturally inside the fixed 410px
+measure, which is exactly what Figma does with the same width and font, so the
+two stay in step as copy changes.
 
 ## Divergence between the repo and Figma
 
