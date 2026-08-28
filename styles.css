@@ -79,6 +79,13 @@ body {
 
 p, h2 { margin: 0; font: inherit; }   /* keep body's family/weight/tracking */
 
+/* Even out the rag rather than filling each line to the measure. Chrome only
+   balances blocks up to 6 lines; every block here is 2-4, so all qualify. */
+.lede,
+.block__title,
+.afterword p,
+.project figcaption { text-wrap: balance; }
+
 a {
   color: var(--link);
   text-decoration: none;
@@ -171,6 +178,9 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .afterword {
   margin-top: calc(99 * var(--u));
   padding-inline: calc(var(--inset) * var(--u));   /* tracks .content: 10 / 0 */
+  /* Same 410px measure as the Hi and Content columns. Without this the
+     paragraphs ran the full page width on desktop (1792px lines). */
+  max-width: calc((410 + 2 * var(--inset)) * var(--u));
 }
 .afterword p + p { margin-top: calc(20 * var(--u)); }
 

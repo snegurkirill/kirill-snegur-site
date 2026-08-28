@@ -58,6 +58,19 @@ The page therefore loads two closely-related families — Source Sans 3 for body
 Source Sans Pro for captions. That is what the styles specify; collapsing the
 captions onto Source Sans 3 would drop a 15KB request if you ever want to.
 
+## Line breaking
+
+Line breaks are not hard-coded. Every multi-line block uses `text-wrap: balance`,
+so lines are evened out rather than filled greedily to the measure.
+
+One consequence: **Figma does not balance.** It fills each line before wrapping.
+So with identical copy, width and font, the code and the Figma frames will now
+break lines differently — the code's rag is deliberately the better-looking one.
+If exact parity matters more than the rag, drop the `text-wrap: balance` rule.
+
+All text columns share one 410px measure: Hi, both content columns, and the
+afterword.
+
 ## Open — needs a decision
 
 1. **Desktop below the fold is undefined** — the 1920 frame clips it. Rows 2 of each
