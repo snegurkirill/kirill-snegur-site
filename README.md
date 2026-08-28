@@ -3,9 +3,10 @@
 Static welcome page (business card). Plain HTML + CSS, no build step.
 
 ```
-index.html
-styles.css
-assets/           signature.svg, hero portrait, 8 project images
+index.html        English
+ru/index.html     Russian
+styles.css        shared by both
+assets/           signatures, hero portrait, 8 project images, 4 font subsets
 ```
 
 Open `index.html`, or serve locally:
@@ -57,6 +58,38 @@ interpolation, not a browser-synthesised weight (verified: 400 → 201.6px,
 The page therefore loads two closely-related families — Source Sans 3 for body,
 Source Sans Pro for captions. That is what the styles specify; collapsing the
 captions onto Source Sans 3 would drop a 15KB request if you ever want to.
+
+## Russian version — /ru
+
+`ru/index.html` shares `styles.css` and every image with the English page. Only
+three things differ: the copy, `lang="ru"`, and the signature — `Handwritten-logo.svg`
+is the **Cyrillic** signature ("Кирилл Снегур"), a different drawing from the Latin
+one and a different aspect (430x42 vs 430x32). Saved as `assets/signature-ru.svg`,
+with its viewBox tightened to the ink so it drops into the same CSS with no overrides.
+
+Ported from `Mobile-ru.pdf` (430 x 3362). Line counts match the design exactly:
+lede 4 lines, both headings 3, afterword 4/2/2. Vertical positions drift up to ~9px
+by the foot of the page — worth trueing against Figma when the Russian frames exist
+there.
+
+Three typos were corrected: `клиенсткий` → клиентский, `платмофрма` → платформа,
+and `через в Телеграм` → через Телеграм. Still worth a look: *«в сообщества
+совместного развития и бизнеса и личности»* wants a correlative comma —
+«— и бизнеса, и личности».
+
+The Russian design drops the email contact and links only Телеграм. Followed as
+drawn, but it means the Russian page offers one way to make contact where the
+English offers two.
+
+**There is no language switcher in either design**, so /ru is reachable only by
+typing the URL. `hreflang` tags cross-link the two for search engines, but a
+visible switch is missing.
+
+### Fonts
+
+Latin and Cyrillic ship as separate subsets keyed by `unicode-range`. Verified
+cold-cache: the English page downloads only the two Latin files (44KB), and /ru
+adds the Cyrillic pair (27KB).
 
 ## Line breaking
 
