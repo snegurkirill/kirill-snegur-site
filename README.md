@@ -38,18 +38,25 @@ Every dimension is a Figma design pixel multiplied by `--u`:
 Verified against the Figma export: every block lands on its design Y coordinate at
 both breakpoints (the second content block sits 3px high — see *Inconsistencies*).
 
+## Typeface
+
+**Apercu Pro Regular** (Colophon Foundry), read directly from the Figma text nodes:
+20px body / 14px captions, line height AUTO (= 20px at 20px), tracking 0% on the
+intro block and the captions, -4% on headings and the afterword. Rendered line
+widths match the Figma export within ~1.5px.
+
+It is a **commercial face and is not self-hosted here** — only viewers with it
+installed locally see it. A webfont licence plus `@font-face` is needed before
+launch; until then remote visitors get the system fallback and run slightly wide.
+
 ## Open — needs a decision
 
-1. **Typeface is unknown.** Figma outlines text on SVG export, so the family could
-   not be read. `--font` is a system fallback; `--track-intro` / `--track-body`
-   are tracking values calibrated so the fallback reproduces the design's measured
-   line widths. Drop in the real font and re-check both.
-2. **Desktop below the fold is undefined** — the 1920 frame clips it. Rows 2 of each
+1. **Desktop below the fold is undefined** — the 1920 frame clips it. Rows 2 of each
    block, all captions and the afterword are coded as the obvious continuation of
    the pattern, not from design.
-3. **No bottom padding in the design** — the frame ends flush with the last line of
+2. **No bottom padding in the design** — the frame ends flush with the last line of
    text. Set to 97px (mobile) / 96px (desktop) here.
-4. **No favicon, no OG image.** Basic `<title>`/description/OG tags added.
+3. **No favicon, no OG image.** Basic `<title>`/description/OG tags added.
 
 ## Inconsistencies found in the design
 
@@ -63,10 +70,33 @@ both breakpoints (the second content block sits 3px high — see *Inconsistencie
 - Desktop content occupies the left 980px of a 1920px frame — over half the canvas
   is empty, and there is no max-width or centring rule for wider screens.
 
-## Copy to check
+## Copy
 
-`Wave Lenght` → Length · `Raiffesien` → Raiffeisen · `lets get in touch` → let's ·
-`than dive into your` → then · `Kiosk for universal` reads unfinished.
+Spelling and grammar were corrected in both this repo and the Figma source on
+2026-08-28: `Lenght` → Length, `Raiffesien` → Raiffeisen, `lets` → let's,
+`than` → then, `see world as space` → see the world as a space, and
+`Kiosk for universal` → Kiosk.
+
+Left as-authored, as voice rather than error: `profound teams`,
+`cognitive-pleasant`, `details about experience`.
+
+The same corrections are still **pending in Figma** — `use_figma` runs in a cloud
+context that cannot load Apercu Pro, and the Plugin API refuses text edits on nodes
+whose font it cannot load.
+
+## Divergence between the repo and Figma
+
+This port was built from node `52:351`, which is **not** the live Development page.
+The Development page (`60:142`) holds the current `Mobile` (`60:143`) and `Desktop`
+(`60:185`) frames, and they already differ:
+
+- Mobile's kiosk caption there is already `Kiosk`; `52:351` still says
+  `Kiosk for universal`.
+- Mobile has the **afterword twice** — `60:183` at y=2976 and `60:184` at y=3212,
+  identical text. Only one is coded here.
+- Desktop's eighth caption reads `Sila Vetra Sea&City` instead of the kiosk name —
+  a copy-paste error. Not reproduced here.
+- Desktop's first caption has a trailing space: `"[ Wave Lenght ] AstroTour "`.
 
 ## Assets
 

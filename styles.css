@@ -26,19 +26,18 @@
   --stroke: #d9d9d9;
   --paper: #fff;
 
-  /* TODO: the Figma text is outlined, so the real family could not be read.
-     Confirm the typeface and swap this stack. */
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Apercu Pro Regular — read from the Figma text nodes. It is a commercial
+     face (Colophon Foundry): installed locally here, but NOT yet self-hosted,
+     so remote visitors fall back until a webfont licence is in place. */
+  --font: "Apercu Pro", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
 
   --fs-body: 20;
   --fs-caption: 14;
 
-  /* The Figma text is outlined, so the family is unknown. These two tracking
-     values reproduce the design's measured line widths with the fallback
-     stack: the intro block is untracked, everything else runs ~4% tighter.
-     Re-calibrate (probably to 0) once the real typeface is in. */
-  --track-intro: 0;
-  --track-body: -0.04em;
+  /* Tracking, straight from Figma: the intro block and the captions are set at
+     0%, headings and the afterword at -4%. */
+  --track-tight: -0.04em;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -79,8 +78,8 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   height: auto;
 }
 
-.eyebrow { margin-top: calc(100.6 * var(--u)); letter-spacing: var(--track-intro); }
-.lede    { margin-top: calc(20 * var(--u)); letter-spacing: var(--track-intro); }
+.eyebrow { margin-top: calc(100.6 * var(--u)); }   /* intro is untracked in Figma */
+.lede    { margin-top: calc(20 * var(--u)); }
 
 .portrait {
   display: block;
@@ -96,7 +95,7 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 
 .block__title {
   margin-top: calc(97 * var(--u));
-  letter-spacing: var(--track-body);
+  letter-spacing: var(--track-tight);
 }
 .block + .block { margin-top: calc(99 * var(--u)); }
 
@@ -122,7 +121,6 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   font-size: calc(var(--fs-caption) * var(--u));
   line-height: calc(var(--fs-caption) * var(--u));
   margin-top: calc(9 * var(--u));
-  letter-spacing: var(--track-body);
 }
 
 /* The second content block's images carry a 1px inside stroke in the design.
@@ -143,7 +141,7 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 
 .afterword {
   margin-top: calc(99 * var(--u));
-  letter-spacing: var(--track-body);
+  letter-spacing: var(--track-tight);
 }
 .afterword p + p { margin-top: calc(20 * var(--u)); }
 
