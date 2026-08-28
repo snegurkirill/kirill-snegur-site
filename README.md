@@ -40,14 +40,19 @@ both breakpoints (the second content block sits 3px high — see *Inconsistencie
 
 ## Typeface
 
-**Apercu Pro Regular** (Colophon Foundry), read directly from the Figma text nodes:
-20px body / 14px captions, line height AUTO (= 20px at 20px), tracking 0% on the
-intro block and the captions, -4% on headings and the afterword. Rendered line
-widths match the Figma export within ~1.5px.
+**Source Sans 3**, self-hosted from `assets/source-sans-3-latin.woff2` — a 28KB
+latin-subset variable file (SIL OFL), so the page makes no third-party request.
 
-It is a **commercial face and is not self-hosted here** — only viewers with it
-installed locally see it. A webfont licence plus `@font-face` is needed before
-launch; until then remote visitors get the system fallback and run slightly wide.
+Mirrors the two text styles in the Figma typography library:
+
+| style | Figma | CSS |
+|---|---|---|
+| `Regular-20` | Source Sans 3 ExtraLight, 20, line-height 100%, tracking -4% | body default: weight 200, 20/20, -0.04em |
+| `Regular-14` | Source Sans **Pro** Regular, 14, line-height AUTO, tracking -5% | `figcaption`: weight 400, 14/normal, -0.05em |
+
+Two things to fix in the library: `Regular-14` still points at **Source Sans Pro**
+(the 2012 family) rather than Source Sans 3, and `Regular-20` is named "Regular"
+but is set in **ExtraLight**.
 
 ## Open — needs a decision
 
@@ -64,7 +69,9 @@ launch; until then remote visitors get the system fallback and run slightly wide
   in both blocks. Reproduced via `.project--row2`; delete that rule to normalise.
 - Heading → grid gap is **19px in block A, 22px in block B**. Normalised to 19px,
   which puts block B 3px above its Figma position.
-- The intro block has **no tracking**; every other text block runs ~4% tighter.
+- The intro text is inset 10px from the page edge while the signature, portrait
+  and project grid are not — on desktop it sits at x=138 against everything else
+  at x=128. Reproduced as-is.
 - On desktop the hero image is 430px wide but the content columns are 410px, so it
   overhangs the grid by 20px on the right.
 - Desktop content occupies the left 980px of a 1920px frame — over half the canvas
@@ -72,17 +79,13 @@ launch; until then remote visitors get the system fallback and run slightly wide
 
 ## Copy
 
-Spelling and grammar were corrected in both this repo and the Figma source on
-2026-08-28: `Lenght` → Length, `Raiffesien` → Raiffeisen, `lets` → let's,
-`than` → then, `see world as space` → see the world as a space, and
-`Kiosk for universal` → Kiosk.
+Current copy was supplied on 2026-08-28. Four corrections were applied to it and
+are worth confirming: `tecnhology` → technology, `I would glad` → I would be glad,
+`and own experience` → and my own experience, and `as dive into` → then dive into.
 
-Left as-authored, as voice rather than error: `profound teams`,
-`cognitive-pleasant`, `details about experience`.
-
-The same corrections are still **pending in Figma** — `use_figma` runs in a cloud
-context that cannot load Apercu Pro, and the Plugin API refuses text edits on nodes
-whose font it cannot load.
+Line breaks are no longer hard-coded. Text wraps naturally inside the fixed 410px
+measure, which is exactly what Figma does with the same width and font, so the two
+stay in step as copy changes.
 
 ## Divergence between the repo and Figma
 

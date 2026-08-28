@@ -26,18 +26,29 @@
   --stroke: #d9d9d9;
   --paper: #fff;
 
-  /* Apercu Pro Regular — read from the Figma text nodes. It is a commercial
-     face (Colophon Foundry): installed locally here, but NOT yet self-hosted,
-     so remote visitors fall back until a webfont licence is in place. */
-  --font: "Apercu Pro", system-ui, -apple-system, "Segoe UI", Roboto,
+  /* Source Sans 3, self-hosted below. Mirrors the two text styles in the Figma
+     typography library:
+       Regular-20  ExtraLight (200) / 20 / line-height 100% / tracking -4%
+       Regular-14  Regular    (400) / 14 / line-height AUTO / tracking -5%   */
+  --font: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto,
           "Helvetica Neue", Arial, sans-serif;
 
   --fs-body: 20;
   --fs-caption: 14;
+  --wt-body: 200;
+  --wt-caption: 400;
+  --track-body: -0.04em;
+  --track-caption: -0.05em;
+}
 
-  /* Tracking, straight from Figma: the intro block and the captions are set at
-     0%, headings and the afterword at -4%. */
-  --track-tight: -0.04em;
+/* Source Sans 3 (SIL OFL), latin subset, variable weight axis 200-900.
+   Self-hosted so the page makes no third-party request. */
+@font-face {
+  font-family: "Source Sans 3";
+  src: url("assets/source-sans-3-latin.woff2") format("woff2-variations");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -50,11 +61,13 @@ body {
   color: var(--ink);
   font-family: var(--font);
   font-size: calc(var(--fs-body) * var(--u));
-  line-height: calc(var(--fs-body) * var(--u));
+  line-height: calc(var(--fs-body) * var(--u));   /* Regular-20: 100% */
+  font-weight: var(--wt-body);
+  letter-spacing: var(--track-body);
   -webkit-font-smoothing: antialiased;
 }
 
-p, h2 { margin: 0; font-size: inherit; font-weight: 400; }
+p, h2 { margin: 0; font: inherit; }   /* keep the 200 weight from body */
 
 a {
   color: var(--link);
@@ -78,7 +91,13 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   height: auto;
 }
 
-.eyebrow { margin-top: calc(100.6 * var(--u)); }   /* intro is untracked in Figma */
+/* The signature and portrait bleed to the page edge, but the intro text is
+   inset 10 design px — at both breakpoints (mobile x=10, desktop x=138). */
+.eyebrow, .lede {
+  margin-left: calc(10 * var(--u));
+  max-width: calc(410 * var(--u));
+}
+.eyebrow { margin-top: calc(100.6 * var(--u)); }
 .lede    { margin-top: calc(20 * var(--u)); }
 
 .portrait {
@@ -93,10 +112,7 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 
 .content { padding-inline: calc(var(--inset) * var(--u)); }
 
-.block__title {
-  margin-top: calc(97 * var(--u));
-  letter-spacing: var(--track-tight);
-}
+.block__title { margin-top: calc(97 * var(--u)); }
 .block + .block { margin-top: calc(99 * var(--u)); }
 
 .grid {
@@ -117,10 +133,12 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   object-fit: cover;
 }
 
-.project figcaption {
+.project figcaption {                    /* Regular-14 */
   font-size: calc(var(--fs-caption) * var(--u));
-  line-height: calc(var(--fs-caption) * var(--u));
-  margin-top: calc(9 * var(--u));
+  line-height: normal;                   /* AUTO in Figma */
+  font-weight: var(--wt-caption);
+  letter-spacing: var(--track-caption);
+  margin-top: calc(7 * var(--u));
 }
 
 /* The second content block's images carry a 1px inside stroke in the design.
@@ -135,13 +153,13 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 /* The design sets a tighter image-to-caption gap on the second row of each
    block (5px vs 12px to the cap height). Kept for fidelity — see the notes in
    README.md; delete this rule to normalise. */
-.project--row2 figcaption { margin-top: calc(2 * var(--u)); }
+.project--row2 figcaption { margin-top: calc(0 * var(--u)); }
 
 /* --- afterword ----------------------------------------------------------- */
 
 .afterword {
   margin-top: calc(99 * var(--u));
-  letter-spacing: var(--track-tight);
+  padding-inline: calc(var(--inset) * var(--u));   /* tracks .content: 10 / 0 */
 }
 .afterword p + p { margin-top: calc(20 * var(--u)); }
 
