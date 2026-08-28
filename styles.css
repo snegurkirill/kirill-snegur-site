@@ -23,6 +23,7 @@
   --ink: #a9a9a9;
   --ink-strong: #000;
   --link: #7eb0ff;
+  --stroke: #d9d9d9;
   --paper: #fff;
 
   /* TODO: the Figma text is outlined, so the real family could not be read.
@@ -122,6 +123,15 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   line-height: calc(var(--fs-caption) * var(--u));
   margin-top: calc(9 * var(--u));
   letter-spacing: var(--track-body);
+}
+
+/* The second content block's images carry a 1px inside stroke in the design.
+   `outline` with a negative offset is the only inside stroke that paints on top
+   of an <img>; an inset box-shadow would sit under the image content. Kept at a
+   true hairline rather than scaled with --u. */
+.block--outlined .project img {
+  outline: 1px solid var(--stroke);
+  outline-offset: -1px;
 }
 
 /* The design sets a tighter image-to-caption gap on the second row of each
