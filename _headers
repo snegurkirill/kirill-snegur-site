@@ -1,0 +1,16 @@
+# Cloudflare Pages response headers.
+# Rules are matched per request path; a later, more specific rule wins for a
+# header it repeats. HTML and CSS always revalidate so edits go live at once;
+# assets are versionless filenames, so they get a week rather than a year.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=15552000
+  Content-Security-Policy: default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=604800
