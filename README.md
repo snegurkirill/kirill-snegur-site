@@ -91,6 +91,11 @@ Latin and Cyrillic ship as separate subsets keyed by `unicode-range`. Verified
 cold-cache: the English page downloads only the two Latin files (44KB), and /ru
 adds the Cyrillic pair (27KB).
 
+A third, 1.3KB file holds a single glyph: `→` (U+2192). Google's Latin subset
+carries U+2191 and U+2193 but not U+2192, so the arrow in the Russian afterword
+was falling back to a system font — 47.2px wide against Source Sans 3's 28.9px,
+a very visible mismatch.
+
 ## Line breaking
 
 Line breaks are not hard-coded. Every multi-line block uses `text-wrap: balance`,
