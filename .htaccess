@@ -1,0 +1,49 @@
+# Apache config for shared hosting (Timeweb, Beget, REG.RU and similar).
+# Mirrors _headers, which only Cloudflare Pages / Netlify read. Both files can
+# sit in the repo harmlessly; each host ignores the other's.
+# Every block is wrapped in IfModule so a missing module degrades instead of
+# throwing a 500.
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+  # The site ships no JavaScript at all, so scripts are denied outright.
+  Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+  # Enable once HTTPS is confirmed working on the live domain:
+  # Header always set Strict-Transport-Security "max-age=15552000"
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # Versionless asset filenames, so a week rather than a year. Rename a file to
+  # push a replacement through immediately.
+  ExpiresByType image/jpeg              "access plus 7 days"
+  ExpiresByType image/png               "access plus 7 days"
+  ExpiresByType image/svg+xml           "access plus 7 days"
+  ExpiresByType font/woff2              "access plus 7 days"
+  # HTML and CSS revalidate so edits go live at once.
+  ExpiresByType text/html               "access plus 0 seconds"
+  ExpiresByType text/css                "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType image/svg+xml .svg
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css image/svg+xml application/xml
+  # woff2 is already compressed; do not re-compress it.
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Force HTTPS. Comment out until the certificate is issued, or the site will
+  # redirect into a loop of failed TLS handshakes.
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+DirectoryIndex index.html
