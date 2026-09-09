@@ -1,1 +1,6 @@
 .DS_Store
+
+# GES-2 case: keep only the compressed derivatives, not the 47MB of source PNGs.
+# Originals stay local; regenerate with the sharp script if they are ever needed.
+assets/GES-2 digital design/*
+!assets/GES-2 digital design/Сжатые/

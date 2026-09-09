@@ -1,0 +1,139 @@
+/* ---------------------------------------------------------------------------
+   Case page — /ges-2-digital-designer
+   Ported from Figma "ges-2-digital-designer" (node 129:290), a 1920-wide
+   desktop frame: 128px margins around a 1664px content column, with the text
+   set in a 410px measure. Type, colour and the font faces come from
+   styles.css; only layout lives here.
+
+   The design exists at desktop width only. Below 1920 the column is fluid and
+   the type stays at 20px; the side margin collapses on small screens. A proper
+   mobile design would replace the last media query.
+   --------------------------------------------------------------------------- */
+
+/* styles.css scales --u against a 430px mobile design below 1000px. This page
+   is authored at 1920, so pin it: type stays 20/20 at every width. */
+:root { --u: 1px; }
+
+.case {
+  --edge: 128px;      /* page margin */
+  --measure: 410px;   /* text column */
+  --gap-para: 20px;   /* between paragraphs */
+  --gap-title: 32px;  /* title -> description */
+  --gap-sub: 16px;    /* title -> one-line subtitle (tighter in the design) */
+  --gap-text-img: 28px;
+  --gap-img: 32px;    /* between images inside a section */
+  --gap-section: 100px;
+  --gap-ref-img: 4px;
+
+  max-width: 1920px;
+  margin-inline: auto;
+  padding: 98px var(--edge) 449px;
+}
+
+/* --- intro ---------------------------------------------------------------- */
+
+.case-sig {
+  display: block;
+  width: 430px;
+  height: auto;
+}
+
+.case-intro p {
+  max-width: var(--measure);
+  margin-top: var(--gap-para);
+}
+.case-intro p:first-of-type { margin-top: 100.6px; }   /* signature -> text */
+
+.case-portrait {
+  display: block;
+  margin-top: var(--gap-text-img);
+  width: 430px;
+  height: 304px;
+  object-fit: cover;
+}
+
+/* --- sections ------------------------------------------------------------- */
+
+.case-section { margin-top: var(--gap-section); }
+
+.case-title {
+  color: var(--link);            /* headings are the link blue in this design */
+  max-width: var(--measure);
+}
+
+.case-sub,
+.case-desc { max-width: var(--measure); }
+.case-title + .case-sub  { margin-top: var(--gap-sub); }
+.case-title + .case-desc { margin-top: var(--gap-title); }
+.case-desc--cont { margin-top: var(--gap-para); }
+
+/* --- images --------------------------------------------------------------- */
+
+.case-shot { margin: var(--gap-img) 0 0; }
+.case-sub + .case-shot,
+.case-desc + .case-shot { margin-top: var(--gap-text-img); }
+
+.case-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The block crops the video rather than letter-boxing it: fixed frame ratio
+   from the design, video covers it, edges clipped. */
+.case-shot--video {
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+}
+.case-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- reference credits ---------------------------------------------------- */
+
+.case-refs {
+  list-style: none;
+  counter-reset: ref;
+  margin: var(--gap-img) 0 0;
+  padding: 0;
+  max-width: var(--measure);
+}
+.case-refs li { counter-increment: ref; }
+.case-refs li::before {
+  content: counter(ref) " .";
+  display: inline-block;
+  width: 31px;
+}
+.case-refs + .case-shot { margin-top: var(--gap-ref-img); }
+
+/* Underlined in the design but with no destination yet — see README. */
+.case-ref {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+/* --- the ГЭС-2 offer, set apart by a rule --------------------------------- */
+
+.case-section--offer {
+  margin-top: 171px;
+  border-top: 1px solid var(--ink);
+  padding-top: 176px;
+}
+
+/* --- narrow screens ------------------------------------------------------
+   Not designed. The column goes fluid and the margin collapses so nothing
+   overflows; replace once a mobile frame exists.
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .case { --edge: 64px; padding-top: 64px; padding-bottom: 200px; --gap-section: 80px; }
+}
+@media (max-width: 700px) {
+  .case { --edge: 20px; --gap-section: 64px; }
+  .case-sig { width: 100%; max-width: 430px; }
+  .case-portrait { width: 100%; height: auto; aspect-ratio: 430 / 304; }
+}

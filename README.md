@@ -96,6 +96,51 @@ carries U+2191 and U+2193 but not U+2192, so the arrow in the Russian afterword
 was falling back to a system font — 47.2px wide against Source Sans 3's 28.9px,
 a very visible mismatch.
 
+## Case page — /ges-2-digital-designer
+
+Ported from the Figma page `ges-2-digital-designer` (node `129:290`), a 1920-wide
+desktop frame: 128px margins around a 1664px column, text set in a 410px measure.
+Type and colour come from `styles.css`; `case.css` holds only layout, `case.js`
+only the video. Section headings are the link blue (#7EB0FF) and the signature is
+grey (#B3B3B3) here, unlike the black one on the main pages — hence
+`assets/signature-grey.svg`.
+
+Verified against the Figma render: five of the seven sections land within 2-4px
+of their design Y. The last two sit ~104px low, entirely because the
+`Опыт сотрудников Райффайзен 1` export is 3416x1710 where every other block is
+3328 wide — it renders 833px tall against a 733px design slot. Re-export that one
+at the same bounds as the rest and the page matches throughout.
+
+### Images
+
+Sources are 2x flattened exports of whole content blocks (3328px = 2 x 1664).
+They are **not** in git: 47MB of PNG would bloat the repo for no gain. Only the
+derivatives in `assets/GES-2 digital design/Сжатые/` are tracked.
+
+Compressed with **sharp**, not Squoosh: Google archived the Squoosh CLI and it
+crashes on Node 22 (it assigns `globalThis.navigator`, now read-only). sharp uses
+the same codec family. WebP q80 at two widths, wired up with `srcset`, plus a
+fully-opaque alpha channel dropped where present:
+
+**46.9MB → 5.1MB (10.9%)** — and a 1x screen pulls only ~1.3MB of it.
+
+### The Everytale video
+
+The first slot in that section is a video, not an image. The source is **1440x1440
+square** in a 1664x1091 frame, so the frame crops it top and bottom — the mask
+behaviour asked for, done with `aspect-ratio` + `overflow:hidden` + `object-fit:cover`.
+
+It preloads, starts **one second after entering the viewport**, then loops. Leaving
+the viewport before that second is up cancels the start. `muted` + `playsinline`
+are what make autoplay permitted at all; under `prefers-reduced-motion` it stays on
+the poster and gets controls instead.
+
+The 4.4MB MP4 ships as-is — there is no ffmpeg on this machine to re-encode it.
+It is already fast-start (moov before mdat), so it streams rather than blocking.
+
+Adding a script and a video meant widening the CSP in `_headers` and `.htaccess`
+with `script-src 'self'` and `media-src 'self'`. Still no `unsafe-inline`.
+
 ## Line breaking
 
 Line breaks are not hard-coded. Every multi-line block uses `text-wrap: balance`,
