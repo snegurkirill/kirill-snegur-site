@@ -30,6 +30,14 @@
   padding: 98px var(--edge) 449px;
 }
 
+/* Even out the rag on every text block, as on the main pages. Chrome balances
+   up to 6 lines; the longest block here is 5. */
+.case-intro p,
+.case-title,
+.case-sub,
+.case-desc,
+.case-refs li { text-wrap: balance; }
+
 /* --- intro ---------------------------------------------------------------- */
 
 .case-sig {
@@ -113,18 +121,15 @@
    uses the image-to-image step so the rhythm stays even. */
 .case-shot + .case-desc { margin-top: var(--gap-img); }
 
-/* Credits are real links but not accented: body grey, always underlined as
-   drawn in the design. */
+/* Quiet links — the "корневой" link and the ГЭС-2 credits. Plain body grey,
+   no underline until hovered; the global a:hover rule in styles.css supplies
+   the underline, these just set how it sits. */
+.case-quiet,
 .case-ref {
   color: inherit;
-  text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
 }
-
-/* Quiet link — plain body text until hovered, then underlined (the global
-   a:hover rule in styles.css supplies the underline). */
-.case-quiet { color: inherit; }
 
 /* --- the ГЭС-2 offer, set apart by a rule --------------------------------- */
 

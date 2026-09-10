@@ -105,6 +105,7 @@ p, h2 { margin: 0; font: inherit; }   /* keep body's family/weight/tracking */
 
 /* Even out the rag rather than filling each line to the measure. Chrome only
    balances blocks up to 6 lines; every block here is 2-4, so all qualify. */
+.eyebrow,
 .lede,
 .block__title,
 .afterword p,
