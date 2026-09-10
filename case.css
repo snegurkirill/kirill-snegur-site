@@ -109,12 +109,22 @@
 }
 .case-refs + .case-shot { margin-top: var(--gap-ref-img); }
 
-/* Underlined in the design but with no destination yet — see README. */
+/* Text resuming after an image (the ГЭС-2 closing lines). Not in the design;
+   uses the image-to-image step so the rhythm stays even. */
+.case-shot + .case-desc { margin-top: var(--gap-img); }
+
+/* Credits are real links but not accented: body grey, always underlined as
+   drawn in the design. */
 .case-ref {
+  color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
 }
+
+/* Quiet link — plain body text until hovered, then underlined (the global
+   a:hover rule in styles.css supplies the underline). */
+.case-quiet { color: inherit; }
 
 /* --- the ГЭС-2 offer, set apart by a rule --------------------------------- */
 
