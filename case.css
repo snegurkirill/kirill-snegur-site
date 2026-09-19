@@ -139,6 +139,58 @@
   padding-top: 176px;
 }
 
+/* --- long-form text (/margarita-pushkina) -------------------------------
+   A wider measure and two text colours: grey for questions and reasoning,
+   near-black for the answers themselves. */
+
+.case--wide {
+  --measure: 823px;
+  --ink-dark: #232222;
+  padding-bottom: 530px;
+}
+
+.case-ink { color: var(--ink-dark, #232222); }
+
+.case-text { max-width: var(--measure); margin-top: var(--gap-para); }
+.case-title + .case-text { margin-top: var(--gap-sub); }
+.case-text--apart { margin-top: 40px; }
+.case-section > .case-text:first-child { margin-top: 0; }
+
+/* Numbered answers: "1 ." in its own column, wrapped lines hang under the text. */
+.case-list {
+  list-style: none;
+  counter-reset: item;
+  margin: var(--gap-para) 0 0;
+  padding: 0 0 0 31px;
+  max-width: var(--measure);
+}
+.case-list li { counter-increment: item; }
+.case-list li::before {
+  content: counter(item) " .";
+  display: inline-block;
+  width: 31px;
+  margin-left: -31px;
+}
+
+/* Time table: time range, then what happens. */
+.case-sched {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  margin: 0;
+  max-width: var(--measure);
+}
+.case-sched dt, .case-sched dd { margin: 0; }
+
+.case-text,
+.case-list li { text-wrap: balance; }
+
+/* Closing rule under the last section. */
+.case-end {
+  margin: 171px 0 0;
+  border: 0;
+  border-top: 1px solid var(--ink);
+}
+
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
    overflows; replace once a mobile frame exists.

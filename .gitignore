@@ -4,3 +4,7 @@
 # Originals stay local; regenerate with the sharp script if they are ever needed.
 assets/GES-2 digital design/*
 !assets/GES-2 digital design/Сжатые/
+
+# Margarita Pushkina page: same rule — only the compressed derivatives are tracked.
+assets/Margarita Puskina/*
+!assets/Margarita Puskina/Сжатые/
