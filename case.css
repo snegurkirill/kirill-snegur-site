@@ -196,9 +196,16 @@
    overlaps consecutive blocks so a single band of that padding shows between
    photo rows (32px, not 64). Black over black, so the overlap is invisible. */
 
-.case--stacked { padding-bottom: 76px; }
+.case--stacked { padding-bottom: 65px; }
 .case--stacked .case-intro p { margin-left: 10px; }
 .case-shot--stack { margin-top: -32px; }
+
+/* A closing section set apart by a full-width rule above it. */
+.case-section--ruled {
+  margin-top: 171px;
+  border-top: 1px solid var(--ink);
+  padding-top: 172px;
+}
 
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
