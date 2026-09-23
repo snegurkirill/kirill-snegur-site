@@ -8,3 +8,7 @@ assets/GES-2 digital design/*
 # Margarita Pushkina page: same rule — only the compressed derivatives are tracked.
 assets/Margarita Puskina/*
 !assets/Margarita Puskina/Сжатые/
+
+# A-club page: only the compressed derivatives are tracked.
+assets/A Club/*
+!assets/A Club/Сжатые/

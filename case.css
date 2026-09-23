@@ -191,6 +191,15 @@
   border-top: 1px solid var(--ink);
 }
 
+/* --- /a-club -------------------------------------------------------------
+   The exports here are whole blocks: photos inset 32px on black. The design
+   overlaps consecutive blocks so a single band of that padding shows between
+   photo rows (32px, not 64). Black over black, so the overlap is invisible. */
+
+.case--stacked { padding-bottom: 76px; }
+.case--stacked .case-intro p { margin-left: 10px; }
+.case-shot--stack { margin-top: -32px; }
+
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
    overflows; replace once a mobile frame exists.
