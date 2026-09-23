@@ -12,3 +12,6 @@ assets/Margarita Puskina/*
 # A-club page: only the compressed derivatives are tracked.
 assets/A Club/*
 !assets/A Club/Сжатые/
+
+# Stray exports that live in the project folder but must not be published.
+Downloads/
