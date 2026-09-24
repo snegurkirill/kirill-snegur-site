@@ -223,6 +223,19 @@
   padding-top: 172px;
 }
 
+/* --- /omanko-dom ---------------------------------------------------------
+   Same stacked blocks as /a-club, but the page ends on a reference list under
+   the last image rather than on the image itself. */
+
+.case--omanko { padding-bottom: 182px; }
+
+/* Credits under the closing image, not above it as on the ГЭС-2 page. */
+.case-shot + .case-refs { margin-top: 8px; }
+
+/* The wordmark's own cut of the typeface — see the @font-face note in
+   styles.css. Same design, same wght axis, just a file that holds the marks. */
+.wordmark { font-family: "Source Sans 3 Wordmark", var(--font); }
+
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
    overflows; replace once a mobile frame exists.

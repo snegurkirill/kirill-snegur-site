@@ -13,5 +13,10 @@ assets/Margarita Puskina/*
 assets/A Club/*
 !assets/A Club/Сжатые/
 
+# ÖMANKÖ ꞉DÖM page: only the compressed derivatives are tracked. The two Kiosk
+# videos are copied into Сжатые/ as-is — no ffmpeg here to transcode them.
+assets/Omanko dom/*
+!assets/Omanko dom/Сжатые/
+
 # Stray exports that live in the project folder but must not be published.
 Downloads/

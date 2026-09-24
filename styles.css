@@ -70,6 +70,19 @@
   font-weight: 200 900; font-style: normal; font-display: swap;
   unicode-range: U+2192;
 }
+/* The ÖMANKÖ ꞉DÖM̤ wordmark on /omanko-dom needs a modifier colon (U+A789) and a
+   combining diaeresis below (U+0324); the Latin subset carries neither. Adding a
+   two-glyph face like the arrow one above does not work here: a base letter and
+   its combining mark have to come from the SAME file or the browser gives up on
+   the cluster and falls back for both. So this is a whole-wordmark cut — every
+   letter of the name plus the two marks — used as its own family. */
+@font-face {
+  font-family: "Source Sans 3 Wordmark";
+  src: url("assets/source-sans-3-wordmark.woff2") format("woff2");
+  font-weight: 200 900; font-style: normal; font-display: swap;
+  unicode-range: U+0020, U+0041, U+0044, U+004B, U+004D-004F, U+00C4, U+00D6,
+    U+0308, U+0324, U+A789;
+}
 @font-face {
   font-family: "Source Sans Pro";
   src: url("assets/source-sans-pro-latin.woff2") format("woff2");
