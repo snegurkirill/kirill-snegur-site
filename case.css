@@ -200,6 +200,22 @@
 .case--stacked .case-intro p { margin-left: 10px; }
 .case-shot--stack { margin-top: -32px; }
 
+/* Credits under a section: a semibold role line, then the people. The role is
+   the one place on the page where the weight leaves the body 420 — measured off
+   the design export, where its stems run half again as wide as the names
+   directly beneath it. */
+.case-credits { max-width: var(--measure); }
+.case-sub + .case-credits,
+.case-text + .case-credits { margin-top: var(--gap-sub); }
+.case-desc + .case-credits { margin-top: var(--gap-title); }
+.case-credits + .case-shot { margin-top: var(--gap-text-img); }
+.case-credits__role { font-weight: 600; }
+.case-credits__names { text-wrap: balance; }
+
+/* The A-club design underlines its one link rather than leaving the underline
+   to hover, as the ГЭС-2 page does. */
+.case-link { text-decoration: underline; text-underline-offset: 2px; }
+
 /* A closing section set apart by a full-width rule above it. */
 .case-section--ruled {
   margin-top: 171px;
