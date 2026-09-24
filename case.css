@@ -234,7 +234,10 @@
 
 /* The wordmark's own cut of the typeface — see the @font-face note in
    styles.css. Same design, same wght axis, just a file that holds the marks. */
-.wordmark { font-family: "Source Sans 3 Wordmark", var(--font); }
+.wordmark {
+  font-family: "Source Sans 3 Wordmark", var(--font);
+  white-space: nowrap;   /* the name is one word; balance was splitting it in two */
+}
 
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
