@@ -252,6 +252,7 @@
   --cv-muted: #7f7f7f;    /* the design draws these as black at 50% on white */
   --cv-accent: #638ece;
   --cv-name-col: 260px;
+  --cv-measure: 840px;
 
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -304,6 +305,33 @@
 
 .case--in-out { padding-bottom: 312px; }
 
+/* --- /yana-rogozina ------------------------------------------------------
+   Same CV machinery, without the skills column: the index runs full width and
+   each period opens with what the role itself covered. Entries carry a grey
+   line under the client naming what they are, and results rather than tasks. */
+
+.cv--solo { grid-template-columns: 1fr; }
+
+/* The design holds both the role list and the results to about 840px. Left to
+   the full 1664 they run past 150 characters a line, which is unreadable. */
+.cv-roles {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  max-width: var(--cv-measure);
+  line-height: 24px;
+  color: var(--cv-accent);
+}
+.cv-roles + .cv-entry { margin-top: 20px; }
+
+.cv-client__note,
+.cv-result { color: var(--cv-dim, #737373); }
+
+.cv-client__note { display: block; }
+.cv-result { list-style: none; margin: 0; padding: 0; max-width: var(--cv-measure); }
+
+.case--yana { padding-bottom: 133px; }
+
 /* Two columns need roughly 1400px before the skills list starts shredding. */
 @media (max-width: 1400px) {
   .cv { grid-template-columns: 1fr; row-gap: 56px; }
@@ -311,6 +339,10 @@
 @media (max-width: 640px) {
   .cv-entry { grid-template-columns: 1fr; }
   .cv-client { margin-bottom: 4px; }
+  /* One line each on a wide screen, two or three here — without a gap the
+     items run together and stop reading as a list. */
+  .cv-roles li + li,
+  .cv-result li + li { margin-top: 12px; }
   /* The dash means "same client as above" only while there is a column to
      stand in; stacked it would read as a stray line. */
   .cv-client--none { display: none; }

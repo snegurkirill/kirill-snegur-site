@@ -23,5 +23,9 @@ assets/Omanko dom/*
 assets/in-out/*
 !assets/in-out/Сжатые/
 
+# yana-rogozina page: only the compressed derivatives are tracked.
+assets/yana-rogozina/*
+!assets/yana-rogozina/Сжатые/
+
 # Stray exports that live in the project folder but must not be published.
 Downloads/
