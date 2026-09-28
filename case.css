@@ -239,6 +239,83 @@
   white-space: nowrap;   /* the name is one word; balance was splitting it in two */
 }
 
+/* --- /in-out: the CV / index block ---------------------------------------
+   The design sets three fixed columns — client, work, skills. Rebuilt here as
+   a 2/3 + 1/3 grid so the index gets the room it needs and the whole thing can
+   collapse to one column on a phone.
+
+   Three ink levels, read off the export: black for the names a reader scans
+   for, the design's blue for what was actually done, and black at half opacity
+   for the framing (period headings, the skills list). --------------------- */
+
+.cv {
+  --cv-muted: #7f7f7f;    /* the design draws these as black at 50% on white */
+  --cv-accent: #638ece;
+  --cv-name-col: 260px;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  column-gap: 40px;
+  align-items: start;
+  margin-top: var(--gap-title);
+}
+
+/* h3/h4 only exist on this page; styles.css resets p and h2 only. */
+.cv :is(h3, h4) { margin: 0; font: inherit; }
+
+.cv-period {
+  font-weight: 600;
+  color: var(--cv-muted);
+}
+.cv-period + .cv-entry { margin-top: 24px; }
+.cv-entry + .cv-period { margin-top: 48px; }
+
+/* Looser leading than the body: these are list rows to be scanned, not prose. */
+.cv-entry {
+  display: grid;
+  grid-template-columns: var(--cv-name-col) 1fr;
+  column-gap: 20px;
+  line-height: 24px;
+}
+.cv-entry + .cv-entry { margin-top: 20px; }
+
+.cv-client  { color: var(--ink-strong); }
+.cv-project { color: var(--ink-strong); font-weight: 600; }
+.cv-job + .cv-job { margin-top: 12px; }
+
+.cv-tasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--cv-accent);
+}
+
+.cv-skills { line-height: 20px; }
+.cv-skills__title,
+.cv-group__title { color: var(--ink-strong); font-weight: 600; }
+.cv-group { margin-top: 20px; }
+.cv-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--cv-muted);
+}
+.cv-lang { margin-top: 40px; color: var(--cv-muted); }
+
+.case--in-out { padding-bottom: 312px; }
+
+/* Two columns need roughly 1400px before the skills list starts shredding. */
+@media (max-width: 1400px) {
+  .cv { grid-template-columns: 1fr; row-gap: 56px; }
+}
+@media (max-width: 640px) {
+  .cv-entry { grid-template-columns: 1fr; }
+  .cv-client { margin-bottom: 4px; }
+  /* The dash means "same client as above" only while there is a column to
+     stand in; stacked it would read as a stray line. */
+  .cv-client--none { display: none; }
+}
+
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
    overflows; replace once a mobile frame exists.

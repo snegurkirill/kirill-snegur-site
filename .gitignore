@@ -18,5 +18,10 @@ assets/A Club/*
 assets/Omanko dom/*
 !assets/Omanko dom/Сжатые/
 
+# in-out page: only the compressed derivatives are tracked (the source PDF and
+# the block exports stay local).
+assets/in-out/*
+!assets/in-out/Сжатые/
+
 # Stray exports that live in the project folder but must not be published.
 Downloads/
