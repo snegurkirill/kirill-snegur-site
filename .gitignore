@@ -27,5 +27,10 @@ assets/in-out/*
 assets/yana-rogozina/*
 !assets/yana-rogozina/Сжатые/
 
+# index page: only the compressed derivatives are tracked (the source PDF and
+# the block renders stay local).
+assets/index/*
+!assets/index/Сжатые/
+
 # Stray exports that live in the project folder but must not be published.
 Downloads/

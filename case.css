@@ -332,6 +332,89 @@
 
 .case--yana { padding-bottom: 133px; }
 
+/* --- /index --------------------------------------------------------------
+   A project index, then the cases, each opened by a row of the same table:
+   client, project, category, role. The design sets the table in Inter; it is
+   Source Sans here, like every other page, at the design's 24px row pitch.
+
+   Columns 1-2 share whatever the row has left, columns 3-4 stay fixed. At
+   1920 that lands the four columns on the design's 128 / 790 / 1452 / 1602.
+   1-2 never shrink below their longest entry; once the row cannot hold that
+   (see the container query below) 3-4 wrap onto a second line instead. */
+
+.case--index {
+  --idx-c1: 380px;      /* longest client, "[Wave Length] media, Strongnormal residency", 365px */
+  --idx-c2: 200px;      /* longest project, "Sunday rides community", 190px */
+  --idx-c3: 130px;
+  --idx-c4: 190px;
+  --idx-gap: 20px;
+  --gap-section: 96px;
+  padding-top: 99px;
+  padding-bottom: 304px;
+}
+
+/* The new signature is a shorter drawing (37px against 42), so the gap below
+   it grows to keep the intro line where the other case pages have it. */
+.case--index .case-intro p:first-of-type { margin-top: 104.2px; }
+
+.case--index main { container: idx / inline-size; }
+
+.idx-row {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--idx-c1), 1fr) minmax(var(--idx-c2), 1fr) var(--idx-c3) var(--idx-c4);
+  column-gap: var(--idx-gap);
+  line-height: 24px;
+  color: var(--ink-strong);
+}
+
+/* The Everytale video sits in the same black frame the exported blocks have
+   baked in: 32px of a 1664 block, kept proportional as the column narrows. */
+.case-shot--framed {
+  background: #000;
+  padding: calc(32 / 1664 * 100%);
+}
+.case-shot--framed .case-video {
+  height: auto;
+  aspect-ratio: var(--ar);
+}
+
+/* Consecutive blocks overlap by one frame so a single black band shows between
+   them. The frame scales with the image, so the overlap has to as well; a flat
+   -32px eats into the photos once the column is narrower than 1664. */
+.case--index .case-shot--stack { margin-top: calc(-32 / 1664 * 100%); }
+
+.case--index .case-section--ruled { padding-top: 171px; }
+
+.idx-outro {
+  margin-top: var(--gap-section);
+  max-width: 370px;
+  line-height: 24px;
+  color: var(--ink-strong);
+}
+.idx-outro p { text-wrap: balance; }
+.idx-outro p + p { margin-top: 24px; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 960 = --idx-c1 + --idx-c2 + --idx-c3 + --idx-c4 + 3 gaps. Below it a row no
+   longer fits on one line, so columns 3-4 drop to a second line: category
+   under client, role under project. Kept at 130/190 there they zigzag against
+   the halves above them on a phone. Every row switches together; a table
+   where only some rows wrap stops reading as a table. */
+@container idx (width < 960px) {
+  .idx-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Two lines per entry now; without a gap the entries run together. */
+  .idx-row + .idx-row { margin-top: 12px; }
+}
+
 /* Two columns need roughly 1400px before the skills list starts shredding. */
 @media (max-width: 1400px) {
   .cv { grid-template-columns: 1fr; row-gap: 56px; }
