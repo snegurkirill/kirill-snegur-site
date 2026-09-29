@@ -13,7 +13,19 @@
     if (!window.posthog || typeof window.posthog.init !== 'function') return;
     window.posthog.init(TOKEN, {
       api_host: API_HOST,
-      ui_host: 'https://eu.posthog.com'
+      ui_host: 'https://eu.posthog.com',
+      // Opening any page with ?me marks this browser as the owner's for good,
+      // so the "Internal / Test users" cohort can filter it out. Runs before
+      // the first pageview, so that pageview is marked too.
+      loaded: function (ph) {
+        var params = new URLSearchParams(location.search);
+        if (!params.has('me')) return;
+        ph.register({ internal: true });
+        ph.setPersonProperties({ internal: true });
+        params.delete('me');
+        var query = params.toString();
+        history.replaceState(null, '', location.pathname + (query ? '?' + query : '') + location.hash);
+      }
     });
   };
   document.head.appendChild(s);
