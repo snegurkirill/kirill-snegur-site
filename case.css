@@ -198,7 +198,10 @@
 
 .case--stacked { padding-bottom: 65px; }
 .case--stacked .case-intro p { margin-left: 10px; }
-.case-shot--stack { margin-top: -32px; }
+/* 32px of a 1664 block. A percentage margin resolves against the column width,
+   so the overlap shrinks with the image and its frame; a flat -32px ate into
+   the photo above once the column was narrower than 1664 (~25px on a phone). */
+.case-shot--stack { margin-top: calc(-32 / 1664 * 100%); }
 
 /* Credits under a section: a semibold role line, then the people. The role is
    the one place on the page where the weight leaves the body 420 — measured off
@@ -378,11 +381,6 @@
   height: auto;
   aspect-ratio: var(--ar);
 }
-
-/* Consecutive blocks overlap by one frame so a single black band shows between
-   them. The frame scales with the image, so the overlap has to as well; a flat
-   -32px eats into the photos once the column is narrower than 1664. */
-.case--index .case-shot--stack { margin-top: calc(-32 / 1664 * 100%); }
 
 .case--index .case-section--ruled { padding-top: 171px; }
 
