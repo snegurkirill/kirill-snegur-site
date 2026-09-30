@@ -341,8 +341,8 @@
    project, format, role. The same Unit opens each case as its header.
 
    Columns 1-2 share whatever the row has left, 3-4 are fixed at 190 / 210.
-   1-2 never shrink below --unit-min1 / --unit-min2; once the row cannot hold
-   that (see the container query below) it folds to two columns, 3-4 moving
+   1-2 never shrink below their longest entry (plus a few px); once the row
+   cannot hold that (see the container query below) it folds to two columns, 3-4 moving
    onto a second line under 1-2, as on /index. All text is black, folded or not.
    Row pitch is the body's 100%, 20px. ------------------------------------- */
 
@@ -351,16 +351,17 @@
 .unit {
   display: grid;
   grid-template-columns:
-    minmax(var(--unit-min1, 380px), 1fr)   /* longest client, "[Wave Length] media, Strongnormal residency", 365px */
-    minmax(var(--unit-min2, 200px), 1fr)   /* longest project, "Sunday rides community", 190px */
+    minmax(370px, 1fr)   /* longest client, "[Wave Length] media, Strongnormal residency", 365px */
+    minmax(195px, 1fr)   /* longest project, "Sunday rides community", 190px */
     190px 210px;
   column-gap: 20px;
   color: var(--ink-strong);
 }
 
-/* 1040 = 380 + 200 + 190 + 210 + 3 gaps. Every Unit folds together; a table
+/* 1025 = 370 + 195 + 190 + 210 + 3 gaps: the width below which the longest
+   entries no longer fit on one line. Every Unit folds together; a table
    where only some rows wrap stops reading as a table. */
-@container units (width < 1040px) {
+@container units (width < 1025px) {
   .unit { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .unit > :nth-child(n+3) { margin-top: 8px; }
   /* Two lines per entry now; the gap between entries has to beat the 8
@@ -380,7 +381,7 @@
 /* --- Info ----------------------------------------------------------------
    A case description behind an INFO line. Closed, only the line shows; one
    click opens every Info on the page and the line goes away. The page
-   remembers that for the session: an inline script in <head> sets
+   remembers that for the session: info.js, loaded blocking in <head>, sets
    .info-closed on <html> before first paint unless the page was opened
    already, so nothing flashes. Without JS the text simply shows. ---------- */
 
