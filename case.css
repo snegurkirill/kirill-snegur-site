@@ -413,6 +413,100 @@
   .idx-row + .idx-row { margin-top: 12px; }
 }
 
+/* --- /cabinet-truda ------------------------------------------------------
+   An index of every project as a four-column table (client, project, format,
+   role), then five of them opened up: the same four columns as a header row,
+   an INFO label, the description and a stacked image block. Text is black
+   here; only the intro line and the INFO label keep the body grey.
+
+   The design sets the columns at x 128 / 790 / 1452 / 1602 of a 1920 frame:
+   two equal 662px columns and two fixed ones, 150 and 190. Only the first two
+   flex, so format and role never wrap at any width the table survives. --- */
+
+.case--cabinet {
+  --gap-section: 96px;
+  --gap-head: 35px;   /* header row -> INFO, and INFO -> text */
+  --measure: 640px;   /* the Russian descriptions run ~620px a line in the design */
+  --proj-cols: 1fr 1fr 150px 190px;
+
+  color: var(--ink-strong);
+  padding-bottom: 268px;
+}
+.case--cabinet .case-intro p { color: var(--ink); }
+/* The Latin signature is 32px tall against the Cyrillic one's 42, so the
+   shared 100.6 gap would lift everything below it; these put the line and
+   the portrait back on their design Y (237, 289). */
+.case--cabinet .case-intro p:first-of-type { margin-top: 106px; }
+.case--cabinet .case-portrait { margin-top: 32px; }
+
+.proj-index {
+  width: 100%;
+  margin-top: var(--gap-section);
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.proj-index__format { width: 150px; }
+.proj-index__role   { width: 190px; }
+.proj-index td {
+  padding: 0 20px 0 0;
+  vertical-align: top;
+}
+
+.proj { margin-top: var(--gap-section); }
+
+.proj-head {
+  display: grid;
+  grid-template-columns: var(--proj-cols);
+}
+.proj-head > * { padding-right: 20px; }
+
+/* Underlined like a link in the design, but it opens nothing: a label. */
+.proj-label {
+  margin-top: var(--gap-head);
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.proj-info { margin-top: var(--gap-head); max-width: var(--measure); }
+.proj-info p + p { margin-top: var(--gap-para); }
+.proj-info p { text-wrap: balance; }
+
+.proj .case-shot { margin-top: var(--gap-img); }
+.proj .case-shot--stack { margin-top: calc(-32 / 1664 * 100%); }   /* the shared overlap, restated past .proj .case-shot */
+
+/* The closing rule sits 170 below the last block and 176 above "Personal". */
+.case--cabinet .case-section--ruled { margin-top: 170px; padding-top: 176px; }
+
+.proj-outro { margin-top: var(--gap-section); max-width: 410px; }
+.proj-outro p { text-wrap: balance; }
+.proj-outro p + p { margin-top: var(--gap-para); }
+
+/* Four columns stop fitting well below ~900px. Each index row becomes the
+   client on one line and "project · format · role" under it, and each header
+   row stacks client and project over a two-column format / role pair, so the
+   paired lines (Collaboration — Coordination…) still line up. */
+@media (max-width: 900px) {
+  .proj-index, .proj-index tbody { display: block; }
+  .proj-index colgroup { display: none; }
+  .proj-index tr { display: block; }
+  .proj-index tr + tr { margin-top: 12px; }
+  .proj-index td { display: inline; padding: 0; }
+  .proj-index td:first-child { display: block; }
+  .proj-index td:nth-child(n+2) { color: var(--ink); }
+  .proj-index td:nth-child(n+3)::before { content: " · "; }
+
+  .proj-head { grid-template-columns: 1fr 1fr; }
+  .proj-head__client,
+  .proj-head__kind { grid-column: 1 / -1; }
+  .proj-head__kind,
+  .proj-head__format,
+  .proj-head__role { color: var(--ink); }
+  .proj-head__format { margin-top: 12px; }
+  .proj-head__role   { margin-top: 12px; }
+}
+
 /* Two columns need roughly 1400px before the skills list starts shredding. */
 @media (max-width: 1400px) {
   .cv { grid-template-columns: 1fr; row-gap: 56px; }

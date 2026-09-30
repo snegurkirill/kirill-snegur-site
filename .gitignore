@@ -34,3 +34,7 @@ assets/index/*
 
 # Stray exports that live in the project folder but must not be published.
 Downloads/
+
+# cabinet-truda page: only the compressed derivatives are tracked.
+assets/cabinet-truda/*
+!assets/cabinet-truda/Сжатые/
