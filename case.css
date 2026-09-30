@@ -344,7 +344,7 @@
    1-2 never shrink below --unit-min1 / --unit-min2; once the row cannot hold
    that (see the container query below) it folds to two columns, 3-4 moving
    onto a second line under 1-2, as on /index. All text is black, folded or not.
-   Row pitch is --unit-lh: 24 on /index, 20 on /cabinet-truda. -------------- */
+   Row pitch is the body's 100%, 20px. ------------------------------------- */
 
 .case main { container: units / inline-size; }
 
@@ -355,7 +355,6 @@
     minmax(var(--unit-min2, 200px), 1fr)   /* longest project, "Sunday rides community", 190px */
     190px 210px;
   column-gap: 20px;
-  line-height: var(--unit-lh, 24px);
   color: var(--ink-strong);
 }
 
@@ -413,7 +412,7 @@
 /* --- /index --------------------------------------------------------------
    A project index, then the cases, each opened by a Unit of the same table.
    The design sets the table in Inter; it is Source Sans here, like every
-   other page, at the design's 24px row pitch. */
+   other page. */
 
 .case--index {
   --gap-section: 96px;
@@ -455,7 +454,6 @@
 .case--cabinet {
   --gap-section: 96px;
   --measure: 640px;   /* the Russian descriptions run ~620px a line in the design */
-  --unit-lh: 20px;
 
   color: var(--ink-strong);
   padding-bottom: 268px;
