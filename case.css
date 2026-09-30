@@ -335,22 +335,86 @@
 
 .case--yana { padding-bottom: 133px; }
 
-/* --- /index --------------------------------------------------------------
-   A project index, then the cases, each opened by a row of the same table:
-   client, project, category, role. The design sets the table in Inter; it is
-   Source Sans here, like every other page, at the design's 24px row pitch.
+/* --- Table / Unit ---------------------------------------------------------
+   One component for every project table on the site (/index, /cabinet-truda).
+   A Table is a stack of Units; a Unit is one row of four cells: client,
+   project, format, role. The same Unit opens each case as its header.
 
-   Columns 1-2 share whatever the row has left, columns 3-4 stay fixed. At
-   1920 that lands the four columns on the design's 128 / 790 / 1452 / 1602.
-   1-2 never shrink below their longest entry; once the row cannot hold that
-   (see the container query below) 3-4 wrap onto a second line instead. */
+   Columns 1-2 share whatever the row has left, 3-4 are fixed at 190 / 210.
+   1-2 never shrink below --unit-min1 / --unit-min2; once the row cannot hold
+   that (see the container query below) it folds to two columns, 3-4 moving
+   onto a second line under 1-2, as on /index. All text is black, folded or not.
+   Row pitch is the body's 100%, 20px. ------------------------------------- */
+
+.case main { container: units / inline-size; }
+
+.unit {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--unit-min1, 380px), 1fr)   /* longest client, "[Wave Length] media, Strongnormal residency", 365px */
+    minmax(var(--unit-min2, 200px), 1fr)   /* longest project, "Sunday rides community", 190px */
+    190px 210px;
+  column-gap: 20px;
+  color: var(--ink-strong);
+}
+
+/* 1040 = 380 + 200 + 190 + 210 + 3 gaps. Every Unit folds together; a table
+   where only some rows wrap stops reading as a table. */
+@container units (width < 1040px) {
+  .unit { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .unit > :nth-child(n+3) { margin-top: 8px; }
+  /* Two lines per entry now; the gap between entries has to beat the 8
+     inside one, or the rows run together. */
+  .table > .unit + .unit { margin-top: 20px; }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Info ----------------------------------------------------------------
+   A case description behind an INFO line. Closed, only the line shows; one
+   click opens every Info on the page and the line goes away. The page
+   remembers that for the session: an inline script in <head> sets
+   .info-closed on <html> before first paint unless the page was opened
+   already, so nothing flashes. Without JS the text simply shows. ---------- */
+
+.info {
+  margin-top: var(--gap-img);
+  max-width: var(--measure);
+  color: var(--ink-strong);
+}
+
+.info__toggle {
+  display: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.info-closed .info__toggle { display: inline-block; }
+.info-closed .info__text   { display: none; }
+
+.info__text:focus { outline: none; }
+.info__text p { text-wrap: balance; }
+.info__text p + p { margin-top: var(--gap-para); }
+
+/* --- /index --------------------------------------------------------------
+   A project index, then the cases, each opened by a Unit of the same table.
+   The design sets the table in Inter; it is Source Sans here, like every
+   other page. */
 
 .case--index {
-  --idx-c1: 380px;      /* longest client, "[Wave Length] media, Strongnormal residency", 365px */
-  --idx-c2: 200px;      /* longest project, "Sunday rides community", 190px */
-  --idx-c3: 130px;
-  --idx-c4: 190px;
-  --idx-gap: 20px;
   --gap-section: 96px;
   padding-top: 99px;
   padding-bottom: 304px;
@@ -359,17 +423,6 @@
 /* The new signature is a shorter drawing (37px against 42), so the gap below
    it grows to keep the intro line where the other case pages have it. */
 .case--index .case-intro p:first-of-type { margin-top: 104.2px; }
-
-.case--index main { container: idx / inline-size; }
-
-.idx-row {
-  display: grid;
-  grid-template-columns:
-    minmax(var(--idx-c1), 1fr) minmax(var(--idx-c2), 1fr) var(--idx-c3) var(--idx-c4);
-  column-gap: var(--idx-gap);
-  line-height: 24px;
-  color: var(--ink-strong);
-}
 
 /* The Everytale video sits in the same black frame the exported blocks have
    baked in: 32px of a 1664 block, kept proportional as the column narrows. */
@@ -393,41 +446,14 @@
 .idx-outro p { text-wrap: balance; }
 .idx-outro p + p { margin-top: 24px; }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* 960 = --idx-c1 + --idx-c2 + --idx-c3 + --idx-c4 + 3 gaps. Below it a row no
-   longer fits on one line, so columns 3-4 drop to a second line: category
-   under client, role under project. Kept at 130/190 there they zigzag against
-   the halves above them on a phone. Every row switches together; a table
-   where only some rows wrap stops reading as a table. */
-@container idx (width < 960px) {
-  .idx-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* Two lines per entry now; without a gap the entries run together. */
-  .idx-row + .idx-row { margin-top: 12px; }
-}
-
 /* --- /cabinet-truda ------------------------------------------------------
-   An index of every project as a four-column table (client, project, format,
-   role), then five of them opened up: the same four columns as a header row,
-   an INFO label, the description and a stacked image block. Text is black
-   here; only the intro line and the INFO label keep the body grey.
-
-   The design sets the columns at x 128 / 790 / 1452 / 1602 of a 1920 frame:
-   two equal 662px columns and two fixed ones, 150 and 190. Only the first two
-   flex, so format and role never wrap at any width the table survives. --- */
+   An index of every project as a Table, then five of them opened up: a Unit
+   as the header, the image block, and an Info under it. Text is black here;
+   only the intro line keeps the body grey. --------------------------------- */
 
 .case--cabinet {
   --gap-section: 96px;
-  --gap-head: 35px;   /* header row -> INFO, and INFO -> text */
   --measure: 640px;   /* the Russian descriptions run ~620px a line in the design */
-  --proj-cols: 1fr 1fr 150px 190px;
 
   color: var(--ink-strong);
   padding-bottom: 268px;
@@ -439,40 +465,9 @@
 .case--cabinet .case-intro p:first-of-type { margin-top: 106px; }
 .case--cabinet .case-portrait { margin-top: 32px; }
 
-.proj-index {
-  width: 100%;
-  margin-top: var(--gap-section);
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-.proj-index__format { width: 150px; }
-.proj-index__role   { width: 190px; }
-.proj-index td {
-  padding: 0 20px 0 0;
-  vertical-align: top;
-}
+.case--cabinet .table { margin-top: var(--gap-section); }
 
 .proj { margin-top: var(--gap-section); }
-
-.proj-head {
-  display: grid;
-  grid-template-columns: var(--proj-cols);
-}
-.proj-head > * { padding-right: 20px; }
-
-/* Underlined like a link in the design, but it opens nothing: a label. */
-.proj-label {
-  margin-top: var(--gap-head);
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-
-.proj-info { margin-top: var(--gap-head); max-width: var(--measure); }
-.proj-info p + p { margin-top: var(--gap-para); }
-.proj-info p { text-wrap: balance; }
-
 .proj .case-shot { margin-top: var(--gap-img); }
 .proj .case-shot--stack { margin-top: calc(-32 / 1664 * 100%); }   /* the shared overlap, restated past .proj .case-shot */
 
@@ -482,30 +477,6 @@
 .proj-outro { margin-top: var(--gap-section); max-width: 410px; }
 .proj-outro p { text-wrap: balance; }
 .proj-outro p + p { margin-top: var(--gap-para); }
-
-/* Four columns stop fitting well below ~900px. Each index row becomes the
-   client on one line and "project · format · role" under it, and each header
-   row stacks client and project over a two-column format / role pair, so the
-   paired lines (Collaboration — Coordination…) still line up. */
-@media (max-width: 900px) {
-  .proj-index, .proj-index tbody { display: block; }
-  .proj-index colgroup { display: none; }
-  .proj-index tr { display: block; }
-  .proj-index tr + tr { margin-top: 12px; }
-  .proj-index td { display: inline; padding: 0; }
-  .proj-index td:first-child { display: block; }
-  .proj-index td:nth-child(n+2) { color: var(--ink); }
-  .proj-index td:nth-child(n+3)::before { content: " · "; }
-
-  .proj-head { grid-template-columns: 1fr 1fr; }
-  .proj-head__client,
-  .proj-head__kind { grid-column: 1 / -1; }
-  .proj-head__kind,
-  .proj-head__format,
-  .proj-head__role { color: var(--ink); }
-  .proj-head__format { margin-top: 12px; }
-  .proj-head__role   { margin-top: 12px; }
-}
 
 /* Two columns need roughly 1400px before the skills list starts shredding. */
 @media (max-width: 1400px) {
