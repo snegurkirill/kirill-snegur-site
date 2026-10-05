@@ -36,19 +36,3 @@
 
   Array.prototype.forEach.call(videos, function (v) { io.observe(v); });
 })();
-
-/* Info blocks. One click on any INFO line opens every block on the page and
-   the page stays open for the rest of the session. The closed state itself
-   is set by the inline script in <head>, before first paint. */
-(function () {
-  var toggles = document.querySelectorAll('.info__toggle');
-  Array.prototype.forEach.call(toggles, function (b) {
-    b.addEventListener('click', function () {
-      document.documentElement.classList.remove('info-closed');
-      try { sessionStorage.setItem('info-open:' + location.pathname, '1'); } catch (e) {}
-      // The button is gone now; hand focus to the text it opened.
-      var text = b.parentNode.querySelector('.info__text');
-      if (text) text.focus();
-    });
-  });
-})();
