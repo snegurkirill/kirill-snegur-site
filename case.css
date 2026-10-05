@@ -417,6 +417,7 @@
 
 .case--index {
   --gap-section: 96px;
+  --measure: 640px;   /* the Info descriptions run ~620px a line in the design */
   padding-top: 99px;
   padding-bottom: 304px;
 }
