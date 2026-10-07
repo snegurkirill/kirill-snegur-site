@@ -141,6 +141,20 @@ It is already fast-start (moov before mdat), so it streams rather than blocking.
 Adding a script and a video meant widening the CSP in `_headers` and `.htaccess`
 with `script-src 'self'` and `media-src 'self'`. Still no `unsafe-inline`.
 
+## Photo page — /life-photos
+
+Not ported from Figma: the standard case intro (Cyrillic signature, one line of
+copy, the double portrait), then every photo from `assets/life-photos/` as a
+gallery. On a wide screen the photos sit in one justified row — each figure grows
+by its aspect ratio (`--ar`), so all four come out the same height. Below 1100px
+they flow into two columns, below 700px into one.
+
+Originals (two HEIC, two JPEG) stay local; only `assets/life-photos/Сжатые/` is
+tracked. HEIC goes through `sips` to PNG first — sharp's prebuilt libvips cannot
+decode it — then sharp to WebP q80 at 800 and 1600px wide, with EXIF orientation
+baked in. **6.7MB → 740KB.** To add a photo: compress it the same way and add a
+`<figure>` with its `--ar` (width / height).
+
 ## Line breaking
 
 Line breaks are not hard-coded. Every multi-line block uses `text-wrap: balance`,

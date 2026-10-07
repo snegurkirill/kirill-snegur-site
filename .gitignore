@@ -38,3 +38,8 @@ Downloads/
 # cabinet-truda page: only the compressed derivatives are tracked.
 assets/cabinet-truda/*
 !assets/cabinet-truda/Сжатые/
+
+
+# life-photos page: only the compressed derivatives are tracked.
+assets/life-photos/*
+!assets/life-photos/Сжатые/

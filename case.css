@@ -480,6 +480,35 @@
 .proj-outro p { text-wrap: balance; }
 .proj-outro p + p { margin-top: var(--gap-para); }
 
+/* --- /life-photos --------------------------------------------------------
+   No cases: the intro, then the photos as one justified row. Each figure
+   grows by its own aspect ratio (--ar, width / height), so the widths come
+   out proportional and every photo lands at the same height. Too narrow for
+   a row, the photos flow into two columns, then one. ---------------------- */
+
+.case--life { padding-bottom: 133px; }
+
+.gallery {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-img);
+  margin-top: var(--gap-section);
+}
+.gallery .case-shot {
+  flex: var(--ar) 1 0%;
+  min-width: 0;
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .gallery { display: block; columns: 2; column-gap: var(--gap-img); }
+  .gallery .case-shot { break-inside: avoid; }
+  .gallery .case-shot + .case-shot { margin-top: var(--gap-img); }
+}
+@media (max-width: 700px) {
+  .gallery { columns: 1; }
+}
+
 /* Two columns need roughly 1400px before the skills list starts shredding. */
 @media (max-width: 1400px) {
   .cv { grid-template-columns: 1fr; row-gap: 56px; }
