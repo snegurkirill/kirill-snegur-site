@@ -174,11 +174,42 @@ Unit and Table are set in **ABC Diatype Cyrillic**, a commercial face. It is
 not in `assets/`: it renders only where it is installed and falls back to
 Source Sans 3 elsewhere, until there is a web licence to self-host it.
 
+A Showcase is built from rows: one wide frame, two halves, three thirds, or
+four portraits in two pairs. Each frame carries its photo's proportion as
+`--ar` and grows by it, so a row comes out one height whatever its mix.
+
 Showcase photos are separate files, not a flattened block export, under
-`media/<project>/` — the first step towards one media library per project
-rather than per page. Exported from Figma as PNG, then WebP q80 through Pillow
-at two sizes: short side 900 (`name.webp`) and the 2000px export
-(`name@2x.webp`). The four Sea&City frames: 3.6MB → 1.1MB.
+`media/<project>/NN.webp` — one media library per project rather than per
+page. They arrive from Figma already cropped to their slot at 2x (a portrait
+is 798×1861 for a 399×930.5 slot), and go to WebP q80 through Pillow: the
+export as `NN@2x.webp` and half of it as `NN.webp`.
+
+## Index page — /index
+
+Rebuilt on the design-system blocks from `Desktop.pdf` (1920 wide): the
+intro, the full project table, eight cases as Content, the outro. Measured
+against the PDF, every block lands within 2px of its design position once the
+table is filled out.
+
+- **Table** — all rows of the old index, not the five of the template. One
+  exact duplicate (Self-initiated · Aluminium workshop · Event · Production)
+  is dropped. Rows keep the template's 28px height when they fit on one line.
+- **Cases** — Tamed form, Sila Vetra, AstroTour, RAUM, Yandex, LIM coffee,
+  Everytale, and Personal behind a rule. Raiffeisen and the NightCall bar are
+  not in this design and are gone from the page.
+- **Info-string** only where the design has text: Sila Vetra and AstroTour.
+  The old Russian INFO texts are not carried over.
+- **Copy fixes** against the PDF: `[Wave Lenght]` → Length, `Edducational
+  platfrom` → Educational platform, `streat` → street, `an journey` → a
+  journey, and a Cyrillic `а`/`А` typed into two English words.
+- **Sila Vetra** frames run 01, 02, 04, 03 — the design's order, not the
+  export numbering.
+- The outro is set in Inter in the design; it stays Source Sans, as before.
+- Everytale's video plays in a wide frame, cropped to it, by the same
+  `case.js` as before.
+
+36 photos: 78.9MB of PNG → 6.5MB of WebP. The old `assets/index/` files stay
+for `components.html`, which still shows the blocks they belong to.
 
 ## Line breaking
 

@@ -108,21 +108,44 @@
   gap: 12px;
 }
 
+/* A row keeps its two-line height when it fits on one, so the table steps
+   40px a row at every width, as the Figma Table does (rows fixed at 28). */
+.ds-table > .ds-unit { min-height: 28px; }
+
 /* --- Showcase ------------------------------------------------------------
-   Photos on a black field, 12 inside and between. They come in pairs: a
-   pair holds two photos side by side and never splits, and pairs wrap onto
-   the next row below 2 × 200px. So four photos are one row on a wide screen
-   and two by two on a phone. Every slot keeps the design's 193:415 portrait
-   and crops the photo to it; --pos moves the crop (object-position). */
+   Photos on a black field, 12 inside and between, laid out in rows.
+
+     <figure class="ds-showcase">
+       <div class="ds-showcase__row">          one wide frame
+         <div class="ds-showcase__item" style="--ar: 3264 / 1861"><img …></div>
+       </div>
+       <div class="ds-showcase__row">          four portraits, in two pairs
+         <div class="ds-showcase__pair">item item</div>
+         <div class="ds-showcase__pair">item item</div>
+       </div>
+     </figure>
+
+   Each slot carries its photo's proportion as --ar and grows by it, so the
+   frames in a row come out the same height whatever their mix — one wide,
+   two halves, three thirds or four quarters. Pairs never split and wrap
+   below 2 × 200px: four portraits are one row on a wide screen and two by
+   two on a phone. Without an --ar a slot takes the 193:415 portrait of the
+   Figma mobile Content; the photo is cropped to the slot, and --pos moves
+   the crop (object-position). */
 
 .ds-showcase {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   gap: 12px;
   margin: 0;
   padding: 12px;
   background: var(--ds-frame);
+}
+
+.ds-showcase__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .ds-showcase__pair {
@@ -133,13 +156,16 @@
 }
 
 .ds-showcase__item {
-  flex: 1 1 0;
+  --ar: 193 / 415.258;
+  /* Grow by the proportion, scaled up: flex-grow factors that sum below 1
+     leave part of the row empty, and two portraits sum to 0.9. */
+  flex: calc(var(--ar) * 100) 1 0%;
   min-width: 0;
-  aspect-ratio: 193 / 415.258;
+  aspect-ratio: var(--ar);
   overflow: hidden;
 }
 
-.ds-showcase__item img {
+.ds-showcase__item :is(img, video) {
   display: block;
   width: 100%;
   height: 100%;
@@ -186,3 +212,7 @@
   gap: 12px;
   padding: 4px;
 }
+
+/* The header's client column is the 410 text measure, not half the row, so
+   the project sets 420 in from the edge in every case on a page. */
+.ds-content > .ds-unit .ds-unit__client { flex: 0 1 410px; }

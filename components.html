@@ -198,13 +198,16 @@
     <div class="sg-doc">
       <div><h3>Состав</h3><ul>
         <li>Чёрное поле с отступом 12 вокруг и между кадрами.</li>
-        <li>Кадры идут парами (<code>__pair</code>), каждый — портретное окно 193:415.</li>
+        <li>Кадры собраны в ряды (<code>__row</code>). Ряд — один широкий кадр, две половины, три трети или четыре портрета в двух парах (<code>__pair</code>).</li>
+        <li>У каждого кадра своя пропорция <code>--ar</code> — по умолчанию 193:415 из мобильного макета.</li>
         <li>Каждая фотография — отдельный файл, в двух размерах для обычных и плотных экранов.</li>
       </ul></div>
       <div><h3>Поведение</h3><ul>
+        <li>Кадры в ряду растут пропорционально <code>--ar</code>, поэтому выходят одной высоты при любом составе ряда.</li>
         <li>Пара никогда не разрывается, а пары переносятся, когда на две не хватает 2×200.</li>
         <li>Четыре кадра — одна строка на широком экране, два на два на телефоне.</li>
-        <li>Фотография кадрируется в окно; точку кадрирования задаёт <code>--pos</code> — у кадра с дверью она смещена вправо, как в макете.</li>
+        <li>Фотография кадрируется в окно; точку кадрирования сдвигает <code>--pos</code>.</li>
+        <li>Вместо фотографии может стоять видео (<code>.ds-video</code>): оно стартует так же, как Video ниже.</li>
         <li>Грузится лениво.</li>
       </ul></div>
       <div class="sg-warn"><h3>Отличие от Shot</h3><ul>
@@ -217,13 +220,15 @@
         <div class="sg-label"><b>422</b> внутри Content на телефоне</div>
         <div class="sg-demo" style="max-width: calc(422px + 50px)" lang="en">
           <figure class="ds-showcase">
-            <div class="ds-showcase__pair">
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/walk.webp" srcset="media/sila-vetra-sea-city/walk.webp 1x, media/sila-vetra-sea-city/walk@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/sail.webp" srcset="media/sila-vetra-sea-city/sail.webp 1x, media/sila-vetra-sea-city/sail@2x.webp 2x" width="1350" height="900" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
-            </div>
-            <div class="ds-showcase__pair">
-              <div class="ds-showcase__item" style="--pos: 85.5% 50%"><img src="media/sila-vetra-sea-city/door.webp" srcset="media/sila-vetra-sea-city/door.webp 1x, media/sila-vetra-sea-city/door@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/bike.webp" srcset="media/sila-vetra-sea-city/bike.webp 1x, media/sila-vetra-sea-city/bike@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+            <div class="ds-showcase__row">
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+              </div>
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              </div>
             </div>
           </figure>
         </div>
@@ -232,16 +237,38 @@
         <div class="sg-label"><b>Шире 448</b> пары встают в одну строку</div>
         <div class="sg-demo" lang="en">
           <figure class="ds-showcase">
-            <div class="ds-showcase__pair">
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/walk.webp" srcset="media/sila-vetra-sea-city/walk.webp 1x, media/sila-vetra-sea-city/walk@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/sail.webp" srcset="media/sila-vetra-sea-city/sail.webp 1x, media/sila-vetra-sea-city/sail@2x.webp 2x" width="1350" height="900" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
-            </div>
-            <div class="ds-showcase__pair">
-              <div class="ds-showcase__item" style="--pos: 85.5% 50%"><img src="media/sila-vetra-sea-city/door.webp" srcset="media/sila-vetra-sea-city/door.webp 1x, media/sila-vetra-sea-city/door@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/bike.webp" srcset="media/sila-vetra-sea-city/bike.webp 1x, media/sila-vetra-sea-city/bike@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+            <div class="ds-showcase__row">
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+              </div>
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              </div>
             </div>
           </figure>
         </div>
+      </div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Ряды разной ширины</b> широкий кадр над четырьмя портретами · /index, Sila Vetra</div>
+      <div class="sg-demo" lang="en">
+        <figure class="ds-showcase">
+          <div class="ds-showcase__row">
+            <div class="ds-showcase__item" style="--ar: 3264 / 1861"><img src="media/sila-vetra-sea-city/00.webp" srcset="media/sila-vetra-sea-city/00.webp 1x, media/sila-vetra-sea-city/00@2x.webp 2x" width="1632" height="930" loading="lazy" decoding="async" alt="Sea&amp;City collection laid out on white"></div>
+          </div>
+          <div class="ds-showcase__row">
+            <div class="ds-showcase__pair">
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman by the sail"></div>
+            </div>
+            <div class="ds-showcase__pair">
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier"></div>
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+            </div>
+          </div>
+        </figure>
       </div>
     </div>
   </section>
@@ -332,13 +359,15 @@
               <div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration<br>Campaign<br>Cloth<br>Package</p><p class="ds-unit__role">Coordination<br>Production<br>Production<br>Design</p></div>
             </div>
             <figure class="ds-showcase">
-              <div class="ds-showcase__pair">
-                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/walk.webp" srcset="media/sila-vetra-sea-city/walk.webp 1x, media/sila-vetra-sea-city/walk@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
-                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/sail.webp" srcset="media/sila-vetra-sea-city/sail.webp 1x, media/sila-vetra-sea-city/sail@2x.webp 2x" width="1350" height="900" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
-              </div>
-              <div class="ds-showcase__pair">
-                <div class="ds-showcase__item" style="--pos: 85.5% 50%"><img src="media/sila-vetra-sea-city/door.webp" srcset="media/sila-vetra-sea-city/door.webp 1x, media/sila-vetra-sea-city/door@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
-                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/bike.webp" srcset="media/sila-vetra-sea-city/bike.webp 1x, media/sila-vetra-sea-city/bike@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              <div class="ds-showcase__row">
+                <div class="ds-showcase__pair">
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+                </div>
+                <div class="ds-showcase__pair">
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+                </div>
               </div>
             </figure>
             <div class="ds-info-string">
@@ -361,13 +390,15 @@
             <div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration<br>Campaign<br>Cloth<br>Package</p><p class="ds-unit__role">Coordination<br>Production<br>Production<br>Design</p></div>
           </div>
           <figure class="ds-showcase">
-            <div class="ds-showcase__pair">
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/walk.webp" srcset="media/sila-vetra-sea-city/walk.webp 1x, media/sila-vetra-sea-city/walk@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/sail.webp" srcset="media/sila-vetra-sea-city/sail.webp 1x, media/sila-vetra-sea-city/sail@2x.webp 2x" width="1350" height="900" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
-            </div>
-            <div class="ds-showcase__pair">
-              <div class="ds-showcase__item" style="--pos: 85.5% 50%"><img src="media/sila-vetra-sea-city/door.webp" srcset="media/sila-vetra-sea-city/door.webp 1x, media/sila-vetra-sea-city/door@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
-              <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/bike.webp" srcset="media/sila-vetra-sea-city/bike.webp 1x, media/sila-vetra-sea-city/bike@2x.webp 2x" width="900" height="1350" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+            <div class="ds-showcase__row">
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+              </div>
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              </div>
             </div>
           </figure>
           <div class="ds-info-string">

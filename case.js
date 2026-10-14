@@ -2,7 +2,7 @@
    Loads eagerly, starts one second after it comes into view, then loops.
    Muted + playsinline are what make autoplay permitted at all. */
 (function () {
-  var videos = document.querySelectorAll('.case-video');
+  var videos = document.querySelectorAll('.case-video, .ds-video');
   if (!videos.length) return;
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
