@@ -1,0 +1,224 @@
+/* ---------------------------------------------------------------------------
+   /components.html — the catalogue of blocks.
+
+   Everything prefixed sg- is the documentation around the specimens. The
+   specimens themselves are drawn by styles.css and case.css, untouched, so a
+   change to either shows up here at once. The few rules that reach into a
+   specimen are at the bottom, each with the reason it has to.
+   --------------------------------------------------------------------------- */
+
+.sg-page {
+  --sg-ink: #111;
+  --sg-dim: #6b6b6b;
+  --sg-line: #e4e4e1;
+  --sg-wash: #f4f4f1;
+  --sg-gutter: 32px;
+  --sg-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sg-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  padding: 0 var(--sg-gutter) 160px;
+}
+
+/* The page body is Source Sans 20/20 grey at -4%; the documentation steps out
+   of that so it can never be mistaken for a specimen. */
+.sg-top,
+.sg-nav,
+.sg-head,
+.sg-doc,
+.sg-label,
+.sg-note,
+.sg-table {
+  font: 400 13px/1.5 var(--sg-font);
+  letter-spacing: 0;
+  color: var(--sg-ink);
+}
+
+.sg-page code {
+  font: 400 12px/1.4 var(--sg-mono);
+  letter-spacing: 0;
+  background: var(--sg-wash);
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* --- top ------------------------------------------------------------------ */
+
+.sg-top { padding: 40px 0 28px; max-width: 760px; }
+.sg-top h1 { margin: 0; font: 600 28px/1.15 var(--sg-font); letter-spacing: -0.01em; }
+.sg-top p { margin-top: 12px; color: var(--sg-dim); }
+.sg-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 0; padding: 0; list-style: none; }
+.sg-legend li { display: flex; gap: 8px; align-items: baseline; color: var(--sg-dim); }
+
+.sg-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 18px;
+  margin: 0 calc(-1 * var(--sg-gutter));
+  padding: 11px var(--sg-gutter);
+  overflow-x: auto;
+  white-space: nowrap;
+  background: #fff;
+  border-block: 1px solid var(--sg-line);
+}
+.sg-nav a { color: var(--sg-ink); }
+.sg-nav a:hover { text-decoration: underline; }
+
+/* --- one component -------------------------------------------------------- */
+
+.sg-comp { padding-top: 72px; scroll-margin-top: 44px; }
+.sg-comp + .sg-comp { margin-top: 72px; border-top: 1px solid var(--sg-line); }
+
+.sg-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.sg-num { font-family: var(--sg-mono); font-size: 12px; color: var(--sg-dim); }
+.sg-name { font: 600 22px/1.2 var(--sg-font); letter-spacing: -0.01em; }
+.sg-where { flex-basis: 100%; color: var(--sg-dim); }
+
+.sg-tag {
+  font: 600 10.5px/1 var(--sg-font);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 6px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.sg-tag--shared { background: #111; color: #fff; }
+.sg-tag--unique { border-color: #b9b9b5; color: #555; }
+.sg-tag--dup    { background: #fdebd3; color: #8a4500; }
+.sg-tag--home   { background: #e6effe; color: #24508f; }
+
+.sg-doc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 20px 40px;
+  max-width: 1240px;
+  margin-top: 22px;
+}
+.sg-doc h3 {
+  margin: 0 0 6px;
+  font: 600 10.5px/1.4 var(--sg-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sg-dim);
+}
+.sg-doc ul { margin: 0; padding: 0 0 0 1.1em; }
+.sg-doc li + li { margin-top: 4px; }
+.sg-doc .sg-warn h3 { color: #8a4500; }
+
+/* --- variants and specimens ----------------------------------------------- */
+
+.sg-var { margin-top: 28px; min-width: 0; }
+
+.sg-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--sg-min, 440px)), 1fr));
+  gap: 24px;
+  align-items: start;
+  margin-top: 28px;
+}
+.sg-row > .sg-var { margin-top: 0; }
+
+.sg-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 8px;
+  color: var(--sg-dim);
+}
+.sg-label b { font-weight: 600; color: var(--sg-ink); }
+
+.sg-demo {
+  border: 1px dashed #cfcfca;
+  padding: 24px;
+  overflow-x: auto;
+}
+.sg-demo--narrow { max-width: 760px; }
+
+/* Specimens at the Figma frame width: the box is the frame plus the 24px
+   padding and the 1px border on each side, so the content inside is exact. */
+.sg-demo--410 { max-width: calc(410px + 50px); }
+.sg-demo--430 { max-width: calc(430px + 50px); }
+
+.sg-note { margin-top: 8px; color: var(--sg-dim); max-width: 760px; }
+
+/* --- groups --------------------------------------------------------------- */
+
+.sg-group {
+  margin-top: 96px;
+  padding: 20px 0 0;
+  border-top: 3px solid var(--sg-ink);
+  font: 400 13px/1.5 var(--sg-font);
+  letter-spacing: 0;
+  color: var(--sg-ink);
+}
+.sg-group:first-of-type { margin-top: 48px; }
+.sg-group h2 { font: 600 28px/1.15 var(--sg-font); letter-spacing: -0.01em; }
+.sg-group p { margin-top: 8px; max-width: 760px; color: var(--sg-dim); }
+.sg-group + .sg-comp { padding-top: 48px; }
+
+.sg-nav__sep { color: #b9b9b5; }
+
+.sg-btn {
+  font: 500 12px/1 var(--sg-font);
+  letter-spacing: 0;
+  color: var(--sg-ink);
+  background: #fff;
+  border: 1px solid #b9b9b5;
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.sg-btn:hover { background: var(--sg-wash); }
+
+/* --- tokens --------------------------------------------------------------- */
+
+.sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px 24px; }
+.sg-swatch { display: flex; align-items: center; gap: 10px; }
+.sg-chip { flex: none; width: 36px; height: 36px; border: 1px solid var(--sg-line); }
+.sg-swatch .sg-label { display: block; margin: 0; }
+
+.sg-table { border-collapse: collapse; margin-top: 8px; }
+.sg-table th,
+.sg-table td { padding: 5px 24px 5px 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--sg-line); }
+.sg-table th { font-weight: 600; color: var(--sg-dim); }
+
+/* --- rules that reach into the specimens ----------------------------------
+
+   1. Context. Blocks read their measure, gaps and colour from the .case wrapper
+      and its page modifier, so each specimen sits in the wrapper of the page it
+      comes from. The wrapper's own page margins and width cap are dropped, and
+      it becomes the container the Unit folds against — on a real page that is
+      `.case main`. */
+.sg-demo > .case {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  container: units / inline-size;
+}
+
+/* 2. The gap above a block belongs to whatever precedes it on a page; here
+      nothing does. Gaps inside a block are left alone. */
+.sg-demo > :first-child,
+.sg-demo > .case > :first-child,
+.sg-home > :first-child { margin-top: 0; }
+.sg-home .block__title { margin-top: 0; }
+
+/* 3. The business-card blocks are sized in design pixels times --u, which
+      case.css pins to 1px. Give them back a --u that fits the 430px design into
+      the specimen, capped at 1:1, so they scale here as they do on a phone. */
+.sg-home {
+  --u: min(calc((100vw - 2 * var(--sg-gutter) - 50px) / 430), 1px);
+  font-size: calc(var(--fs-body) * var(--u));
+  line-height: calc(var(--fs-body) * var(--u));
+}
+
+@media (max-width: 700px) {
+  .sg-page { --sg-gutter: 16px; }
+  .sg-demo { padding: 16px; }
+  .sg-comp { padding-top: 48px; }
+  .sg-comp + .sg-comp { margin-top: 48px; }
+}

@@ -1,0 +1,188 @@
+/* ---------------------------------------------------------------------------
+   Design system — the blocks pages are assembled from.
+
+   Ported from Figma "— Kirill Snegur • site —>", canvas Components (292:16).
+   Every block is fluid: widths come from the container, and rows rewrap by
+   min-widths instead of being scaled. Nothing here reads --u.
+
+   Classes are prefixed ds- so the kit can sit next to case.css while the old
+   pages still use it. Font faces and the base colour come from styles.css.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Unit and Table are set in ABC Diatype Cyrillic. It is a commercial face
+     installed on the design machine, not served from assets/: without a web
+     licence it renders only where it is installed, and falls back to Source
+     Sans 3 everywhere else. */
+  --ds-font-grotesk: "ABC Diatype Cyrillic", "Source Sans 3", system-ui, sans-serif;
+  --ds-font-caption: "Source Sans Pro", "Source Sans 3", system-ui, sans-serif;
+
+  --ds-ink: #000;
+  --ds-ink-caption: #2f2b28;
+  --ds-frame: #000;
+}
+
+/* --- Unit ----------------------------------------------------------------
+   One project in one line of four: client, project, format, role. The same
+   markup for every variant; the variant only changes size and how the cells
+   wrap.
+
+     <div class="ds-unit [ds-unit--compact] [ds-unit--end]">
+       <p class="ds-unit__year">2026</p>          optional
+       <p class="ds-unit__client">…</p>
+       <div class="ds-unit__options">
+         <p class="ds-unit__project">…</p>
+         <p class="ds-unit__format">…</p>
+         <p class="ds-unit__role">…</p>
+       </div>
+     </div>
+
+   Cells wrap by their minimum widths, so a Unit is one line wherever the
+   row is wide enough and folds on its own where it is not — no breakpoint. */
+
+.ds-unit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 10px;
+  font-family: var(--ds-font-grotesk);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 20px;
+  letter-spacing: -0.04em;
+  color: var(--ds-ink);
+}
+
+/* Any cell may be a heading — the client is one when the Unit heads a case. */
+.ds-unit :is(p, h2, h3, h4) {
+  margin: 0;
+  font: inherit;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+/* Default, 20/20 — a case header. The options wrapper steps aside so all four
+   cells share one row: client and project split the room, format and role
+   are fixed. At 410 that is client + project, then format + role. */
+.ds-unit__options { display: contents; }
+.ds-unit__client,
+.ds-unit__project { flex: 1 1 0; min-width: min(200px, 100%); }
+.ds-unit__year    { flex: none; width: 48px; }
+
+/* Format and role hold their design widths wherever there is room. Below the
+   430 frame — a 375 phone — they give way rather than push the row past the
+   edge, and their words wrap inside the narrower cell. */
+.ds-unit__format  { flex: 0 1 140px; min-width: 0; }
+.ds-unit__role    { flex: 0 1 190px; min-width: 0; }
+
+/* Compact, 13/12 — a table row. The client gets a line of its own until the
+   row reaches 650px; project, format and role travel together as a group. */
+.ds-unit--compact {
+  font-size: 13px;
+  line-height: 12px;
+}
+.ds-unit--compact .ds-unit__client { min-width: min(320px, 100%); }
+.ds-unit--compact .ds-unit__options {
+  display: flex;
+  flex: 1 1 0;
+  gap: 4px;
+  min-width: min(320px, 100%);
+}
+.ds-unit--compact .ds-unit__project { min-width: min(120px, 100%); }
+.ds-unit--compact .ds-unit__format,
+.ds-unit--compact .ds-unit__role { flex-basis: 120px; }
+
+/* With a year in front, the design spaces the three options by the full 10. */
+.ds-unit--compact:has(.ds-unit__year) .ds-unit__options { gap: 10px; }
+
+/* Format and role set flush right — the dated row and the Content header. */
+.ds-unit--end .ds-unit__format,
+.ds-unit--end .ds-unit__role { text-align: right; }
+
+/* --- Table ---------------------------------------------------------------
+   A stack of compact Units, 12 apart. */
+
+.ds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Showcase ------------------------------------------------------------
+   Photos on a black field, 12 inside and between. They come in pairs: a
+   pair holds two photos side by side and never splits, and pairs wrap onto
+   the next row below 2 × 200px. So four photos are one row on a wide screen
+   and two by two on a phone. Every slot keeps the design's 193:415 portrait
+   and crops the photo to it; --pos moves the crop (object-position). */
+
+.ds-showcase {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px;
+  background: var(--ds-frame);
+}
+
+.ds-showcase__pair {
+  display: flex;
+  flex: 1 1 0;
+  gap: 12px;
+  min-width: min(200px, 100%);
+}
+
+.ds-showcase__item {
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: 193 / 415.258;
+  overflow: hidden;
+}
+
+.ds-showcase__item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--pos, 50% 50%);
+}
+
+/* --- Info-string ---------------------------------------------------------
+   A case description as short paragraphs laid side by side: each takes
+   320–420px and they wrap like words, so a phone stacks them and a wide
+   screen sets them in a row. Text-box trim takes the half-leading off top
+   and bottom, so the 12px gaps run cap height to baseline as in Figma;
+   browsers without it show slightly looser gaps. */
+
+.ds-info-string {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 32px;
+  font-family: var(--ds-font-caption);
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 12px;
+  letter-spacing: -0.05em;
+  color: var(--ds-ink-caption);
+}
+
+.ds-info-string p {
+  flex: 1 1 0;
+  min-width: min(320px, 100%);
+  max-width: 420px;
+  margin: 0;
+  text-wrap: balance;
+  text-box: trim-both cap alphabetic;
+}
+
+/* --- Content -------------------------------------------------------------
+   One case: a Unit as its header, the Showcase, the Info-string. 12 between
+   them and 4 around. */
+
+.ds-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px;
+}

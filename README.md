@@ -157,6 +157,29 @@ sharp to WebP q80 at 800 and 1600px wide, with EXIF orientation baked in.
 **20MB → 2.1MB.** To add a photo: compress it the same way and add a `<figure>`
 with its `--ar` (width / height) to a row.
 
+## Design system — ds.css
+
+The blocks new pages are to be assembled from, ported from the Figma canvas
+**Components** (node `292:16`): Unit, Table, Showcase, Info-string and Content,
+which is one case built from the other three. All of them are on
+`components.html`, next to the blocks the current pages use.
+
+Unlike `styles.css`, nothing here scales by `--u`. Every block is fluid and
+rewraps by min-widths, so it fits any container without a breakpoint: a
+compact Unit is two lines at 430 and one from 650, the Showcase is two by two
+on a phone and one row from 448, the Info-string paragraphs stack or sit side
+by side. Classes carry a `ds-` prefix so the kit can load beside `case.css`.
+
+Unit and Table are set in **ABC Diatype Cyrillic**, a commercial face. It is
+not in `assets/`: it renders only where it is installed and falls back to
+Source Sans 3 elsewhere, until there is a web licence to self-host it.
+
+Showcase photos are separate files, not a flattened block export, under
+`media/<project>/` — the first step towards one media library per project
+rather than per page. Exported from Figma as PNG, then WebP q80 through Pillow
+at two sizes: short side 900 (`name.webp`) and the 2000px export
+(`name@2x.webp`). The four Sea&City frames: 3.6MB → 1.1MB.
+
 ## Line breaking
 
 Line breaks are not hard-coded. Every multi-line block uses `text-wrap: balance`,
