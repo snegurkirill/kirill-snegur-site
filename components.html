@@ -1,0 +1,1536 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Компоненты — Кирилл Снегур</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="case.css">
+<link rel="stylesheet" href="ds.css">
+<link rel="stylesheet" href="components.css">
+<script src="info.js"></script>
+</head>
+<body>
+<div class="sg-page">
+
+  <header class="sg-top">
+    <h1>Компоненты</h1>
+    <p>Все блоки сайта на настоящих стилях: образцы рисуют <code>styles.css</code> и <code>case.css</code>, поэтому любая правка в них сразу видна здесь. Пунктирная рамка — граница образца, она показывает, сколько места блок занимает сам и где кончается его текстовая колонка.</p>
+    <ul class="sg-legend">
+      <li><span class="sg-tag sg-tag--shared">общий</span> стоит на нескольких страницах</li>
+      <li><span class="sg-tag sg-tag--dup">дубль</span> один смысл, несколько реализаций</li>
+      <li><span class="sg-tag sg-tag--unique">уникальный</span> одна страница</li>
+      <li><span class="sg-tag sg-tag--home">визитка</span> только <code>/</code> и <code>/ru/</code></li>
+    </ul>
+  </header>
+
+  <nav class="sg-nav" aria-label="Компоненты">
+    <a href="#ds-unit">Unit</a>
+    <a href="#ds-table">Table</a>
+    <a href="#ds-showcase">Showcase</a>
+    <a href="#ds-info-string">Info-string</a>
+    <a href="#ds-content">Content</a>
+    <span class="sg-nav__sep" aria-hidden="true">|</span>
+    <a href="#tokens">Основа</a>
+    <a href="#signature">Подпись</a>
+    <a href="#intro">Intro</a>
+    <a href="#masthead">Masthead</a>
+    <a href="#cards">Тезис и карточки</a>
+    <a href="#section">Section</a>
+    <a href="#case-head">Заголовок кейса</a>
+    <a href="#credits">Credits</a>
+    <a href="#shot">Shot</a>
+    <a href="#video">Video</a>
+    <a href="#unit">Unit</a>
+    <a href="#table">Table</a>
+    <a href="#info">Info</a>
+    <a href="#cv">CV</a>
+    <a href="#lists">Списки</a>
+    <a href="#sched">Расписание</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#outro">Outro</a>
+    <a href="#links">Ссылки</a>
+  </nav>
+
+  <div class="sg-group">
+    <h2>Дизайн-система</h2>
+    <p>Новые блоки из Figma, канвас Components (<code>292:16</code>). Стили в <code>ds.css</code>, классы с префиксом <code>ds-</code>, чтобы не пересекаться со старыми страницами. Блоки резиновые: ширину задаёт контейнер, строки перестраиваются сами, без масштабирования. Слева — ширина макета, справа или ниже — во всю ширину.</p>
+  </div>
+
+  <!-- ============================================================== ds 01 -->
+  <section class="sg-comp" id="ds-unit">
+    <div class="sg-head">
+      <span class="sg-num">ds 01</span>
+      <h2 class="sg-name">Unit</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Figma <code>311:95</code>. Класс <code>.ds-unit</code>, варианты <code>--compact</code>, <code>--end</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Четыре ячейки: клиент, проект, формат, роль; перед ними может стоять год.</li>
+        <li>Проект, формат и роль собраны в группу <code>__options</code>.</li>
+        <li>Разметка одна на все варианты — вариант меняет только кегль и то, как ячейки переносятся.</li>
+        <li>Шрифт ABC Diatype Cyrillic, чёрный.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li><b>Основной</b>, 20/20 — шапка кейса. Клиент и проект делят строку (от 200 каждый), формат 140 и роль 190 фиксированы. В 410 — две строки, от 760 — одна.</li>
+        <li><b><code>--compact</code></b>, 13/12 — строка таблицы. Клиент на своей строке, под ним группа «проект 120+ · формат 120 · роль 120». От 650 всё в одну строку.</li>
+        <li><b>С годом</b> — compact с ячейкой года 48 впереди, группа разведена на 10 вместо 4.</li>
+        <li><b><code>--end</code></b> — формат и роль выключены вправо.</li>
+        <li>Перенос — по минимальным ширинам ячеек, без медиазапросов: блок подстраивается под любой контейнер.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
+        <li>В Figma варианты называются Default / Variant2 / Variant3 — здесь основной, compact и «с годом».</li>
+        <li>В Table формат и роль стоят влево, в Content и в варианте с годом — вправо. Сделал так же, через <code>--end</code>; если это одно правило, оставлю один вариант.</li>
+        <li>Diatype — коммерческий шрифт. Он установлен у вас и виден здесь, но для сайта нужна веб-лицензия. Без неё у посетителей будет Source Sans 3.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 460px">
+      <div class="sg-var">
+        <div class="sg-label"><b>Основной</b> 410 · <code>311:94</code></div>
+        <div class="sg-demo sg-demo--410" lang="en">
+          <div class="ds-unit">
+            <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
+            <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>--compact</code></b> 410 · <code>311:96</code></div>
+        <div class="sg-demo sg-demo--410" lang="en">
+          <div class="ds-unit ds-unit--compact">
+            <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
+            <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>С годом, <code>--end</code></b> 410 · <code>315:569</code></div>
+        <div class="sg-demo sg-demo--410" lang="en">
+          <div class="ds-unit ds-unit--compact ds-unit--end">
+            <p class="ds-unit__year">2026</p>
+            <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
+            <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Те же три во всю ширину</b> каждый складывается в одну строку</div>
+      <div class="sg-demo" lang="en">
+        <div class="ds-unit">
+          <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
+          <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
+        </div>
+        <br>
+        <div class="ds-unit ds-unit--compact">
+          <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
+          <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
+        </div>
+        <br>
+        <div class="ds-unit ds-unit--compact ds-unit--end">
+          <p class="ds-unit__year">2026</p>
+          <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
+          <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== ds 02 -->
+  <section class="sg-comp" id="ds-table">
+    <div class="sg-head">
+      <span class="sg-num">ds 02</span>
+      <h2 class="sg-name">Table</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Figma <code>320:1609</code>. Класс <code>.ds-table</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Стопка Unit в варианте <code>--compact</code>.</li>
+        <li>Без шапки колонок и линий.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Записи идут через 12.</li>
+        <li>На телефоне запись занимает две строки, на широком экране — одну, и таблица становится вчетверо короче.</li>
+        <li>Длинный проект переносится внутри своей ячейки, соседние колонки не сдвигаются.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
+        <li>Фрейм в Figma 272 шириной — уже минимальной строки (320). Принял это за размер фрейма: таблица берёт ширину контейнера.</li>
+        <li>Пятая строка в макете повторяет первую; в образце она заменена строкой LIM.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+        <div class="sg-label"><b>430</b> ширина макета</div>
+        <div class="sg-demo sg-demo--430" lang="en">
+          <div class="ds-table">
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Sila Vetra</p><div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration</p><p class="ds-unit__role">Coordination</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Mark Yavorsky, Elizaveta Alifirenko</p><div class="ds-unit__options"><p class="ds-unit__project">Trubnaya 2</p><p class="ds-unit__format">Art advisory</p><p class="ds-unit__role">Coordination</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Dmitriy Markin</p><div class="ds-unit__options"><p class="ds-unit__project">Tverskaya 9</p><p class="ds-unit__format">Public space</p><p class="ds-unit__role">Product strategy</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">LIM coffee</p><div class="ds-unit__options"><p class="ds-unit__project">Vending machine</p><p class="ds-unit__format">Presentations</p><p class="ds-unit__role">Design</p></div></div>
+          </div>
+        </div>
+    </div>
+    <div class="sg-var">
+        <div class="sg-label"><b>Во всю ширину</b> запись в одну строку</div>
+        <div class="sg-demo" lang="en">
+          <div class="ds-table">
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Sila Vetra</p><div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration</p><p class="ds-unit__role">Coordination</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Mark Yavorsky, Elizaveta Alifirenko</p><div class="ds-unit__options"><p class="ds-unit__project">Trubnaya 2</p><p class="ds-unit__format">Art advisory</p><p class="ds-unit__role">Coordination</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Dmitriy Markin</p><div class="ds-unit__options"><p class="ds-unit__project">Tverskaya 9</p><p class="ds-unit__format">Public space</p><p class="ds-unit__role">Product strategy</p></div></div>
+            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">LIM coffee</p><div class="ds-unit__options"><p class="ds-unit__project">Vending machine</p><p class="ds-unit__format">Presentations</p><p class="ds-unit__role">Design</p></div></div>
+          </div>
+        </div>
+      </div>
+  </section>
+
+  <!-- ============================================================== ds 03 -->
+  <section class="sg-comp" id="ds-showcase">
+    <div class="sg-head">
+      <span class="sg-num">ds 03</span>
+      <h2 class="sg-name">Showcase</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Figma <code>319:983</code> (внутри Content). Класс <code>.ds-showcase</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Чёрное поле с отступом 12 вокруг и между кадрами.</li>
+        <li>Кадры собраны в ряды (<code>__row</code>). Ряд — один широкий кадр, две половины, три трети или четыре портрета в двух парах (<code>__pair</code>).</li>
+        <li>У каждого кадра своя пропорция <code>--ar</code> — по умолчанию 193:415 из мобильного макета.</li>
+        <li>Каждая фотография — отдельный файл, в двух размерах для обычных и плотных экранов.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Кадры в ряду растут пропорционально <code>--ar</code>, поэтому выходят одной высоты при любом составе ряда.</li>
+        <li>Пара никогда не разрывается, а пары переносятся, когда на две не хватает 2×200.</li>
+        <li>Четыре кадра — одна строка на широком экране, два на два на телефоне.</li>
+        <li>Фотография кадрируется в окно; точку кадрирования сдвигает <code>--pos</code>.</li>
+        <li>Вместо фотографии может стоять видео (<code>.ds-video</code>): оно стартует так же, как Video ниже.</li>
+        <li>Грузится лениво.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличие от Shot</h3><ul>
+        <li>Раскладку строит страница, а не экспорт из макета: фото меняются по одному, а на телефоне они вдвое крупнее, чем были в склеенной картинке.</li>
+        <li>В Figma это часть Content, а не отдельный компонент. Вынес отдельно, потому что он нужен и без Info-string.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 480px">
+      <div class="sg-var">
+        <div class="sg-label"><b>422</b> внутри Content на телефоне</div>
+        <div class="sg-demo" style="max-width: calc(422px + 50px)" lang="en">
+          <figure class="ds-showcase">
+            <div class="ds-showcase__row">
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+              </div>
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              </div>
+            </div>
+          </figure>
+        </div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Шире 448</b> пары встают в одну строку</div>
+        <div class="sg-demo" lang="en">
+          <figure class="ds-showcase">
+            <div class="ds-showcase__row">
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+              </div>
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              </div>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Ряды разной ширины</b> широкий кадр над четырьмя портретами · /index, Sila Vetra</div>
+      <div class="sg-demo" lang="en">
+        <figure class="ds-showcase">
+          <div class="ds-showcase__row">
+            <div class="ds-showcase__item" style="--ar: 3264 / 1861"><img src="media/sila-vetra-sea-city/00.webp" srcset="media/sila-vetra-sea-city/00.webp 1x, media/sila-vetra-sea-city/00@2x.webp 2x" width="1632" height="930" loading="lazy" decoding="async" alt="Sea&amp;City collection laid out on white"></div>
+          </div>
+          <div class="ds-showcase__row">
+            <div class="ds-showcase__pair">
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman by the sail"></div>
+            </div>
+            <div class="ds-showcase__pair">
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier"></div>
+              <div class="ds-showcase__item" style="--ar: 798 / 1861"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== ds 04 -->
+  <section class="sg-comp" id="ds-info-string">
+    <div class="sg-head">
+      <span class="sg-num">ds 04</span>
+      <h2 class="sg-name">Info-string</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Figma <code>320:1518</code>. Класс <code>.ds-info-string</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Описание кейса короткими абзацами — по одной мысли в каждом.</li>
+        <li>Source Sans Pro 13/12, трекинг −5%, цвет #2F2B28.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Абзацы стоят рядом, как слова в строке: каждый от 320 до 420, между ними 32.</li>
+        <li>На телефоне встают столбиком через 12, на широком экране — в ряд.</li>
+        <li>Всегда открыт, в отличие от старого Info.</li>
+        <li>Верх и низ строки подрезаны по высоте прописной и базовой линии, поэтому зазор 12 считается от букв, как в Figma. Браузеры, которые этого не умеют, покажут зазоры чуть свободнее.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
+        <li>Стиль в Figma называется Regular-14, но задан 13/12 — имя расходится со значением.</li>
+        <li>#2F2B28 — новый цвет, раньше его в системе не было.</li>
+        <li>В макете «for streat» — исправил на «street».</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 480px">
+      <div class="sg-var">
+        <div class="sg-label"><b>430</b> столбиком</div>
+        <div class="sg-demo sg-demo--430" lang="en">
+          <div class="ds-info-string">
+            <p>Sea&amp;City collection, from the international sailing community, fits for water areas as well as for street.</p>
+            <p>These everyday items, featuring illustrations by Arthur Zima, serve as a reminder of adventures past and future.</p>
+            <p>Specialised accessories to help you on your travels and on the boat, including the CapCord, which was developed from scratch.</p>
+            <p>Collaboration with Shulz and 99 Recycle studios&nbsp;— a bicycle as land vehicle and a keyring made from recycled plastic.</p>
+            <p>Promotional photoshoot&nbsp;– a day in the life of a couple who lead an active lifestyle whatever the circumstances.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Во всю ширину</b> в ряд, в Figma <code>320:1518</code> — 1849</div>
+      <div class="sg-demo" lang="en">
+        <div class="ds-info-string">
+          <p>Sea&amp;City collection, from the international sailing community, fits for water areas as well as for street.</p>
+          <p>These everyday items, featuring illustrations by Arthur Zima, serve as a reminder of adventures past and future.</p>
+          <p>Specialised accessories to help you on your travels and on the boat, including the CapCord, which was developed from scratch.</p>
+          <p>Collaboration with Shulz and 99 Recycle studios&nbsp;— a bicycle as land vehicle and a keyring made from recycled plastic.</p>
+          <p>Promotional photoshoot&nbsp;– a day in the life of a couple who lead an active lifestyle whatever the circumstances.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== ds 05 -->
+  <section class="sg-comp" id="ds-content">
+    <div class="sg-head">
+      <span class="sg-num">ds 05</span>
+      <h2 class="sg-name">Content</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Figma <code>319:999</code>. Класс <code>.ds-content</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Один кейс целиком: Unit <code>--compact --end</code> как шапка, Showcase, Info-string.</li>
+        <li>Отступ 4 вокруг, 12 между частями.</li>
+        <li>В ячейках формата и роли — несколько строк, по одной на каждую роль.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Части перестраиваются каждая по-своему: шапка в одну строку от 650, фото в ряд от 448, описание в ряд, когда помещается по 320.</li>
+        <li>Заменяет связку старых блоков Unit + Shot + Info.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
+        <li>Расстояние между кейсами на странице в макете не задано.</li>
+        <li>На ширине 1664 описание выстроится в четыре колонки и пятый абзац уйдёт на вторую строку; если нужен ровный ряд — стоит решить, сколько абзацев допустимо.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 480px">
+      <div class="sg-var">
+        <div class="sg-label"><b>430</b> как в макете</div>
+        <div class="sg-demo sg-demo--430" lang="en">
+          <article class="ds-content">
+            <div class="ds-unit ds-unit--compact ds-unit--end">
+              <h3 class="ds-unit__client">Sila Vetra</h3>
+              <div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration<br>Campaign<br>Cloth<br>Package</p><p class="ds-unit__role">Coordination<br>Production<br>Production<br>Design</p></div>
+            </div>
+            <figure class="ds-showcase">
+              <div class="ds-showcase__row">
+                <div class="ds-showcase__pair">
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+                </div>
+                <div class="ds-showcase__pair">
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                  <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+                </div>
+              </div>
+            </figure>
+            <div class="ds-info-string">
+              <p>Sea&amp;City collection, from the international sailing community, fits for water areas as well as for street.</p>
+              <p>These everyday items, featuring illustrations by Arthur Zima, serve as a reminder of adventures past and future.</p>
+              <p>Specialised accessories to help you on your travels and on the boat, including the CapCord, which was developed from scratch.</p>
+              <p>Collaboration with Shulz and 99 Recycle studios&nbsp;— a bicycle as land vehicle and a keyring made from recycled plastic.</p>
+              <p>Promotional photoshoot&nbsp;– a day in the life of a couple who lead an active lifestyle whatever the circumstances.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Во всю ширину</b> та же разметка</div>
+      <div class="sg-demo" lang="en">
+        <article class="ds-content">
+          <div class="ds-unit ds-unit--compact ds-unit--end">
+            <h3 class="ds-unit__client">Sila Vetra</h3>
+            <div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration<br>Campaign<br>Cloth<br>Package</p><p class="ds-unit__role">Coordination<br>Production<br>Production<br>Design</p></div>
+          </div>
+          <figure class="ds-showcase">
+            <div class="ds-showcase__row">
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/01.webp" srcset="media/sila-vetra-sea-city/01.webp 1x, media/sila-vetra-sea-city/01@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple walking along the embankment"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/02.webp" srcset="media/sila-vetra-sea-city/02.webp 1x, media/sila-vetra-sea-city/02@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a woman in sunglasses and a vest by the sail"></div>
+              </div>
+              <div class="ds-showcase__pair">
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/03.webp" srcset="media/sila-vetra-sea-city/03.webp 1x, media/sila-vetra-sea-city/03@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a couple stepping out of a building"></div>
+                <div class="ds-showcase__item"><img src="media/sila-vetra-sea-city/04.webp" srcset="media/sila-vetra-sea-city/04.webp 1x, media/sila-vetra-sea-city/04@2x.webp 2x" width="399" height="930" loading="lazy" decoding="async" alt="Sea&amp;City: a folding bicycle on the pier, sails beyond"></div>
+              </div>
+            </div>
+          </figure>
+          <div class="ds-info-string">
+            <p>Sea&amp;City collection, from the international sailing community, fits for water areas as well as for street.</p>
+            <p>These everyday items, featuring illustrations by Arthur Zima, serve as a reminder of adventures past and future.</p>
+            <p>Specialised accessories to help you on your travels and on the boat, including the CapCord, which was developed from scratch.</p>
+            <p>Collaboration with Shulz and 99 Recycle studios&nbsp;— a bicycle as land vehicle and a keyring made from recycled plastic.</p>
+            <p>Promotional photoshoot&nbsp;– a day in the life of a couple who lead an active lifestyle whatever the circumstances.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="sg-group">
+    <h2>Действующие блоки</h2>
+    <p>То, из чего собраны страницы сейчас: <code>styles.css</code> и <code>case.css</code>. Новые блоки выше со временем заменят их.</p>
+  </div>
+
+  <!-- ================================================================== 00 -->
+  <section class="sg-comp" id="tokens">
+    <div class="sg-head">
+      <span class="sg-num">00</span>
+      <h2 class="sg-name">Основа</h2>
+      <p class="sg-where">Цвет, шрифт и шаги отступов, из которых собраны все блоки ниже.</p>
+    </div>
+
+    <div class="sg-var">
+      <div class="sg-label"><b>Цвета</b> первые четыре — токены в <code>styles.css</code>, остальные записаны числом прямо в блоках</div>
+      <div class="sg-swatches">
+        <div class="sg-swatch"><span class="sg-chip" style="background:#a9a9a9"></span><div class="sg-label"><b>#A9A9A9</b><br><code>--ink</code> основной текст</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#000"></span><div class="sg-label"><b>#000000</b><br><code>--ink-strong</code> Unit, Info, CV</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#7eb0ff"></span><div class="sg-label"><b>#7EB0FF</b><br><code>--link</code> ссылки, заголовки кейсов</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#d9d9d9"></span><div class="sg-label"><b>#D9D9D9</b><br><code>--stroke</code> обводка карточек</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#b3b3b3"></span><div class="sg-label"><b>#B3B3B3</b><br>серые подписи (внутри SVG)</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#7f7f7f"></span><div class="sg-label"><b>#7F7F7F</b><br><code>--cv-muted</code> периоды, навыки</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#737373"></span><div class="sg-label"><b>#737373</b><br>результаты и пометки в CV</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#232222"></span><div class="sg-label"><b>#232222</b><br><code>.case-ink</code> ответы на /margarita-pushkina</div></div>
+        <div class="sg-swatch"><span class="sg-chip" style="background:#638ece"></span><div class="sg-label"><b>#638ECE</b><br><code>--cv-accent</code> задачи в CV</div></div>
+      </div>
+      <p class="sg-note">Пять серых и два синих. Чёрный текст тоже двух видов: #000 и #232222.</p>
+    </div>
+
+    <div class="sg-var">
+      <div class="sg-label"><b>Шрифт</b> три начертания на весь сайт</div>
+      <div class="sg-demo">
+        <p>Regular-20 — Source Sans 3, вес 420, 20/20, трекинг −4%. Весь текст по умолчанию.</p>
+        <p class="case-credits__role">Тот же кегль, вес 600 — роль в Credits, периоды и названия проектов в CV.</p>
+        <figure class="project"><figcaption>Regular-14 — Source Sans Pro, 14/auto, −5%. Только подписи карточек на визитке.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="sg-var">
+      <div class="sg-label"><b>Отступы и колонка</b> переменные на обёртке <code>.case</code></div>
+      <table class="sg-table">
+        <tr><th>Переменная</th><th>Значение</th><th>Где меняется</th></tr>
+        <tr><td><code>--edge</code> поле страницы</td><td>128</td><td>64 до 1100px, 20 до 700px</td></tr>
+        <tr><td><code>--measure</code> текстовая колонка</td><td>410</td><td>640 на /index и /cabinet-truda, 823 на /margarita-pushkina</td></tr>
+        <tr><td><code>--gap-section</code> между кейсами</td><td>100</td><td>96 на /index и /cabinet-truda; 80 до 1100px, 64 до 700px</td></tr>
+        <tr><td><code>--gap-title</code> заголовок → описание</td><td>32</td><td>—</td></tr>
+        <tr><td><code>--gap-sub</code> заголовок → подзаголовок</td><td>16</td><td>—</td></tr>
+        <tr><td><code>--gap-para</code> между абзацами</td><td>20</td><td>—</td></tr>
+        <tr><td><code>--gap-text-img</code> текст → картинка</td><td>28</td><td>—</td></tr>
+        <tr><td><code>--gap-img</code> между картинками</td><td>32</td><td>—</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================== 01 -->
+  <section class="sg-comp" id="signature">
+    <div class="sg-head">
+      <span class="sg-num">01</span>
+      <h2 class="sg-name">Подпись</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <span class="sg-tag sg-tag--dup">дубль</span>
+      <p class="sg-where">Все страницы. Классы <code>.signature</code> на визитке, <code>.case-sig</code> на остальных.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Одна SVG-картинка шириной 430, без ссылки.</li>
+        <li>Три разных рисунка: латиница 32px высотой, кириллица 42px, новая латиница 37px.</li>
+        <li>Цвет зашит в файл: чёрный для визитки, серый #B3B3B3 для остальных.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>На визитке масштабируется вместе с макетом (430 × <code>--u</code>).</li>
+        <li>На остальных страницах 430px, уже 700px — во всю ширину колонки.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Пять файлов на три рисунка в двух цветах; серой латиницы два разных рисунка.</li>
+        <li>Из-за разной высоты рисунков отступ до текста подгоняется вручную: 100,6 / 104,2 / 106.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row">
+      <div class="sg-var"><div class="sg-label"><b>signature.svg</b> 430×32 · /</div><div class="sg-demo"><img class="case-sig" src="assets/signature.svg" alt="Kirill Snegur" width="430" height="32"></div></div>
+      <div class="sg-var"><div class="sg-label"><b>signature-latin-grey.svg</b> 430×32 · /cabinet-truda</div><div class="sg-demo"><img class="case-sig" src="assets/signature-latin-grey.svg" alt="Kirill Snegur" width="430" height="32"></div></div>
+      <div class="sg-var"><div class="sg-label"><b>signature-grey-en.svg</b> 430×37 · /index</div><div class="sg-demo"><img class="case-sig" src="assets/signature-grey-en.svg" alt="Kirill Snegur" width="430" height="37"></div></div>
+      <div class="sg-var"><div class="sg-label"><b>signature-ru.svg</b> 430×42 · /ru</div><div class="sg-demo"><img class="case-sig" src="assets/signature-ru.svg" alt="Кирилл Снегур" width="430" height="42"></div></div>
+      <div class="sg-var"><div class="sg-label"><b>signature-grey.svg</b> 430×42 · семь русских страниц</div><div class="sg-demo"><img class="case-sig" src="assets/signature-grey.svg" alt="Кирилл Снегур" width="430" height="42"></div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 02 -->
+  <section class="sg-comp" id="intro">
+    <div class="sg-head">
+      <span class="sg-num">02</span>
+      <h2 class="sg-name">Intro</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Все девять страниц, кроме визитки. Класс <code>.case-intro</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Подпись.</li>
+        <li>От одного до четырёх абзацев «кто я» в колонке 410.</li>
+        <li>Портрет 430×304 — необязательный, его нет на двух страницах.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Абзацы идут через 20, портрет через 28 после текста.</li>
+        <li>Портрет кадрируется в рамку 430×304, а не сжимается.</li>
+        <li>Строки выравниваются по длине (<code>text-wrap: balance</code>).</li>
+        <li>Уже 700px подпись и портрет растягиваются на всю колонку.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>На страницах с <code>.case--stacked</code> текст сдвинут на 10px вправо, на остальных стоит вровень с подписью.</li>
+        <li>Отступ подпись → текст свой под каждый рисунок подписи.</li>
+        <li>На /cabinet-truda портрет через 32, а не 28.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 470px">
+      <div class="sg-var">
+        <div class="sg-label"><b>Базовый</b> /ges-2-digital-designer · текст вровень с подписью</div>
+        <div class="sg-demo"><div class="case">
+          <header class="case-intro">
+            <img class="case-sig" src="assets/signature-grey.svg" alt="Кирилл Снегур" width="430" height="42">
+            <p>Дизайнер, продюсер</p>
+            <p>Работаю с&nbsp;командами культурных, средовых и&nbsp;технологичных проектов</p>
+            <p>Создаю эмпатичные коммуникации и&nbsp;взаимодействия, через призмы искусства, архитектуры, философии. Развиваю визуальный язык и&nbsp;клиентский сервис.</p>
+            <p>На этой странице работы в&nbsp;контексте цифрового дизайна. В&nbsp;<a class="case-quiet" href="ru/">корневой</a>&nbsp;— шире.</p>
+            <img class="case-portrait" src="assets/hero-portrait.jpg" width="1290" height="911" alt="Кирилл Снегур, два портрета рядом">
+          </header>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Stacked</b> /a-club, /omanko-dom, /in-out, /yana-rogozina · текст сдвинут на 10</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <header class="case-intro">
+            <img class="case-sig" src="assets/signature-grey.svg" alt="Кирилл Снегур" width="430" height="42">
+            <p>Менеджер, ранее дизайнер, культурных, средовых и&nbsp;технологичных проектов</p>
+            <p>Развиваю социальные платформы компании: ее&nbsp;сообщества, бренд и&nbsp;клиентский сервис</p>
+            <p>Создаю эмпатичные взаимодействия, через призмы искусства, архитектуры, философии</p>
+            <img class="case-portrait" src="assets/hero-portrait.jpg" width="1290" height="911" alt="Кирилл Снегур, два портрета рядом">
+          </header>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Index</b> /index · новая латинская подпись, одна строка</div>
+        <div class="sg-demo"><div class="case case--stacked case--index" lang="en">
+          <header class="case-intro">
+            <img class="case-sig" src="assets/signature-grey-en.svg" alt="Kirill Snegur" width="430" height="37">
+            <p>Producer, designer in&nbsp;culture and tech</p>
+            <img class="case-portrait" src="assets/hero-portrait.jpg" width="1290" height="911" alt="Kirill Snegur, two portraits side by side">
+          </header>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Cabinet</b> /cabinet-truda · старая латинская подпись, портрет через 32</div>
+        <div class="sg-demo"><div class="case case--stacked case--cabinet" lang="en">
+          <header class="case-intro">
+            <img class="case-sig" src="assets/signature-latin-grey.svg" alt="Kirill Snegur" width="430" height="32">
+            <p>Producer, designer in&nbsp;culture and tech</p>
+            <img class="case-portrait" src="assets/hero-portrait.jpg" width="1290" height="911" alt="Kirill Snegur, two portraits side by side">
+          </header>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Без портрета, тёмный текст</b> /margarita-pushkina</div>
+        <div class="sg-demo"><div class="case case--wide">
+          <header class="case-intro">
+            <img class="case-sig" src="assets/signature-grey.svg" alt="Кирилл Снегур" width="430" height="42">
+            <p class="case-ink">Решение тестового задания для Ирины из Zakadrom,<br>роли ассистента Маргариты Пушкиной</p>
+          </header>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Без портрета, список параметров</b> /life-photos</div>
+        <div class="sg-demo"><div class="case case--life">
+          <header class="case-intro">
+            <img class="case-sig" src="assets/signature-grey.svg" alt="Кирилл Снегур" width="430" height="42">
+            <p lang="en">Kirill<br>AGE: 26<br>HEIGHT: 190&nbsp;cm / 6'2¾"<br>CHEST: 120&nbsp;cm / 47¼"<br>WAIST: 90&nbsp;cm / 35½"<br>HIPS: 110&nbsp;cm / 43¼"<br>SHOES: 44&nbsp;EU / 11&nbsp;US / 10&nbsp;UK</p>
+          </header>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 03 -->
+  <section class="sg-comp" id="masthead">
+    <div class="sg-head">
+      <span class="sg-num">03</span>
+      <h2 class="sg-name">Masthead</h2>
+      <span class="sg-tag sg-tag--home">визитка</span>
+      <span class="sg-tag sg-tag--dup">дубль</span>
+      <p class="sg-where"><code>/</code> и <code>/ru/</code>. Классы <code>.masthead</code>, <code>.eyebrow</code>, <code>.lede</code>, <code>.portrait</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Чёрная подпись.</li>
+        <li>Строка-роль и абзац-позиционирование.</li>
+        <li>Тот же портрет 430×304.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Все размеры заданы в пикселях макета и умножены на <code>--u</code>.</li>
+        <li>Уже 1000px макет 430 растягивается на ширину экрана (до 1,2×), строки при этом не переносятся иначе.</li>
+        <li>От 1000px — реальные пиксели и поле 128 слева.</li>
+        <li>Текст сдвинут на 10 от края подписи и портрета.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия от Intro</h3><ul>
+        <li>По смыслу это тот же Intro, но свёрстан второй раз другой системой.</li>
+        <li>Портрет через 19 после текста, в Intro — 28.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 470px">
+      <div class="sg-var">
+        <div class="sg-label"><b>English</b> /</div>
+        <div class="sg-demo"><div class="sg-home" lang="en">
+          <header class="masthead">
+            <img class="signature" src="assets/signature.svg" alt="Kirill Snegur" width="430" height="32">
+            <p class="eyebrow">Designer, producer</p>
+            <p class="lede">Working on strategy, product design and brand with progressive teams in culture and technology</p>
+          </header>
+          <img class="portrait" src="assets/hero-portrait.jpg" alt="Kirill Snegur, two portraits side by side" width="1290" height="911">
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Русский</b> /ru/ · подпись выше на 10</div>
+        <div class="sg-demo"><div class="sg-home">
+          <header class="masthead">
+            <img class="signature" src="assets/signature-ru.svg" alt="Кирилл Снегур" width="430" height="42">
+            <p class="eyebrow">Дизайнер, продюсер</p>
+            <p class="lede">Работаю со стратегией, дизайном продукта и&nbsp;брендом с&nbsp;прогрессивными командами в&nbsp;культуре и&nbsp;технологиях</p>
+          </header>
+          <img class="portrait" src="assets/hero-portrait.jpg" alt="Кирилл Снегур, два портрета рядом" width="1290" height="911">
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 04 -->
+  <section class="sg-comp" id="cards">
+    <div class="sg-head">
+      <span class="sg-num">04</span>
+      <h2 class="sg-name">Тезис и сетка карточек</h2>
+      <span class="sg-tag sg-tag--home">визитка</span>
+      <p class="sg-where"><code>/</code> и <code>/ru/</code>. Классы <code>.block</code>, <code>.grid</code>, <code>.project</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Тезис-заголовок в колонке 410.</li>
+        <li>Сетка 2×2 из карточек: картинка 202×459 и подпись кеглем 14.</li>
+        <li>Вариант <code>--outlined</code>: обводка 1px внутрь картинки — для скриншотов интерфейсов на белом.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Картинка кадрируется в пропорцию 202:459.</li>
+        <li>Уже 1000px блоки идут друг под другом через 99.</li>
+        <li>От 1000px два блока встают рядом колонками по 410 с зазором 32.</li>
+        <li>Карточки не ссылки: кейс за ними не открывается.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>У второго ряда подпись прижата к картинке (<code>.project--row2</code>: 0 против 7) — перенесено из макета как есть.</li>
+        <li>Единственный блок сайта, где у картинки есть подпись.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Обычный и <code>--outlined</code></b> слева без обводки, справа с ней</div>
+      <div class="sg-demo"><div class="sg-home" lang="en">
+        <main class="content">
+          <section class="block">
+            <h2 class="block__title">Produce events and&nbsp;media that unite people into communities for collective growth in&nbsp;both business and personal pursuits</h2>
+            <div class="grid">
+              <figure class="project"><img src="assets/astrotour.jpg" alt="A telescope on a tripod by a window" width="465" height="995" loading="lazy"><figcaption>[ Wave Length ] AstroTour</figcaption></figure>
+              <figure class="project"><img src="assets/yandex-collagetable.jpg" alt="Person in a cream utility shirt and trousers" width="465" height="995" loading="lazy"><figcaption>Yandex CollageTable</figcaption></figure>
+              <figure class="project project--row2"><img src="assets/lim-partners.jpg" alt="Person holding a LIM Specialty coffee cup" width="465" height="995" loading="lazy"><figcaption>LIM Partners</figcaption></figure>
+              <figure class="project project--row2"><img src="assets/sila-vetra.jpg" alt="Two people walking through a city at dusk" width="465" height="995" loading="lazy"><figcaption>Sila Vetra Sea&amp;City</figcaption></figure>
+            </div>
+          </section>
+          <section class="block block--outlined">
+            <h2 class="block__title">Design cognitively pleasant digital products that embrace productivity with dignity, free up&nbsp;human attention and time for meaningful activities</h2>
+            <div class="grid">
+              <figure class="project"><img src="assets/raiffeisen-budget.png" alt="Budget table interface showing 2023 figures" width="465" height="995" loading="lazy"><figcaption>Raiffeisen bank budget system</figcaption></figure>
+              <figure class="project"><img src="assets/ozon-business-loan.png" alt="Three-dimensional hourglass illustration" width="465" height="995" loading="lazy"><figcaption>Ozon bank business loan</figcaption></figure>
+              <figure class="project project--row2"><img src="assets/everytale.png" alt="Video session interface with participants and chat" width="465" height="995" loading="lazy"><figcaption>Everytale educational platform</figcaption></figure>
+              <figure class="project project--row2"><img src="assets/kiosk.png" alt="Self-service kiosk ordering interface" width="465" height="995" loading="lazy"><figcaption>Kiosk</figcaption></figure>
+            </div>
+          </section>
+        </main>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 05 -->
+  <section class="sg-comp" id="section">
+    <div class="sg-head">
+      <span class="sg-num">05</span>
+      <h2 class="sg-name">Section и разделитель</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <span class="sg-tag sg-tag--dup">дубль</span>
+      <p class="sg-where">Все девять страниц. Классы <code>.case-section</code>, <code>--ruled</code>, <code>--offer</code>, <code>.proj</code>, <code>.case-end</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Обёртка одного кейса: задаёт только расстояние до предыдущего.</li>
+        <li>Разделитель — линия 1px цвета текста на всю ширину колонки, с большим воздухом сверху и снизу.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Между кейсами 100 (96 на /index и /cabinet-truda), на узких экранах 80 и 64.</li>
+        <li>Разделитель отбивает закрывающий раздел: предложение адресату или личное.</li>
+        <li>Воздух у разделителя на узких экранах не уменьшается.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Один разделитель в пяти вариантах: 171/172, 171/171, 170/176, 171/176 и линия без раздела после неё. Разница в 1–5px глазом не читается.</li>
+        <li><code>.proj</code> на /cabinet-truda повторяет <code>.case-section</code> под другим именем.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 240px">
+      <div class="sg-var">
+        <div class="sg-label"><b>Обычный</b> отступ 100</div>
+        <div class="sg-demo"><div class="case">
+          <p class="case-text">Конец предыдущего кейса</p>
+          <section class="case-section"><h2 class="case-title">Следующий кейс</h2></section>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>--ruled</code></b> 171 / 172 · a-club, omanko, in-out, ВШБ</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <p class="case-text">Конец предыдущего кейса</p>
+          <section class="case-section case-section--ruled"><h2 class="case-title">Также</h2></section>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>--offer</code></b> 171 / 176 · ges-2</div>
+        <div class="sg-demo"><div class="case">
+          <p class="case-text">Конец предыдущего кейса</p>
+          <section class="case-section case-section--offer"><h2 class="case-title">ГЭС-2</h2></section>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.proj</code> + <code>--ruled</code></b> 170 / 176 · cabinet-truda</div>
+        <div class="sg-demo"><div class="case case--stacked case--cabinet" lang="en">
+          <p class="case-text">End of the previous case</p>
+          <section class="proj case-section--ruled"><div class="unit"><h2>Personal</h2><p>Active life</p><p>Love</p><p>Exploration</p></div></section>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.case-end</code></b> 171, только линия · margarita</div>
+        <div class="sg-demo"><div class="case case--wide">
+          <p class="case-text case-ink">Конец последнего раздела</p>
+          <hr class="case-end">
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 06 -->
+  <section class="sg-comp" id="case-head">
+    <div class="sg-head">
+      <span class="sg-num">06</span>
+      <h2 class="sg-name">Заголовок кейса прозой</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <span class="sg-tag sg-tag--dup">дубль</span>
+      <p class="sg-where">Шесть русских страниц. Классы <code>.case-title</code>, <code>.case-sub</code>, <code>.case-desc</code>, <code>.case-text</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Название кейса — синим, тем же кеглем, что и текст.</li>
+        <li>Под ним один из трёх видов абзаца и, при необходимости, продолжение.</li>
+        <li>Дальше идут Credits и Shot.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Всё держится в колонке 410 (823 на /margarita-pushkina).</li>
+        <li><code>.case-sub</code> и <code>.case-text</code> встают через 16 от названия, <code>.case-desc</code> — через 32.</li>
+        <li>Следующие абзацы через 20; <code>--apart</code> даёт 40.</li>
+        <li><code>.case-ink</code> красит абзац почти чёрным — так отделены ответы от рассуждений.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Три класса абзаца делают одно дело. Отличается только зазор под названием: 16 или 32.</li>
+        <li>Один и тот же кейс на разных страницах размечен то через <code>-sub</code>, то через <code>-desc</code>.</li>
+        <li>Второе представление того же кейса — <a href="#unit">Unit</a> + <a href="#info">Info</a>.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 440px">
+      <div class="sg-var">
+        <div class="sg-label"><b><code>-sub</code> + <code>-text</code></b> зазор 16 · Астротур, /a-club</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <h2 class="case-title">Астротур</h2>
+          <p class="case-sub">Совместная с&nbsp;арт-резиденцией Сильно, Экспедиция в&nbsp;горы за звездами для 5 персон.</p>
+          <p class="case-text">Камерное путешествие на тему устойчивого развития города и&nbsp;внимания к&nbsp;личному космосу,</p>
+          <p class="case-text">Экскурсии в&nbsp;архитектурные студии, знакомство с&nbsp;предпринимателями региона, его культурой и&nbsp;природой.</p>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>-desc</code> + <code>-desc--cont</code></b> зазор 32 · RAUM, /a-club</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <h2 class="case-title">RAUM / [ длина волны ]</h2>
+          <p class="case-desc">Разработка, реализация, поддержка программы событий, объединяющих предпринимателей и&nbsp;специалистов средовых проектов.</p>
+          <p class="case-desc case-desc--cont">Экскурсии на выставки, частные события с&nbsp;партнерами, беговой клуб</p>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Тот же RAUM через <code>-sub</code></b> зазор 16 · /omanko-dom</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <h2 class="case-title">RAUM / [ длина волны ]</h2>
+          <p class="case-sub">Разработка, реализация, поддержка программы событий, объединяющих предпринимателей и&nbsp;специалистов средовых проектов.</p>
+          <p class="case-text">Экскурсии на выставки, частные прогулки с&nbsp;партнерами, беговой клуб</p>
+        </div></div>
+      </div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Длинный текст</b> колонка 823, серый вопрос и тёмный ответ, <code>--apart</code> · /margarita-pushkina</div>
+      <div class="sg-demo"><div class="case case--wide">
+        <h2 class="case-title">Сценарий дня</h2>
+        <p class="case-text">Уточнил бы: Комфортное время старта дня? Точка старта? Укладка в&nbsp;салоне или мастера?</p>
+        <p class="case-text case-ink">Если допускается иной порядок, то, предлагаю, пилатес вперед для энергии, укладка в&nbsp;салоне по пути в&nbsp;центр и&nbsp;между встречами пауза:</p>
+        <p class="case-text case-text--apart case-ink">Нижний Новгород, пятница вечер&nbsp;– воскресенье, 12-15 ноября:</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 07 -->
+  <section class="sg-comp" id="credits">
+    <div class="sg-head">
+      <span class="sg-num">07</span>
+      <h2 class="sg-name">Credits</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">/a-club, /omanko-dom, /in-out, /yana-rogozina. Класс <code>.case-credits</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Строка роли — вес 600, единственное жирное место в прозе.</li>
+        <li>Строка с именами команды; может отсутствовать.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Стоит между описанием и первой картинкой.</li>
+        <li>Через 16 после <code>-sub</code> и <code>-text</code>, через 32 после <code>-desc</code>; картинка через 28.</li>
+        <li>Цвет наследует от страницы.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Роль у одного кейса меняется от адресата: LIM — «Организация» или «Арт-дирекшн, дизайн».</li>
+        <li>Список имён тоже расходится: у Sea&amp;City пять имён или два.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 440px">
+      <div class="sg-var">
+        <div class="sg-label"><b>Роль и команда</b> после <code>-text</code>, 16</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <p class="case-text">Имиджевые коллаборации со студиями Shulz, 99Recycle</p>
+          <div class="case-credits">
+            <p class="case-credits__role">Арт-дирекшн, продакшн</p>
+            <p class="case-credits__names">Павел Мунтян, Камила Виас, Илья Лакаев, Владлена Старикова, Иван Гущин</p>
+          </div>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Роль и команда</b> после <code>-desc</code>, 32</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <p class="case-desc">Презентация стартапа кофе-поинтов от вело-сообщества, для привлечения партнеров, запуска проекта в&nbsp;Дубай.</p>
+          <div class="case-credits">
+            <p class="case-credits__role">Организация</p>
+            <p class="case-credits__names">Наталья Чувиковская, Илья Крюч</p>
+          </div>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>Только роль</b> Kiosk, /omanko-dom</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <p class="case-desc">Терминалы для гастрономических пространств с&nbsp;интуитивным сценарием и&nbsp;эмпатичными функциями бережно сопровождают гостя при выборе позиций меню</p>
+          <div class="case-credits">
+            <p class="case-credits__role">Дизайн</p>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 08 -->
+  <section class="sg-comp" id="shot">
+    <div class="sg-head">
+      <span class="sg-num">08</span>
+      <h2 class="sg-name">Shot</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Все девять страниц, главный блок сайта. Классы <code>.case-shot</code>, <code>--stack</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Одна картинка на всю ширину колонки, без подписи.</li>
+        <li>Это готовый экспорт целого блока из макета: фотографии уже разложены внутри, с чёрной рамкой 32px.</li>
+        <li>Два файла: 1664px и 3328px, браузер берёт нужный по плотности экрана.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Сжимается вместе с колонкой, пропорция сохраняется.</li>
+        <li>Грузится лениво, когда до неё докручивают.</li>
+        <li>Через 28 после текста, через 32 после другой картинки.</li>
+        <li><code>--stack</code> надвигает блок на предыдущий на 32/1664 ширины: две чёрные рамки сливаются в одну полосу, белый зазор пропадает.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Состав блока зашит в картинку: поменять одну фотографию — значит заново экспортировать весь блок.</li>
+        <li>На телефоне блок из четырёх фотографий сжимается целиком и становится мелким.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 520px">
+      <div class="sg-var">
+        <div class="sg-label"><b>Подряд</b> между блоками белый зазор 32</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <figure class="case-shot">
+            <img src="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-1.webp" srcset="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-1.webp 1x, assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-1@2x.webp 2x" width="1664" height="873" loading="lazy" decoding="async" alt="Сила Ветра: предметы коллекции и коллаборации">
+          </figure>
+          <figure class="case-shot">
+            <img src="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-2.webp" srcset="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-2.webp 1x, assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-2@2x.webp 2x" width="1664" height="873" loading="lazy" decoding="async" alt="Сила Ветра: съёмка-кампейн">
+          </figure>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>--stack</code></b> рамки сливаются в одну полосу</div>
+        <div class="sg-demo"><div class="case case--stacked">
+          <figure class="case-shot">
+            <img src="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-1.webp" srcset="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-1.webp 1x, assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-1@2x.webp 2x" width="1664" height="873" loading="lazy" decoding="async" alt="Сила Ветра: предметы коллекции и коллаборации">
+          </figure>
+          <figure class="case-shot case-shot--stack">
+            <img src="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-2.webp" srcset="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-2.webp 1x, assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/sea-city-2@2x.webp 2x" width="1664" height="873" loading="lazy" decoding="async" alt="Сила Ветра: съёмка-кампейн">
+          </figure>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 09 -->
+  <section class="sg-comp" id="video">
+    <div class="sg-head">
+      <span class="sg-num">09</span>
+      <h2 class="sg-name">Video</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">/ges-2-digital-designer, /omanko-dom, /index. Классы <code>.case-shot--video</code>, <code>.case-shot--framed</code>, <code>.case-video</code>; скрипт <code>case.js</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Shot, внутри которого вместо картинки видео с постером.</li>
+        <li>Пропорция рамки задаётся числом <code>--ar</code> на самом блоке.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Стартует через секунду после того, как четверть блока вошла в экран.</li>
+        <li>Если блок ушёл с экрана раньше — старт отменяется.</li>
+        <li>Запустившись один раз, играет по кругу без звука.</li>
+        <li>При системной настройке «меньше движения» остаётся на постере и показывает кнопки плеера.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li><code>--video</code>: рамка своей пропорции, видео заполняет её и обрезается по краям.</li>
+        <li><code>--framed</code>: чёрная рамка 32/1664, как у экспортов; видео целиком, в своей пропорции.</li>
+        <li>Файл видео лежит в двух папках одинаковыми копиями по 4,4 МБ.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 520px">
+      <div class="sg-var">
+        <div class="sg-label"><b><code>--video</code></b> обрезка под рамку 1664:1091 · /ges-2-digital-designer</div>
+        <div class="sg-demo"><div class="case">
+          <figure class="case-shot case-shot--video" style="--ar: 1664 / 1091">
+            <video class="case-video" playsinline muted loop preload="metadata" poster="assets/GES-2%20digital%20design/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/everytale-1.webp" width="1664" height="1091" aria-label="Интерфейс платформы Everytale в движении">
+              <source src="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/everytale-1.mp4" type="video/mp4">
+            </video>
+          </figure>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>--framed</code></b> чёрная рамка, видео целиком · /index</div>
+        <div class="sg-demo"><div class="case case--stacked case--index">
+          <figure class="case-shot case-shot--framed" style="--ar: 1600 / 1245.5">
+            <video class="case-video" playsinline muted loop preload="metadata" poster="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/everytale-1.webp" width="1600" height="1246" aria-label="Everytale video session interface in motion">
+              <source src="assets/index/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/everytale-1.mp4" type="video/mp4">
+            </video>
+          </figure>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 10 -->
+  <section class="sg-comp" id="unit">
+    <div class="sg-head">
+      <span class="sg-num">10</span>
+      <h2 class="sg-name">Unit</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">/index, /cabinet-truda. Класс <code>.unit</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Одна строка из четырёх ячеек: клиент, проект, формат, роль.</li>
+        <li>Как шапка кейса первая ячейка — заголовок; в ячейке может быть несколько строк.</li>
+        <li>Весь текст чёрный, без выделений.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Колонки 1–2 делят свободное место, 3–4 фиксированные: 190 и 210.</li>
+        <li>Когда колонке становится уже 1025px, строка складывается: клиент и проект сверху, формат и роль под ними через 8.</li>
+        <li>Складываются все Unit на странице разом — иначе таблица перестаёт читаться таблицей.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Это второе представление кейса: те же данные, что в «заголовке прозой», но без описания — оно уходит в Info.</li>
+        <li>Минимальные ширины колонок посчитаны под самые длинные нынешние записи; новая длинная запись потребует их пересчитать.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Шапка кейса</b> одна строка в ячейке и несколько</div>
+      <div class="sg-demo"><div class="case case--stacked case--index" lang="en">
+        <section class="case-section">
+          <div class="unit"><h2>Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</h2><p>Front garden workshop</p><p>Event</p><p>Production</p></div>
+        </section>
+        <section class="case-section">
+          <div class="unit"><h2>Sila Vetra</h2><p>Brand shop</p><p>Collaboration<br>Campaign<br>Cloth<br>Package</p><p>Coordination<br>Production<br>Production<br>Design</p></div>
+        </section>
+      </div></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Сложенный</b> та же шапка в колонке уже 1025px</div>
+      <div class="sg-demo sg-demo--narrow"><div class="case case--stacked case--index" lang="en">
+        <div class="unit"><h2>Sila Vetra</h2><p>Brand shop</p><p>Collaboration<br>Campaign<br>Cloth<br>Package</p><p>Coordination<br>Production<br>Production<br>Design</p></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 11 -->
+  <section class="sg-comp" id="table">
+    <div class="sg-head">
+      <span class="sg-num">11</span>
+      <h2 class="sg-name">Table</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">/index, /cabinet-truda. Класс <code>.table</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Стопка Unit без шапки колонок и без линий.</li>
+        <li>Одна строка — одна роль в одном проекте, поэтому клиент и проект повторяются.</li>
+        <li>Для экранных читалок размечена как таблица.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Шаг строк 20, без зазоров.</li>
+        <li>В сложенном виде между записями появляется 20, чтобы двухстрочные записи не слипались.</li>
+        <li>Строки не ссылки и не сортируются.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>На двух страницах две копии по 47 строк, и они уже разошлись: разные строки и разное написание.</li>
+        <li>Строки таблицы и шапки кейсов набраны отдельно, хотя это одни и те же данные.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Первые строки</b> /index</div>
+      <div class="sg-demo"><div class="case case--stacked case--index" lang="en">
+        <div class="table" role="table" aria-label="Projects: client, project, category, role">
+          <div class="unit" role="row"><span role="cell">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</span><span role="cell">Front garden workshop</span><span role="cell">Event</span><span role="cell">Production</span></div>
+          <div class="unit" role="row"><span role="cell">Maria Kasatkina (&nbsp;159 Foundation, MR group&nbsp;)</span><span role="cell">Demidov 26</span><span role="cell">Stationery</span><span role="cell">Design</span></div>
+          <div class="unit" role="row"><span role="cell">Mary Inkova</span><span role="cell">Artist</span><span role="cell">Website</span><span role="cell">Design</span></div>
+          <div class="unit" role="row"><span role="cell">Mary Inkova</span><span role="cell">Artist</span><span role="cell">Website</span><span role="cell">Production</span></div>
+          <div class="unit" role="row"><span role="cell">[Wave Length] media, Strongnormal residency</span><span role="cell">AstroTour expedition</span><span role="cell">Travel</span><span role="cell">Concept</span></div>
+          <div class="unit" role="row"><span role="cell">[Wave Length] media, Strongnormal residency</span><span role="cell">AstroTour expedition</span><span role="cell">Travel</span><span role="cell">Coordination</span></div>
+          <div class="unit" role="row"><span role="cell">Sila Vetra</span><span role="cell">Brand shop</span><span role="cell">Campaign</span><span role="cell">Production</span></div>
+          <div class="unit" role="row"><span role="cell">Sila Vetra</span><span role="cell">Brand shop</span><span role="cell">Package</span><span role="cell">Design</span></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Сложенная</b> колонка уже 1025px</div>
+      <div class="sg-demo sg-demo--narrow"><div class="case case--stacked case--index" lang="en">
+        <div class="table" role="table" aria-label="Projects: client, project, category, role">
+          <div class="unit" role="row"><span role="cell">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</span><span role="cell">Front garden workshop</span><span role="cell">Event</span><span role="cell">Production</span></div>
+          <div class="unit" role="row"><span role="cell">Maria Kasatkina (&nbsp;159 Foundation, MR group&nbsp;)</span><span role="cell">Demidov 26</span><span role="cell">Stationery</span><span role="cell">Design</span></div>
+          <div class="unit" role="row"><span role="cell">Mary Inkova</span><span role="cell">Artist</span><span role="cell">Website</span><span role="cell">Design</span></div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 12 -->
+  <section class="sg-comp" id="info">
+    <div class="sg-head">
+      <span class="sg-num">12</span>
+      <h2 class="sg-name">Info</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">/index, /cabinet-truda. Класс <code>.info</code>; скрипт <code>info.js</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Подчёркнутая строка INFO.</li>
+        <li>За ней — описание кейса: от одного до шести абзацев в колонке 640, чёрным.</li>
+        <li>Стоит под картинками кейса, через 32.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Закрыт: видна только строка INFO.</li>
+        <li>Один клик открывает все Info на странице сразу, строка INFO исчезает.</li>
+        <li>Закрыть обратно нельзя. Страница помнит, что её открыли, до конца сеанса браузера.</li>
+        <li>Без JavaScript текст просто показан.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Шапки кейсов на этих страницах английские, а текст в Info русский.</li>
+        <li>У части кейсов Info нет вовсе: остаётся шапка и картинка.</li>
+        <li>Тексты Info длиннее и точнее, чем описания тех же кейсов прозой, и набраны отдельно от них.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Два кейса подряд</b> клик по любому INFO открывает оба <button class="sg-btn" type="button" data-info-reset>Закрыть снова</button></div>
+      <div class="sg-demo"><div class="case case--stacked case--index">
+        <section class="case-section">
+          <div class="unit" lang="en"><h2>Sila Vetra</h2><p>Brand shop</p><p>Collaboration<br>Campaign<br>Cloth<br>Package</p><p>Coordination<br>Production<br>Production<br>Design</p></div>
+          <div class="info">
+            <button class="info__toggle" type="button">INFO</button>
+            <div class="info__text" lang="ru" tabindex="-1">
+              <p>Коллекция Sea&amp;City, международного парусного сообщества, актуальная как на&nbsp;воде так и&nbsp;в&nbsp;городе.</p>
+              <p>Базовые предметы для ежедневного применения, с&nbsp;графикой арт-директора Артура Зима, напоминают о&nbsp;приключениях, случившихся и&nbsp;грядущих.</p>
+              <p>Специальные аксессуары, помогающие в&nbsp;пути, на&nbsp;лодке, включая с&nbsp;нуля разработанный КэпКорд, сохраняющий кепку на&nbsp;ветру.</p>
+              <p>Коллаборация со&nbsp;студиями Shulz и&nbsp;99Recycle&nbsp;— велосипед, служащий транспортом на&nbsp;суше, и&nbsp;брелок из&nbsp;переработанного пластика, напоминание о&nbsp;заботе к&nbsp;среде, окружающей нас.</p>
+              <p>Съемка-кампейн, запечатлевающая день из&nbsp;жизни пары, сохраняющей активное движение, по&nbsp;волнам морским и&nbsp;светским.</p>
+            </div>
+          </div>
+        </section>
+        <section class="case-section">
+          <div class="unit" lang="en"><h2>Rep agency (&nbsp;Yandex Ecom&nbsp;)<br>Rep agency (&nbsp;Yandex Ad&nbsp;)</h2><p>Employee experience<br>Partnerships</p><p>Event</p><p>Production</p></div>
+          <div class="info">
+            <button class="info__toggle" type="button">INFO</button>
+            <div class="info__text" lang="ru" tabindex="-1">
+              <p>Зона кастомизации одежды внутренних событий Яндекс.</p>
+              <p>Вокруг стола с&nbsp;термо-патчами команды собираются коллеги и&nbsp;партнеры, общаются, создают персональные композиции на&nbsp;футболках и&nbsp;вместе с&nbsp;этим новые горизонтальные связи.</p>
+            </div>
+          </div>
+        </section>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 13 -->
+  <section class="sg-comp" id="cv">
+    <div class="sg-head">
+      <span class="sg-num">13</span>
+      <h2 class="sg-name">CV</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">/in-out, /yana-rogozina. Классы <code>.cv</code>, <code>.cv-entry</code>, <code>.cv-job</code>, <code>.cv-skills</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Период с должностью — серым, вес 600.</li>
+        <li>Записи в две колонки: клиент слева (260), справа его проекты.</li>
+        <li>У проекта название весом 600 и список под ним.</li>
+        <li>Три уровня цвета: чёрный — имена, синий — что сделано, серый — обрамление.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Межстрочный 24 вместо 20: это список для просмотра, а не текст.</li>
+        <li>Уже 1400px навыки уходят под индекс.</li>
+        <li>Уже 640px клиент встаёт над проектами, пункты списков разрежаются.</li>
+        <li>Прочерк «тот же клиент» на телефоне скрывается.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>/in-out: справа колонка навыков, под проектом синие задачи.</li>
+        <li>/yana-rogozina: навыков нет; под периодом синий список обязанностей, у клиента серая пометка «кто это», под проектом серые результаты с цифрами.</li>
+        <li>Факты между версиями расходятся: 250 и 260 гостей, 2023–2020 и 2023–2018.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>С навыками</b> задачи синим · /in-out</div>
+      <div class="sg-demo"><div class="case case--stacked case--in-out">
+        <div class="cv">
+          <div class="cv-index">
+            <h3 class="cv-period">2026–2023 &nbsp;Продюсер, менеджер проекта</h3>
+            <div class="cv-entry">
+              <p class="cv-client">Сила Ветра</p>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">Sea&amp;City, запуск коллекции бренда</p>
+                <ul class="cv-tasks">
+                  <li>Поиск, подбор, организация производств</li>
+                  <li>Создание и&nbsp;реализация съемки-кампейна</li>
+                  <li>Разработка бренд предметов с&nbsp;дизайн командой</li>
+                  <li>Сопровождение партнерства со студиями Shulz, 99 Recycle</li>
+                </ul>
+              </div></div>
+            </div>
+            <div class="cv-entry">
+              <p class="cv-client">Яндекс</p>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">3 корпоратива для 250 гостей, Бренд-зона КорнерКоллаж</p>
+                <ul class="cv-tasks">
+                  <li>Поиск, подбор, организация производств</li>
+                  <li>Создание и&nbsp;реализация DIY корнера</li>
+                </ul>
+              </div></div>
+            </div>
+            <div class="cv-entry">
+              <p class="cv-client cv-client--none" aria-hidden="true">—</p>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">Интерьерный арт-объект</p>
+                <ul class="cv-tasks">
+                  <li>Разработка концепции</li>
+                  <li>Поиск, подбор, организация производств</li>
+                </ul>
+              </div></div>
+            </div>
+            <div class="cv-entry">
+              <p class="cv-client">Raum / [ длина волны ]</p>
+              <div class="cv-work">
+                <div class="cv-job">
+                  <p class="cv-project">Астротур: экспедиция в&nbsp;Дагестан для 5 человек</p>
+                  <ul class="cv-tasks"><li>Концепция</li><li>Сопровождение партнерства, участников</li></ul>
+                </div>
+                <div class="cv-job">
+                  <p class="cv-project">Световые дизайн-экскурсии</p>
+                  <ul class="cv-tasks"><li>Коммуникация с&nbsp;площадкой</li><li>Сопровождение спикеров и&nbsp;участников</li></ul>
+                </div>
+              </div>
+            </div>
+            <h3 class="cv-period">2023–2020 &nbsp;Менеджер продукта, UX дизайнер</h3>
+            <div class="cv-entry">
+              <p class="cv-client">Райффайзен банк</p>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">Веб-платформа для бюджетирования</p>
+                <ul class="cv-tasks"><li>Модернизация клиентского сервиса</li></ul>
+              </div></div>
+            </div>
+          </div>
+          <aside class="cv-skills">
+            <h3 class="cv-skills__title">Навыки</h3>
+            <div class="cv-group">
+              <h4 class="cv-group__title">Исследования</h4>
+              <ul><li>Анализ рынка, продукта и&nbsp;задач клиента, общекультурных тенденций</li></ul>
+            </div>
+            <div class="cv-group">
+              <h4 class="cv-group__title">Разработка решения</h4>
+              <ul>
+                <li>Декомпозиция запроса</li>
+                <li>Подбор решений и&nbsp;предложений</li>
+                <li>Создание концепций и&nbsp;ее презентация</li>
+                <li>Поддержка команды</li>
+              </ul>
+            </div>
+            <p class="cv-lang">Разговорный, письменный English b2</p>
+          </aside>
+        </div>
+      </div></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b><code>--solo</code></b> обязанности, пометка у клиента, результаты серым · /yana-rogozina</div>
+      <div class="sg-demo"><div class="case case--stacked case--yana">
+        <div class="cv cv--solo">
+          <div class="cv-index">
+            <h3 class="cv-period">2026–2023 &nbsp;Менеджер проекта, продюсер</h3>
+            <ul class="cv-roles">
+              <li>Проведение исследований и&nbsp;создание базы знаний об интересах партнеров</li>
+              <li>Поиск актуальных авторов, специалистов и&nbsp;производств для реализации проектов</li>
+              <li>Разработка предложений, концепции проекта, их презентация</li>
+              <li>Организация и&nbsp;поддержка команды ( ~ 5-15 человек, бюджеты 0.5 - 2 млн. руб )</li>
+            </ul>
+            <div class="cv-entry">
+              <div class="cv-client">Tamed form <span class="cv-client__note">Ландшафтное бюро</span></div>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">Коллаборация (не)забытый цветок с&nbsp;ГЭС-2</p>
+                <ul class="cv-result"><li>Обеспечил мастер-класс для 60 человек</li></ul>
+              </div></div>
+            </div>
+            <div class="cv-entry">
+              <div class="cv-client">Сила Ветра <span class="cv-client__note">Парусное сообщество</span></div>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">Сезонная коллекция Sea&amp;City, поддержка событий</p>
+                <ul class="cv-result">
+                  <li>Обеспечил производство событий публичной программы и&nbsp;партнерского дня</li>
+                  <li>Провел имиджевые коллаборации со студиями Shulz, 99Recycle</li>
+                  <li>Разработал предметы бренда с&nbsp;дизайн-командой, обеспечил их производство</li>
+                  <li>Реализовал съемку для публикации в&nbsp;медиа. Получили рост выручки от года к&nbsp;году</li>
+                </ul>
+              </div></div>
+            </div>
+            <div class="cv-entry">
+              <div class="cv-client">Яндекс <span class="cv-client__note">ИТ-корпорация</span></div>
+              <div class="cv-work"><div class="cv-job">
+                <p class="cv-project">Бренд-зона, поддержка событий</p>
+                <ul class="cv-result"><li>Обеспечил реализацию 3 событий для 260 гостей. Разработал и&nbsp;реализовал корнер, для укрепления связей внутри команды и&nbsp;с&nbsp;партнерами</li></ul>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 14 -->
+  <section class="sg-comp" id="lists">
+    <div class="sg-head">
+      <span class="sg-num">14</span>
+      <h2 class="sg-name">Нумерованные списки</h2>
+      <span class="sg-tag sg-tag--dup">дубль</span>
+      <p class="sg-where"><code>.case-refs</code> — /ges-2-digital-designer, /omanko-dom. <code>.case-list</code> — /margarita-pushkina.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Номер с точкой через пробел («1 .») в колонке 31px, дальше текст.</li>
+        <li>Refs: каждый пункт — тихая ссылка на источник референса.</li>
+        <li>List: пункты — обычный текст.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Номера считает браузер.</li>
+        <li>Refs стоит вплотную к картинке, которую подписывает: 4 над ней или 8 под ней.</li>
+        <li>У ссылок подчёркивание появляется только под курсором.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Одна и та же нумерация сделана дважды.</li>
+        <li>В List вторая строка пункта встаёт под текст, в Refs — уходит под номер.</li>
+        <li>Refs — единственное место, где у картинки есть что-то вроде подписи; номера при этом зашиты и в саму картинку.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 440px">
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.case-refs</code></b> над картинкой, 4 · /ges-2-digital-designer</div>
+        <div class="sg-demo"><div class="case">
+          <ol class="case-refs">
+            <li><a class="case-ref" href="https://hydroformations.com">Hydroformations • Lava Amsterdam</a></li>
+            <li><a class="case-ref" href="https://180db.app">Плеер 180db • Advanced Research GmbH</a></li>
+          </ol>
+          <figure class="case-shot">
+            <img src="assets/GES-2%20digital%20design/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/ges2-1.webp" srcset="assets/GES-2%20digital%20design/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/ges2-1.webp 1x, assets/GES-2%20digital%20design/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/ges2-1@2x.webp 2x" width="1664" height="696" loading="lazy" decoding="async" alt="Референсы: Hydroformations, плеер 180db">
+          </figure>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.case-list</code></b> колонка 823, перенос под текст · /margarita-pushkina</div>
+        <div class="sg-demo"><div class="case case--wide">
+          <ol class="case-list case-ink">
+            <li>Kiyomi&nbsp;— подходящий просторный зал, в&nbsp;центре на Пожарском, с&nbsp;широкой азиатской кухней</li>
+            <li>Рихтер&nbsp;— проверенный, универсальный вариант с&nbsp;большим единым столом, соседствующий с&nbsp;галереей serene</li>
+            <li>Винага&nbsp;— экстра опция, доступный после полуночи, нарочито негламурный, камерный зал, именно для 15 персон, с&nbsp;меню одного дня по фермерским продуктам и&nbsp;богатой винной картой</li>
+          </ol>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 15 -->
+  <section class="sg-comp" id="sched">
+    <div class="sg-head">
+      <span class="sg-num">15</span>
+      <h2 class="sg-name">Расписание</h2>
+      <span class="sg-tag sg-tag--unique">уникальный</span>
+      <p class="sg-where">/margarita-pushkina. Класс <code>.case-sched</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Пары «время — что происходит».</li>
+        <li>Время в колонке 116px, событие занимает остальное.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Строки идут вплотную, шагом 20.</li>
+        <li>На узких экранах не перестраивается.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-demo"><div class="case case--wide">
+        <dl class="case-sched case-ink">
+          <dt>10:30&nbsp;– 12:00</dt><dd>Rink, пилатес</dd>
+          <dt>12:30&nbsp;– 14:00</dt><dd>Rink, встреча</dd>
+          <dt>14:30&nbsp;– 16:00</dt><dd>D.Castello, укладка</dd>
+          <dt>16:30&nbsp;– 18:00</dt><dd>ЦУМ, встреча</dd>
+          <dt>18:30&nbsp;– 21:00</dt><dd>Большой</dd>
+        </dl>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 16 -->
+  <section class="sg-comp" id="gallery">
+    <div class="sg-head">
+      <span class="sg-num">16</span>
+      <h2 class="sg-name">Gallery</h2>
+      <span class="sg-tag sg-tag--unique">уникальный</span>
+      <p class="sg-where">/life-photos. Классы <code>.gallery</code>, <code>.gallery__row</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Ряды по три отдельные фотографии.</li>
+        <li>У каждой фотографии записана её пропорция <code>--ar</code> (ширина / высота).</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Ширина фотографии в ряду пропорциональна её <code>--ar</code>, поэтому все три выходят одной высоты.</li>
+        <li>Зазор 32 между фотографиями и между рядами.</li>
+        <li>Уже 700px ряд рассыпается в одну колонку.</li>
+        <li>Браузер выбирает файл 800 или 1600px по реальной ширине на экране.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия от Shot</h3><ul>
+        <li>Единственное место, где раскладку фотографий строит страница, а не экспорт из макета. Фото можно менять по одной, и на телефоне они крупные.</li>
+      </ul></div>
+    </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Один ряд</b> пропорции 0,67 / 0,75 / 0,57</div>
+      <div class="sg-demo"><div class="case case--life">
+        <div class="gallery">
+          <div class="gallery__row">
+            <figure class="case-shot" style="--ar: 0.6667">
+              <img src="assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-5.webp" srcset="assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-5.webp 800w, assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-5@2x.webp 1600w" sizes="(max-width: 700px) calc(100vw - 40px), 33vw" width="800" height="1200" loading="lazy" decoding="async" alt="Кирилл Снегур в профиль на фоне кирпичной стены">
+            </figure>
+            <figure class="case-shot" style="--ar: 0.7498">
+              <img src="assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-6.webp" srcset="assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-6.webp 800w, assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-6@2x.webp 1600w" sizes="(max-width: 700px) calc(100vw - 40px), 33vw" width="800" height="1067" loading="lazy" decoding="async" alt="Кирилл Снегур в полный рост стоит на парапете фонтана">
+            </figure>
+            <figure class="case-shot" style="--ar: 0.5670">
+              <img src="assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-8.webp" srcset="assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-8.webp 800w, assets/life-photos/%D0%A1%D0%B6%D0%B0%D1%82%D1%8B%D0%B5/life-8@2x.webp 1179w" sizes="(max-width: 700px) calc(100vw - 40px), 33vw" width="800" height="1411" loading="lazy" decoding="async" alt="Кирилл Снегур сидит за столиком в кафе, в полный рост">
+            </figure>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 17 -->
+  <section class="sg-comp" id="outro">
+    <div class="sg-head">
+      <span class="sg-num">17</span>
+      <h2 class="sg-name">Outro</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <span class="sg-tag sg-tag--dup">дубль</span>
+      <p class="sg-where">/, /ru/, /index, /cabinet-truda. Классы <code>.afterword</code>, <code>.idx-outro</code>, <code>.proj-outro</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Три абзаца: чем занят, как связаться, прощальная строка.</li>
+        <li>Во втором — ссылки на Телеграм и почту.</li>
+        <li>Последний блок страницы.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Узкая колонка у левого края, строки выровнены по длине.</li>
+        <li>Отступ сверху — как между кейсами.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Три реализации одного блока: серый или чёрный текст, колонка 410 или 370, шаг строк 20 или 24.</li>
+        <li>Ссылки синие в двух и бесцветные в третьей.</li>
+        <li>Текст почти одинаковый, но набран три раза: «through lens» и «through the lens».</li>
+        <li>На русских откликах вместо Outro — строка «Я доступен в Телеграм» внутри последнего кейса.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 440px">
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.afterword</code></b> серый, 410, шаг 20 · /</div>
+        <div class="sg-demo"><div class="sg-home" lang="en">
+          <footer class="afterword">
+            <p>Currently focusing on creating narratives, social platforms, and tools for scalable continuous transformation based on deep research and integral methods</p>
+            <p>If you want to team up for progress, let&#8217;s get in touch via <a href="https://t.me/snegur_k">Telegram</a> or <a href="mailto:ssnegurkirill@gmail.com">email</a></p>
+            <p>I&#8217;d be happy to envision futures with you</p>
+          </footer>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.idx-outro</code></b> чёрный, 370, шаг 24 · /index</div>
+        <div class="sg-demo"><div class="case case--stacked case--index" lang="en">
+          <footer class="idx-outro">
+            <p>I create brand and product solutions for adaptive growth, based on&nbsp;integral research, industry context and through lens of art, engineering, philosophy.</p>
+            <p>If you want to team up, work together and make progress, let’s get in&nbsp;touch via <a href="https://t.me/snegur_k">Telegram</a> or <a href="mailto:ssnegurkirill@gmail.com">email</a>.</p>
+            <p>I would be happy to envision the futures with you.</p>
+          </footer>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.proj-outro</code></b> чёрный, 410, шаг 20, тихие ссылки · /cabinet-truda</div>
+        <div class="sg-demo"><div class="case case--stacked case--cabinet" lang="en">
+          <section class="proj-outro">
+            <p>I&nbsp;create brand and product solutions for adaptive growth, based on&nbsp;integral research, industry context and through the lens of&nbsp;art, engineering, philosophy.</p>
+            <p>If&nbsp;you want to&nbsp;team up, work together and make progress, let&rsquo;s get in&nbsp;touch via <a class="case-quiet" href="https://t.me/snegur_k">Telegram</a> or&nbsp;<a class="case-quiet" href="mailto:ssnegurkirill@gmail.com">email</a>.</p>
+            <p>I&nbsp;would be happy to&nbsp;envision the futures with you.</p>
+          </section>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== 18 -->
+  <section class="sg-comp" id="links">
+    <div class="sg-head">
+      <span class="sg-num">18</span>
+      <h2 class="sg-name">Ссылки и вордмарк</h2>
+      <span class="sg-tag sg-tag--shared">общий</span>
+      <p class="sg-where">Классы <code>a</code>, <code>.case-quiet</code>, <code>.case-ref</code>, <code>.case-link</code>, <code>.wordmark</code>.</p>
+    </div>
+    <div class="sg-doc">
+      <div><h3>Состав</h3><ul>
+        <li>Обычная ссылка: синяя, без подчёркивания.</li>
+        <li>Тихая: цвета текста, без подчёркивания.</li>
+        <li>Подчёркнутая: синяя с постоянным подчёркиванием.</li>
+        <li>Вордмарк: название ÖMANKÖ ꞉DÖM̤ отдельной нарезкой шрифта, в которой есть его редкие знаки.</li>
+      </ul></div>
+      <div><h3>Поведение</h3><ul>
+        <li>Под курсором подчёркивание появляется у всех.</li>
+        <li>При переходе с клавиатуры — синяя рамка 2px.</li>
+        <li>Вордмарк не переносится на вторую строку.</li>
+      </ul></div>
+      <div class="sg-warn"><h3>Отличия</h3><ul>
+        <li>Три вида ссылки на один и тот же Телеграм — на разных страницах свой.</li>
+        <li>Тихую ссылку на телефоне нельзя отличить от текста: наведения там нет.</li>
+        <li>Без класса <code>.wordmark</code> редкие знаки названия берутся из системного шрифта и выбиваются из строки.</li>
+      </ul></div>
+    </div>
+    <div class="sg-row" style="--sg-min: 440px">
+      <div class="sg-var">
+        <div class="sg-label"><b><code>a</code></b> /, /ru/, /index, /ges-2-digital-designer, /life-photos</div>
+        <div class="sg-demo"><div class="case">
+          <p class="case-text">Мой телеграм: <a href="https://t.me/snegur_k">snegur_k</a></p>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.case-link</code></b> /a-club, /in-out, /yana-rogozina</div>
+        <div class="sg-demo"><div class="case">
+          <p class="case-text">Я&nbsp;доступен в&nbsp;<a class="case-link" href="https://t.me/snegur_k">Телеграм</a></p>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.case-quiet</code>, <code>.case-ref</code></b> /cabinet-truda, списки референсов</div>
+        <div class="sg-demo"><div class="case">
+          <p class="case-text">На этой странице работы в&nbsp;контексте цифрового дизайна. В&nbsp;<a class="case-quiet" href="ru/">корневой</a>&nbsp;— шире.</p>
+        </div></div>
+      </div>
+    </div>
+    <div class="sg-row" style="--sg-min: 440px">
+      <div class="sg-var">
+        <div class="sg-label"><b><code>.wordmark</code></b> /omanko-dom</div>
+        <div class="sg-demo"><div class="case">
+          <h2 class="case-title"><span class="wordmark">ÖMANKÖ ꞉DÖM̤</span></h2>
+        </div></div>
+      </div>
+      <div class="sg-var">
+        <div class="sg-label"><b>То же без класса</b> для сравнения</div>
+        <div class="sg-demo"><div class="case">
+          <h2 class="case-title">ÖMANKÖ ꞉DÖM̤</h2>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="case.js" defer></script>
+<script src="components.js" defer></script>
+</body>
+</html>
