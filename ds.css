@@ -127,9 +127,11 @@
 
    Each slot carries its photo's proportion as --ar and grows by it, so the
    frames in a row come out the same height whatever their mix — one wide,
-   two halves, three thirds or four quarters. Pairs never split and wrap
-   below 2 × 200px: four portraits are one row on a wide screen and two by
-   two on a phone. Without an --ar a slot takes the 193:415 portrait of the
+   two halves, three thirds or four quarters. Frames never squeeze past a
+   minimum; the row wraps instead, and every frame keeps its proportion. A
+   pair holds 320px and never splits, so four portraits are one row from
+   2 × 320 + 12 and two by two below it. A frame on its own holds 148px —
+   half a pair less the 12px between frames — so halves and thirds wrap too. Without an --ar a slot takes the 193:415 portrait of the
    Figma mobile Content; the photo is cropped to the slot, and --pos moves
    the crop (object-position). */
 
@@ -152,7 +154,7 @@
   display: flex;
   flex: 1 1 0;
   gap: 12px;
-  min-width: min(200px, 100%);
+  min-width: min(320px, 100%);
 }
 
 .ds-showcase__item {
@@ -160,10 +162,14 @@
   /* Grow by the proportion, scaled up: flex-grow factors that sum below 1
      leave part of the row empty, and two portraits sum to 0.9. */
   flex: calc(var(--ar) * 100) 1 0%;
-  min-width: 0;
+  min-width: min(148px, 100%);
   aspect-ratio: var(--ar);
   overflow: hidden;
 }
+
+/* Inside a pair the pair holds the minimum; on a phone narrower than 320
+   the pair takes the full width and its two frames share it. */
+.ds-showcase__pair > .ds-showcase__item { min-width: 0; }
 
 .ds-showcase__item :is(img, video) {
   display: block;
