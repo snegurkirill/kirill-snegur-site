@@ -72,13 +72,10 @@
   text-wrap: balance;
 }
 
-/* Кнопка — нейтральная белая карточка, как блок QR на оригинале. */
+/* Кнопка — нейтральная белая карточка, как блок формы на оригинале. */
 .om-offer {
   justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px 8px 8px;
+  padding: 14px 18px 15px;
   background: var(--paper);
   border-radius: 14px;
   box-shadow: 0 1px 2px rgb(16 52 94 / 0.06), 0 6px 20px rgb(16 52 94 / 0.10);
@@ -86,7 +83,6 @@
   white-space: nowrap;
   transition: box-shadow .2s, transform .2s;
 }
-.om-offer img { display: block; width: 48px; height: 48px; }
 .om-offer:hover {
   text-decoration: none;
   transform: translateY(-1px);
@@ -436,8 +432,7 @@
   .om { padding-top: 24px; padding-bottom: 96px; }
   .om-head { gap: 20px 16px; }
   .om-brand { font-size: 13px; line-height: 13px; }
-  .om-offer { gap: 8px; padding: 6px 12px 6px 6px; font-size: 16px; line-height: 16px; }
-  .om-offer img { width: 36px; height: 36px; }
+  .om-offer { padding: 11px 14px 12px; font-size: 16px; line-height: 16px; }
   .om-head h1 { font-size: 24px; line-height: 25px; }
   .om-bar { margin-top: 24px; align-items: center; gap: 20px; }
   .om-tags { display: none; }
