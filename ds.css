@@ -27,7 +27,7 @@
    markup for every variant; the variant only changes size and how the cells
    wrap.
 
-     <div class="ds-unit [ds-unit--compact] [ds-unit--end]">
+     <div class="ds-unit [ds-unit--compact]">
        <p class="ds-unit__year">2026</p>          optional
        <p class="ds-unit__client">…</p>
        <div class="ds-unit__options">
@@ -75,13 +75,17 @@
 .ds-unit__format  { flex: 0 1 140px; min-width: 0; }
 .ds-unit__role    { flex: 0 1 190px; min-width: 0; }
 
-/* Compact, 13/12 — a table row. The client gets a line of its own until the
-   row reaches 650px; project, format and role travel together as a group. */
+/* Compact, 13/12 — a project row. One look wherever it stands: a row of the
+   Table and the header of a case in Content are the same Unit. The client
+   column is the 410 text measure, so the project sets 420 in from the edge
+   in every row and every case; format and role are set flush right.
+   Project, format and role travel together as a group, and the group drops
+   under the client below 410 + 10 + 320 = 740px. */
 .ds-unit--compact {
   font-size: 13px;
   line-height: 12px;
 }
-.ds-unit--compact .ds-unit__client { min-width: min(320px, 100%); }
+.ds-unit--compact .ds-unit__client { flex: 0 1 410px; min-width: min(320px, 100%); }
 .ds-unit--compact .ds-unit__options {
   display: flex;
   flex: 1 1 0;
@@ -90,27 +94,95 @@
 }
 .ds-unit--compact .ds-unit__project { min-width: min(120px, 100%); }
 .ds-unit--compact .ds-unit__format,
-.ds-unit--compact .ds-unit__role { flex-basis: 120px; }
+.ds-unit--compact .ds-unit__role { flex-basis: 120px; text-align: right; }
 
-/* With a year in front, the design spaces the three options by the full 10. */
+/* With a year in front the client fills what the year leaves, rather than
+   the 410 column, and the design spaces the three options by the full 10. */
+.ds-unit--compact .ds-unit__year + .ds-unit__client { flex: 1 1 0; }
 .ds-unit--compact:has(.ds-unit__year) .ds-unit__options { gap: 10px; }
 
-/* Format and role set flush right — the dated row and the Content header. */
-.ds-unit--end .ds-unit__format,
-.ds-unit--end .ds-unit__role { text-align: right; }
-
 /* --- Table ---------------------------------------------------------------
-   A stack of compact Units, 12 apart. */
+   A stack of compact Units. Each row carries 4px of padding — the room its
+   inverted state needs — so the text sits 4 in, level with a case header
+   inside Content. Rows touch while each is one line, and stand 12 apart
+   once they fold: every row folds at the same width (748 = the 740 above
+   plus the padding), so the table can tell from its own width.
+
+   Interactive rows are switched off for now; the styles stay, behind the
+   ds-table--interactive modifier, which no page carries. With it, hovering
+   a row inverts it, and a row that names a preview (data-preview) shows it
+   in the corner of the screen (.ds-preview below, run by ds.js). On a touch
+   screen the row crossing the middle of the screen takes that state. To
+   turn it back on: add the modifier to the table and load ds.js. */
 
 .ds-table {
+  container: ds-table / inline-size;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
-/* A row keeps its two-line height when it fits on one, so the table steps
-   40px a row at every width, as the Figma Table does (rows fixed at 28). */
-.ds-table > .ds-unit { min-height: 28px; }
+.ds-table > .ds-unit { padding: 4px; }
+
+@container ds-table (width < 748px) {
+  .ds-table > .ds-unit + .ds-unit { margin-top: 12px; }
+}
+
+.ds-table--interactive > .ds-unit.is-active {
+  background: var(--ds-ink);
+  color: #fff;
+}
+@media (hover: hover) {
+  .ds-table--interactive > .ds-unit:hover {
+    background: var(--ds-ink);
+    color: #fff;
+  }
+}
+
+/* --- Preview -------------------------------------------------------------
+   One per page, created by ds.js: the picture of the case under the active
+   row, floating in the top-right corner like the iOS Dynamic Island. Half
+   the screen tall, never wider than 80% of it — on a phone the width wins
+   and it comes out shorter. --ar is the picture's proportion, set by ds.js
+   once it has loaded. */
+
+.ds-preview {
+  --ar: 7 / 3;
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  z-index: 100;
+  width: min(80vw, calc(50vh * var(--ar)));
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--ds-frame);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.10), 0 2px 6px rgb(0 0 0 / 0.06);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.96);
+  transform-origin: top right;
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.3s;
+}
+
+.ds-preview.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ds-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-preview { transform: none; transition: opacity 0.15s ease, visibility 0s 0.15s; }
+  .ds-preview.is-shown { transition: opacity 0.15s ease; }
+}
 
 /* --- Showcase ------------------------------------------------------------
    Photos on a black field, 12 inside and between, laid out in rows.
@@ -218,7 +290,3 @@
   gap: 12px;
   padding: 4px;
 }
-
-/* The header's client column is the 410 text measure, not half the row, so
-   the project sets 420 in from the edge in every case on a page. */
-.ds-content > .ds-unit .ds-unit__client { flex: 0 1 410px; }

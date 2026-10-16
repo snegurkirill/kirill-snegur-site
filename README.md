@@ -174,6 +174,21 @@ Unit and Table are set in **ABC Diatype Cyrillic**, a commercial face. It is
 not in `assets/`: it renders only where it is installed and falls back to
 Source Sans 3 elsewhere, until there is a web licence to self-host it.
 
+A table row and a case header are the same compact Unit: the client is a
+410 column, so the project starts 420 in everywhere, and format and role sit
+flush right. In a Table each row has 4px of padding and the rows touch while
+they are one line; once the table is under 748px every row folds and they
+stand 12 apart.
+
+Interactive rows are built but switched off. With the `ds-table--interactive`
+modifier and `ds.js` loaded, hovering a row inverts it, and a row with
+`data-preview` shows that picture in the top-right corner — half the screen
+tall, at most 80% of its width, 12px corners; on a touch screen the row
+crossing the middle of the screen takes that state as the page scrolls. No
+page carries the modifier or loads `ds.js` for now; the `data-preview`
+attributes on /index stay, inert, ready for when it comes back. Previews live with their project in
+`media/<project>/preview.webp`.
+
 A Showcase is built from rows: one wide frame, two halves, three thirds, or
 four portraits in two pairs. Each frame carries its photo's proportion as
 `--ar` and grows by it, so a row comes out one height whatever its mix.
