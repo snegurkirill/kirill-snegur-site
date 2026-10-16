@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="case.css">
-<link rel="stylesheet" href="ds.css?v=6">
+<link rel="stylesheet" href="ds.css?v=8">
 <link rel="stylesheet" href="components.css">
 <script src="info.js"></script>
 </head>
@@ -154,9 +154,9 @@
       </ul></div>
       <div><h3>Поведение</h3><ul>
         <li>Пока строки в одну линию, они идут вплотную; когда таблица уже 748 и строки переносятся — через 12.</li>
-        <li><b>Наведение пока отключено.</b> Стиль сохранён за модификатором <code>ds-table--interactive</code> и скриптом <code>ds.js</code>; ни одна страница их сейчас не подключает.</li>
-        <li>С модификатором наведение инвертирует строку: чёрный фон, белый текст. Если у строки есть превью, оно всплывает в правом верхнем углу экрана: в половину высоты, не шире 80% ширины, скругление 12, едва заметная тень — как Dynamic Island на iOS.</li>
-        <li>На телефоне вместо наведения активной становится строка, которая проходит через середину экрана.</li>
+        <li><b><code>ds-table--interactive</code></b> — строка под курсором заливается синим ссылок #7EB0FF, текст остаётся чёрным. Заливка появляется сразу, а после ухода курсора гаснет за 1 секунду. Включено на /index.</li>
+        <li>На телефоне наведения нет: подсвечивается строка, которая проходит через середину экрана (<code>ds.js</code>).</li>
+        <li><b><code>ds-table--previews</code></b> — поверх этого строка с <code>data-preview</code> показывает превью в правом верхнем углу: в половину высоты экрана, не шире 80% ширины, скругление 12, едва заметная тень. Собрано, но выключено — модификатора нет ни на одной странице.</li>
         <li>Длинный проект переносится внутри своей ячейки, соседние колонки не сдвигаются.</li>
       </ul></div>
       <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
@@ -189,7 +189,7 @@
         </div>
       </div>
     <div class="sg-var">
-      <div class="sg-label"><b>Активная строка</b> <code>ds-table--interactive</code>, состояние показано статично · отключено на страницах</div>
+      <div class="sg-label"><b>Активная строка</b> <code>ds-table--interactive</code> · вторая подсвечена статично, остальные — при наведении · /index</div>
       <div class="sg-demo sg-demo--430" lang="en">
         <div class="ds-table ds-table--interactive">
           <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
