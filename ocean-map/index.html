@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта синей экономики — Kirill Snegur</title>
+<meta name="description" content="Интерактивная карта инновационной экосистемы синей экономики России: 65 организаций в 11 категориях.">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Карта инновационной экосистемы синей экономики России">
+<meta property="og:description" content="65 организаций синей экономики: стартапы, институты, университеты, фонды и инициативы.">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../case.css?v=7">
+<link rel="stylesheet" href="../ds.css?v=8">
+<link rel="stylesheet" href="map.css?v=2">
+</head>
+<body>
+<div class="case om">
+
+  <header class="om-head">
+    <p class="om-brand">Ассоциация<br>экономики океана</p>
+    <h1>Карта инновационной экосистемы синей экономики России</h1>
+    <a class="om-offer" href="https://forms.yandex.ru/cloud/67178d7e5d2a060fb48995c1/" target="_blank" rel="noopener">
+      <img src="../media/ocean-map/form-qr.svg" width="48" height="48" alt="">
+      <span>Предложить проект&nbsp;↗</span>
+    </a>
+  </header>
+
+  <nav class="om-bar" aria-label="Вид и категории">
+    <div class="om-tabs" role="tablist">
+      <button class="is-on" data-view="map" role="tab">Карта</button>
+      <button data-view="table" role="tab">Таблица</button>
+    </div>
+    <div class="om-tags" id="tags"></div>
+    <button class="om-pick" id="pick" aria-haspopup="dialog" aria-controls="sheet">
+      <span class="om-pick__cat"><i class="om-dot" id="pick-dot"></i><span id="pick-label">Все категории</span></span>
+      <svg class="om-pick__icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="4.5" cy="4.5" r="2.5"/><circle cx="13.5" cy="4.5" r="2.5"/><circle cx="4.5" cy="13.5" r="2.5"/><circle cx="13.5" cy="13.5" r="2.5"/></svg>
+      <span class="visually-hidden">Выбрать категорию</span>
+    </button>
+  </nav>
+
+  <main>
+    <section class="om-view is-on" id="view-map">
+      <h2 class="visually-hidden">Карта</h2>
+      <div class="om-map" id="wrap">
+        <svg id="map" viewBox="0 85 2000 995" aria-label="Карта организаций">
+          <defs>
+            <!-- Размытие и порог альфы сливают фигуры одной категории в один остров -->
+            <filter id="om-goo" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="b"/>
+              <feColorMatrix in="b" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 36 -16" result="g"/>
+              <feMorphology in="g" operator="erode" radius="2" result="e"/>
+              <feComposite in="g" in2="e" operator="out" result="ring"/>
+              <feComponentTransfer in="g" result="fill"><feFuncA type="linear" slope=".15"/></feComponentTransfer>
+              <feComponentTransfer in="ring" result="edge"><feFuncA type="linear" slope=".55"/></feComponentTransfer>
+              <feMerge><feMergeNode in="fill"/><feMergeNode in="edge"/></feMerge>
+            </filter>
+            <filter id="om-shadow" x="-30%" y="-30%" width="160%" height="170%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#10345e" flood-opacity=".13"/>
+            </filter>
+          </defs>
+          <g id="layer-sea"></g>
+          <g id="layer-islands"></g>
+          <g id="layer-labels"></g>
+          <g id="layer-nodes"></g>
+        </svg>
+        <div class="om-zoom">
+          <button id="zin" aria-label="Приблизить">+</button>
+          <button id="zout" aria-label="Отдалить">−</button>
+          <button id="zreset" aria-label="Показать всю карту">⤢</button>
+        </div>
+      </div>
+      <p class="om-hint"><span class="om-hint__mouse">Колесо мыши — масштаб, перетаскивание — сдвиг, клик по логотипу или плашке — подробности</span><span class="om-hint__touch">Два пальца — масштаб, перетаскивание — сдвиг, нажатие на логотип или плашку — подробности</span></p>
+    </section>
+
+    <section class="om-view" id="view-table">
+      <h2 class="visually-hidden">Таблица</h2>
+      <div id="groups"></div>
+    </section>
+  </main>
+
+  <footer class="om-foot">
+    <p>При экспертной поддержке Россельхозбанка, Центра морских исследований МГУ имени М.В.&nbsp;Ломоносова. Контакт: <a href="mailto:connect@ocean-economy.ru">connect@ocean-economy.ru</a></p>
+    <p>Цитирование логотипов из открытых источников в целях информирования (не в коммерческих целях)</p>
+  </footer>
+</div>
+
+<div class="om-scrim" id="scrim"></div>
+<aside class="om-panel" id="panel" aria-hidden="true">
+  <button class="om-panel__close" id="close" aria-label="Закрыть">×</button>
+  <div class="om-panel__logo"><img id="p-logo" alt=""></div>
+  <div class="om-panel__body">
+    <p class="om-panel__meta"><span id="p-no"></span> · <i class="om-dot" id="p-dot"></i><span id="p-cat"></span></p>
+    <h2 id="p-name"></h2>
+    <p class="om-panel__full" id="p-full"></p>
+    <p class="om-panel__links">
+      <a id="p-site" target="_blank" rel="noopener">Сайт ↗</a>
+      <button id="p-show">Показать на карте</button>
+    </p>
+    <p class="om-panel__nav">
+      <button id="p-prev">← Предыдущая</button>
+      <button id="p-next">Следующая →</button>
+    </p>
+  </div>
+</aside>
+<aside class="om-sheet" id="sheet" role="dialog" aria-label="Категории" aria-hidden="true">
+  <p class="om-sheet__title">Категории</p>
+  <div class="om-sheet__list" id="sheet-list"></div>
+</aside>
+<div class="om-tip" id="tip"></div>
+
+<script src="data.js?v=1"></script>
+<script src="map.js?v=2"></script>
+<script src="../ds.js"></script>
+</body>
+</html>

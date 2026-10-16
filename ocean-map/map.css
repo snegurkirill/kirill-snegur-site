@@ -1,0 +1,452 @@
+/* ---------------------------------------------------------------------------
+   Ocean map — /ocean-map
+   Интерактивная карта экосистемы синей экономики. Шрифты, цвета и раскладка
+   страницы приходят из styles.css и case.css, таблица — Table из ds.css.
+   Сама карта сохраняет стиль оригинала: цветные острова и плашки категорий,
+   белые карточки логотипов, изолинии на голубом поле. Цвет категории
+   (--c) ставит map.js.
+   --------------------------------------------------------------------------- */
+
+.om {
+  --om-small: 13px;          /* подписи и теги — как compact Unit */
+  --om-navy: #10243e;        /* тёмный текст и подсказка карты */
+  --om-brand: #1a6fc4;       /* логотип ассоциации */
+  padding-top: 48px;
+  padding-bottom: 160px;
+}
+
+.om h1,
+.om h2 { margin: 0; font: inherit; }
+
+.om button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.om-dot {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c, #10243e);   /* шторка живёт вне .om, поэтому без --om-navy */
+}
+
+/* --- шапка: логотип, заголовок по центру, форма -------------------------- */
+
+.om-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px 32px;
+}
+
+/* Логотип ассоциации — как на оригинале: жирные прописные в синем градиенте. */
+.om-brand {
+  justify-self: start;
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 15px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: linear-gradient(100deg, #1b4f9c 0%, var(--om-brand) 60%, #1a8fd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.om-head h1 {
+  max-width: 760px;
+  text-align: center;
+  color: var(--ink-strong);
+  font-size: 30px;
+  line-height: 30px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* Кнопка — нейтральная белая карточка, как блок QR на оригинале. */
+.om-offer {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 8px;
+  background: var(--paper);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgb(16 52 94 / 0.06), 0 6px 20px rgb(16 52 94 / 0.10);
+  color: var(--ink-strong);
+  white-space: nowrap;
+  transition: box-shadow .2s, transform .2s;
+}
+.om-offer img { display: block; width: 48px; height: 48px; }
+.om-offer:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 1px 2px rgb(16 52 94 / 0.06), 0 10px 28px rgb(16 52 94 / 0.16);
+}
+
+/* --- вид и категории ------------------------------------------------------ */
+
+.om-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: baseline;
+  gap: 12px 32px;
+  margin-top: 40px;
+  padding: 12px 0;
+  background: var(--paper);
+}
+
+.om-tabs { display: flex; gap: 20px; flex: none; }
+.om-tabs button.is-on,
+.om-tabs button:hover { color: var(--ink-strong); }
+
+/* Теги без обводки: цветная точка категории и чёрный текст, 8px между ними.
+   Выбранный — заливка цветом категории. */
+.om-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--ds-font-grotesk);
+  font-size: var(--om-small);
+  line-height: 12px;
+}
+.om-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  color: var(--ink-strong);
+  text-align: left;
+  transition: background-color 1s ease-in-out;
+}
+.om .om-tag { color: var(--ink-strong); }
+.om-tag sup { font-size: 10px; color: var(--ink); vertical-align: 4px; line-height: 0; margin-left: -2px; }
+.om-tag:hover { background: color-mix(in srgb, var(--c, var(--om-navy)) 10%, transparent); transition: none; }
+.om-tag.is-on { background: color-mix(in srgb, var(--c, var(--om-navy)) 22%, transparent); transition: none; }
+
+/* На телефоне вместо строки тегов — выбранная категория и кнопка шторки. */
+.om-pick {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--ds-font-grotesk);
+  font-size: 15px;
+  line-height: 16px;
+}
+.om .om-pick { color: var(--ink-strong); }
+.om-pick__cat { display: inline-flex; align-items: center; gap: 8px; min-width: 0; text-align: left; }
+.om-pick__icon { flex: none; fill: var(--ink-strong); }
+
+.om-view { display: none; margin-top: 12px; }
+.om-view.is-on { display: block; }
+
+/* --- карта: стиль оригинала ---------------------------------------------- */
+
+.om-map {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2000 / 995;
+  border-radius: 22px;
+  background: linear-gradient(160deg, #e6f2fb 0%, #f4f9fd 55%, #e9f3fb 100%);
+  box-shadow: inset 0 0 0 1px #d6e4f0;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+.om-map.is-dragging { cursor: grabbing; }
+.om-map svg { display: block; width: 100%; height: 100%; }
+
+.om-contour { fill: none; stroke: #fff; stroke-width: 2; opacity: .9; }
+.om-contour--dash { stroke: #9cc6e8; stroke-dasharray: 10 9; opacity: .55; stroke-width: 1.6; }
+
+.om-island { transition: opacity .25s; }
+.om-island.is-dim { opacity: .22; }
+
+.om-pill {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: 16px;
+  background: var(--c);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  cursor: pointer;
+  box-shadow: 0 8px 18px -8px var(--c);
+  transition: transform .15s, opacity .25s, filter .15s;
+}
+.om-pill:hover { transform: translateY(-2px); filter: brightness(1.07); }
+.om-pill.is-dim { opacity: .3; }
+
+.om-node { cursor: pointer; transition: opacity .25s; }
+.om-node:focus { outline: none; }
+.om-node .om-lift { transform-box: fill-box; transform-origin: center; transition: transform .18s ease; }
+.om-node:hover .om-lift,
+.om-node:focus-visible .om-lift,
+.om-node.is-sel .om-lift { transform: scale(1.14); }
+.om-node .om-card { fill: #fff; }
+.om-node.is-sel .om-card,
+.om-node:focus-visible .om-card { stroke: var(--c); stroke-width: 3; }
+.om-node .om-badge { fill: var(--c); }
+.om-node .om-num {
+  fill: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.om-node.is-dim { opacity: .14; }
+
+.om-zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.om .om-zoom button {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid #d6e4f0;
+  background: #fff;
+  color: #0d5ea8;
+  font-family: var(--font);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  box-shadow: 0 2px 8px rgb(16 52 94 / 0.1);
+}
+.om .om-zoom button:hover { border-color: #1a7fd0; }
+
+.om-hint,
+.om-foot {
+  font-family: var(--font-caption);
+  font-size: var(--om-small);
+  line-height: normal;
+  letter-spacing: var(--track-caption);
+  color: var(--ink);
+}
+.om-hint { margin-top: 8px; text-align: center; }
+.om-hint__touch { display: none; }
+@media (hover: none) {
+  .om-hint__mouse { display: none; }
+  .om-hint__touch { display: inline; }
+}
+.om-foot { margin-top: 96px; display: flex; flex-wrap: wrap; gap: 4px 32px; }
+.om-foot p { max-width: 520px; text-wrap: balance; }
+
+/* --- подсказка над логотипом (стиль карты) -------------------------------- */
+
+.om-tip {
+  position: fixed;
+  z-index: 20;
+  max-width: 280px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #10243e;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.35;
+  letter-spacing: 0;
+  box-shadow: 0 10px 30px rgb(16 52 94 / 0.12);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .12s, transform .12s;
+}
+.om-tip.is-on { opacity: 1; transform: none; }
+.om-tip b { display: block; font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.om-tip span { color: #b9cde3; }
+
+/* --- таблица по категориям ---------------------------------------------- */
+
+.om-group + .om-group { margin-top: 64px; }
+.om-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px 4px;
+  font: inherit;
+  color: var(--ink-strong);
+  text-wrap: balance;
+}
+.om-group h3 .om-dot { width: 10px; height: 10px; }
+.om-group h3 sup { color: var(--ink); font-size: var(--om-small); margin-left: -6px; align-self: flex-start; line-height: 1; }
+.om-group[hidden] { display: none; }
+.om-group .ds-unit { cursor: pointer; }
+.om-group .ds-unit__year { color: var(--ink); width: 32px; }
+/* Когда строка складывается, номер остаётся на одной линии с названием. */
+@container ds-table (width < 748px) {
+  .om-group .ds-unit__year + .ds-unit__client { min-width: 0; }
+  .om-group .ds-unit__options { padding-left: 42px; }   /* под названием, а не под номером */
+}
+/* На подсвеченной строке весь текст чёрный, как на /index. */
+.om-group .ds-unit:is(:hover, .is-active) :is(.ds-unit__year, .ds-unit__project) { color: var(--ds-ink); }
+.om-group .ds-unit__project { color: var(--ds-ink-caption); }
+.om-group .ds-unit__role { overflow-wrap: anywhere; }
+.om-group .ds-unit__role a { color: inherit; }
+
+/* --- карточка организации и шторка категорий ------------------------------ */
+
+.om-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+  background: rgb(0 0 0 / 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.om-scrim.is-on { opacity: 1; pointer-events: auto; }
+
+.om-panel,
+.om-sheet {
+  position: fixed;
+  z-index: 30;
+  background: var(--paper);
+  font-family: var(--font);
+  letter-spacing: var(--track-body);
+  transition: transform .3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.om-panel {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(430px, 100vw);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(105%);
+}
+.om-panel.is-on { transform: none; }
+.om-panel button { font: inherit; letter-spacing: inherit; background: none; border: 0; padding: 0; cursor: pointer; color: var(--link); }
+.om-panel button:hover { text-decoration: underline; }
+
+.om-panel__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  font-size: 28px !important;
+  color: var(--ink-strong) !important;
+  background: var(--paper) !important;
+}
+.om-panel__logo {
+  height: 220px;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  background: #f4f4f4;
+}
+.om-panel__logo img { max-width: 100%; max-height: 140px; object-fit: contain; mix-blend-mode: multiply; }
+.om-panel__body { padding: 20px 10px 32px; overflow-y: auto; }
+.om-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ds-font-grotesk);
+  font-size: 13px;
+  line-height: 12px;
+  color: var(--ink);
+}
+.om-panel h2 { margin-top: 20px; color: var(--ink-strong); text-wrap: balance; }
+.om-panel__full { margin-top: 20px; text-wrap: balance; }
+.om-panel__links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 32px; }
+.om-panel__links a[hidden] { display: none; }
+.om-panel__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  font-family: var(--ds-font-grotesk);
+  font-size: 13px;
+  line-height: 12px;
+}
+
+.om-sheet {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px 12px calc(24px + env(safe-area-inset-bottom, 0px));
+  border-radius: 16px 16px 0 0;
+  transform: translateY(105%);
+}
+.om-sheet.is-on { transform: none; }
+.om-sheet__title { color: var(--ink); margin: 0 8px 12px; }
+.om-sheet__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--ds-font-grotesk);
+  font-size: 17px;
+  line-height: 18px;
+}
+.om-sheet .om-tag {
+  padding: 10px 8px;
+  gap: 10px;
+  font: inherit;
+  letter-spacing: -0.02em;
+  color: var(--ink-strong);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.om-sheet .om-tag.is-on { background: color-mix(in srgb, var(--c, var(--om-navy)) 22%, transparent); }
+.om-sheet .om-tag sup { font-size: 11px; }
+
+@media (max-width: 1100px) {
+  .om-head { grid-template-columns: 1fr auto; }
+  .om-head h1 { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+}
+
+@media (max-width: 700px) {
+  .om { padding-top: 24px; padding-bottom: 96px; }
+  .om-head { gap: 20px 16px; }
+  .om-brand { font-size: 13px; line-height: 13px; }
+  .om-offer { gap: 8px; padding: 6px 12px 6px 6px; font-size: 16px; line-height: 16px; }
+  .om-offer img { width: 36px; height: 36px; }
+  .om-head h1 { font-size: 24px; line-height: 25px; }
+  .om-bar { margin-top: 24px; align-items: center; gap: 20px; }
+  .om-tags { display: none; }
+  .om-pick { display: flex; }
+  .om-map { aspect-ratio: 4 / 5; border-radius: 16px; }
+  .om-panel {
+    top: auto;
+    width: 100vw;
+    height: min(78vh, 620px);
+    transform: translateY(105%);
+  }
+}
