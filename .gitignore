@@ -43,3 +43,9 @@ assets/cabinet-truda/*
 # life-photos page: only the compressed derivatives are tracked.
 assets/life-photos/*
 !assets/life-photos/Сжатые/
+
+# media/: only the WebP/MP4 derivatives are tracked; source exports dropped
+# in next to them (PNG, JPEG) stay local.
+media/**/*.png
+media/**/*.jpg
+media/**/*.jpeg

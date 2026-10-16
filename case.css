@@ -417,7 +417,7 @@
 
 .case--index {
   --gap-section: 96px;
-  --measure: 640px;   /* the Info descriptions run ~620px a line in the design */
+  --measure: 410px;   /* the intro, in the site's text measure; Info no longer runs here */
   padding-top: 99px;
   padding-bottom: 304px;
 }
@@ -439,14 +439,24 @@
 
 .case--index .case-section--ruled { padding-top: 171px; }
 
+/* The closing lines are set like the intro: body grey, 20/20, the 410
+   measure, paragraphs 20 apart and inset 10 like the intro on a stacked page.
+   Links stay grey and are told apart by a monospace face instead; it is
+   drawn larger per em than Source Sans, so it runs at 0.9em to sit on the
+   same x-height, without the body's -4% tracking. */
 .idx-outro {
   margin-top: var(--gap-section);
-  max-width: 370px;
-  line-height: 24px;
-  color: var(--ink-strong);
+  margin-left: 10px;
+  max-width: 410px;
+  color: var(--ink);
 }
 .idx-outro p { text-wrap: balance; }
-.idx-outro p + p { margin-top: 24px; }
+.idx-outro p + p { margin-top: var(--gap-para); }
+.idx-outro a {
+  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em;
+  letter-spacing: 0;
+}
 
 /* --- /cabinet-truda ------------------------------------------------------
    An index of every project as a Table, then five of them opened up: a Unit
