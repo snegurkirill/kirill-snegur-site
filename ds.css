@@ -20,6 +20,7 @@
   --ds-ink: #000;
   --ds-ink-caption: #2f2b28;
   --ds-frame: #000;
+  --ds-highlight: var(--link, #7eb0ff);   /* the link blue */
 }
 
 /* --- Unit ----------------------------------------------------------------
@@ -103,17 +104,19 @@
 
 /* --- Table ---------------------------------------------------------------
    A stack of compact Units. Each row carries 4px of padding — the room its
-   inverted state needs — so the text sits 4 in, level with a case header
+   highlighted state needs — so the text sits 4 in, level with a case header
    inside Content. Rows touch while each is one line, and stand 12 apart
    once they fold: every row folds at the same width (748 = the 740 above
    plus the padding), so the table can tell from its own width.
 
-   Interactive rows are switched off for now; the styles stay, behind the
-   ds-table--interactive modifier, which no page carries. With it, hovering
-   a row inverts it, and a row that names a preview (data-preview) shows it
-   in the corner of the screen (.ds-preview below, run by ds.js). On a touch
-   screen the row crossing the middle of the screen takes that state. To
-   turn it back on: add the modifier to the table and load ds.js. */
+   ds-table--interactive: the row under the pointer is filled with the link
+   blue, its text staying black. On a touch screen there is no hover, so the
+   row crossing the middle of the screen takes that state as the page
+   scrolls — ds.js runs that half; without it, touch shows no highlight.
+
+   ds-table--previews, on top of it: a row that names a picture
+   (data-preview) also shows it in the corner of the screen (.ds-preview
+   below). Built, switched off for now — no page carries this modifier. */
 
 .ds-table {
   container: ds-table / inline-size;
@@ -127,14 +130,18 @@
   .ds-table > .ds-unit + .ds-unit { margin-top: 12px; }
 }
 
+/* The highlight comes on at once and fades out over a second once the
+   pointer — or, on touch, the middle of the screen — has moved on. */
+.ds-table--interactive > .ds-unit { transition: background-color 1s ease-in-out; }
+
 .ds-table--interactive > .ds-unit.is-active {
-  background: var(--ds-ink);
-  color: #fff;
+  background: var(--ds-highlight);
+  transition: none;
 }
 @media (hover: hover) {
   .ds-table--interactive > .ds-unit:hover {
-    background: var(--ds-ink);
-    color: #fff;
+    background: var(--ds-highlight);
+    transition: none;
   }
 }
 

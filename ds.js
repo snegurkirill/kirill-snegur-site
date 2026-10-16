@@ -1,18 +1,17 @@
-/* Table rows with a preview — the behaviour half of the ds- blocks.
+/* Active Table rows — the behaviour half of the ds- blocks.
 
-   Hovering a Table row makes it the active row: ds.css inverts it, and when
-   the row names a picture (data-preview) that picture floats in the top-right
-   corner. A touch screen has no hover, so there the row crossing the middle
-   of the screen is the active one, and scrolling the table runs through the
-   cases.
+   Hovering a row of a ds-table--interactive table makes it the active row,
+   and ds.css fills it with the link blue. A touch screen has no hover, so
+   there the row crossing the middle of the screen is the active one, and
+   scrolling the table runs through the projects. In a table that is also
+   ds-table--previews, a row that names a picture (data-preview) floats it
+   in the top-right corner.
 
    The preview is a single element at the end of <body>, not one per row: the
    page's main column is a CSS container, which would pin anything fixed
    inside it to the column instead of the screen.
 
-   It acts only on tables marked ds-table--interactive; for now no page
-   carries the modifier or loads this file, so it is off. Without JS a marked
-   table still inverts on hover; there is just no preview. */
+   Without JS a marked table still highlights on hover; touch gets nothing. */
 (function () {
   var rows = document.querySelectorAll('.ds-table--interactive > .ds-unit');
   if (!rows.length) return;
@@ -35,7 +34,7 @@
     current = row;
     if (row) row.classList.add('is-active');
 
-    var src = row && row.getAttribute('data-preview');
+    var src = row && row.closest('.ds-table--previews') && row.getAttribute('data-preview');
     if (!src) { box.classList.remove('is-shown'); return; }
 
     var probe = new Image();
@@ -51,12 +50,15 @@
   // A mouse or a pen hovers; a finger does not.
   var hover = window.matchMedia('(hover: hover) and (pointer: fine)');
 
+  // Only where hovering is the way of pointing. Elsewhere a stray cursor —
+  // an emulator's, a touch laptop's — would fire enter and leave as the
+  // page scrolls under it and fight the middle-of-the-screen row.
   rows.forEach(function (row) {
     row.addEventListener('pointerenter', function (e) {
-      if (e.pointerType !== 'touch') activate(row);
+      if (hover.matches && e.pointerType !== 'touch') activate(row);
     });
     row.addEventListener('pointerleave', function (e) {
-      if (e.pointerType !== 'touch' && current === row) activate(null);
+      if (hover.matches && e.pointerType !== 'touch' && current === row) activate(null);
     });
   });
 
@@ -86,7 +88,7 @@
   // instant rather than a beat late.
   window.addEventListener('load', function () {
     rows.forEach(function (row) {
-      var src = row.getAttribute('data-preview');
+      var src = row.closest('.ds-table--previews') && row.getAttribute('data-preview');
       if (src) new Image().src = src;
     });
   });

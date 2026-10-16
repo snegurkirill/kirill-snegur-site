@@ -180,13 +180,14 @@ flush right. In a Table each row has 4px of padding and the rows touch while
 they are one line; once the table is under 748px every row folds and they
 stand 12 apart.
 
-Interactive rows are built but switched off. With the `ds-table--interactive`
-modifier and `ds.js` loaded, hovering a row inverts it, and a row with
-`data-preview` shows that picture in the top-right corner — half the screen
-tall, at most 80% of its width, 12px corners; on a touch screen the row
-crossing the middle of the screen takes that state as the page scrolls. No
-page carries the modifier or loads `ds.js` for now; the `data-preview`
-attributes on /index stay, inert, ready for when it comes back. Previews live with their project in
+On /index the table is `ds-table--interactive`: the row under the pointer
+is filled with the link blue (#7EB0FF), its text staying black — at once
+on the way in, fading out over a second on the way out; on a touch
+screen the row crossing the middle of the screen takes that state as the
+page scrolls (`ds.js`). A further modifier, `ds-table--previews`, would also
+float a row's `data-preview` picture in the top-right corner — half the
+screen tall, at most 80% of its width, 12px corners. It is built but no page
+carries it; the `data-preview` attributes on /index stay, inert. Previews live with their project in
 `media/<project>/preview.webp`.
 
 A Showcase is built from rows: one wide frame, two halves, three thirds, or
