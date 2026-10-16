@@ -17,14 +17,19 @@
   if (!rows.length) return;
   rows = Array.prototype.slice.call(rows);
 
-  var box = document.createElement('div');
-  box.className = 'ds-preview';
-  box.setAttribute('aria-hidden', 'true');
-  var img = document.createElement('img');
-  img.alt = '';
-  img.decoding = 'async';
-  box.appendChild(img);
-  document.body.appendChild(box);
+  // The preview box exists only where a table can show previews; elsewhere
+  // an empty <img> would sit in the page as a broken image.
+  var box = null, img = null;
+  if (document.querySelector('.ds-table--previews')) {
+    box = document.createElement('div');
+    box.className = 'ds-preview';
+    box.setAttribute('aria-hidden', 'true');
+    img = document.createElement('img');
+    img.alt = '';
+    img.decoding = 'async';
+    box.appendChild(img);
+    document.body.appendChild(box);
+  }
 
   var current = null;
 
@@ -34,8 +39,8 @@
     current = row;
     if (row) row.classList.add('is-active');
 
-    var src = row && row.closest('.ds-table--previews') && row.getAttribute('data-preview');
-    if (!src) { box.classList.remove('is-shown'); return; }
+    var src = box && row && row.closest('.ds-table--previews') && row.getAttribute('data-preview');
+    if (!src) { if (box) box.classList.remove('is-shown'); return; }
 
     var probe = new Image();
     probe.onload = function () {
