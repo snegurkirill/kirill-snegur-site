@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="case.css">
-<link rel="stylesheet" href="ds.css?v=3">
+<link rel="stylesheet" href="ds.css?v=6">
 <link rel="stylesheet" href="components.css">
 <script src="info.js"></script>
 </head>
@@ -64,7 +64,7 @@
       <span class="sg-num">ds 01</span>
       <h2 class="sg-name">Unit</h2>
       <span class="sg-tag sg-tag--shared">общий</span>
-      <p class="sg-where">Figma <code>311:95</code>. Класс <code>.ds-unit</code>, варианты <code>--compact</code>, <code>--end</code>.</p>
+      <p class="sg-where">Figma <code>311:95</code>. Класс <code>.ds-unit</code>, вариант <code>--compact</code>.</p>
     </div>
     <div class="sg-doc">
       <div><h3>Состав</h3><ul>
@@ -75,14 +75,13 @@
       </ul></div>
       <div><h3>Поведение</h3><ul>
         <li><b>Основной</b>, 20/20 — шапка кейса. Клиент и проект делят строку (от 200 каждый), формат 140 и роль 190 фиксированы. В 410 — две строки, от 760 — одна.</li>
-        <li><b><code>--compact</code></b>, 13/12 — строка таблицы. Клиент на своей строке, под ним группа «проект 120+ · формат 120 · роль 120». От 650 всё в одну строку.</li>
+        <li><b><code>--compact</code></b>, 13/12 — строка проекта: один и тот же вид в таблице и в шапке кейса. Клиент — колонка 410, поэтому проект везде начинается в 420 от края; формат 120 и роль 120 выключены вправо. Уже 740 группа «проект · формат · роль» уходит под клиента.</li>
         <li><b>С годом</b> — compact с ячейкой года 48 впереди, группа разведена на 10 вместо 4.</li>
-        <li><b><code>--end</code></b> — формат и роль выключены вправо.</li>
         <li>Перенос — по минимальным ширинам ячеек, без медиазапросов: блок подстраивается под любой контейнер.</li>
       </ul></div>
       <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
         <li>В Figma варианты называются Default / Variant2 / Variant3 — здесь основной, compact и «с годом».</li>
-        <li>В Table формат и роль стоят влево, в Content и в варианте с годом — вправо. Сделал так же, через <code>--end</code>; если это одно правило, оставлю один вариант.</li>
+        <li>В Figma строка Table шла по половинам ширины и выключке влево, а шапка Content — по колонке 410 и вправо. Сведены в один вид — как в Content.</li>
         <li>Diatype — коммерческий шрифт. Он установлен у вас и виден здесь, но для сайта нужна веб-лицензия. Без неё у посетителей будет Source Sans 3.</li>
       </ul></div>
     </div>
@@ -106,9 +105,9 @@
         </div>
       </div>
       <div class="sg-var">
-        <div class="sg-label"><b>С годом, <code>--end</code></b> 410 · <code>315:569</code></div>
+        <div class="sg-label"><b>С годом</b> 410 · <code>315:569</code></div>
         <div class="sg-demo sg-demo--410" lang="en">
-          <div class="ds-unit ds-unit--compact ds-unit--end">
+          <div class="ds-unit ds-unit--compact">
             <p class="ds-unit__year">2026</p>
             <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
             <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
@@ -129,7 +128,7 @@
           <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
         </div>
         <br>
-        <div class="ds-unit ds-unit--compact ds-unit--end">
+        <div class="ds-unit ds-unit--compact">
           <p class="ds-unit__year">2026</p>
           <p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p>
           <div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div>
@@ -148,12 +147,16 @@
     </div>
     <div class="sg-doc">
       <div><h3>Состав</h3><ul>
-        <li>Стопка Unit в варианте <code>--compact</code>.</li>
+        <li>Стопка Unit <code>--compact</code> — тех же, что в шапках кейсов.</li>
+        <li>У строки поле 4: текст стоит вровень с шапкой кейса внутри Content, а у инверсии есть воздух.</li>
+        <li>Строка может вести на превью кейса: <code>data-preview="путь к картинке"</code>.</li>
         <li>Без шапки колонок и линий.</li>
       </ul></div>
       <div><h3>Поведение</h3><ul>
-        <li>Записи идут через 12.</li>
-        <li>На телефоне запись занимает две строки, на широком экране — одну, и таблица становится вчетверо короче.</li>
+        <li>Пока строки в одну линию, они идут вплотную; когда таблица уже 748 и строки переносятся — через 12.</li>
+        <li><b>Наведение пока отключено.</b> Стиль сохранён за модификатором <code>ds-table--interactive</code> и скриптом <code>ds.js</code>; ни одна страница их сейчас не подключает.</li>
+        <li>С модификатором наведение инвертирует строку: чёрный фон, белый текст. Если у строки есть превью, оно всплывает в правом верхнем углу экрана: в половину высоты, не шире 80% ширины, скругление 12, едва заметная тень — как Dynamic Island на iOS.</li>
+        <li>На телефоне вместо наведения активной становится строка, которая проходит через середину экрана.</li>
         <li>Длинный проект переносится внутри своей ячейки, соседние колонки не сдвигаются.</li>
       </ul></div>
       <div class="sg-warn"><h3>Вопросы к макету</h3><ul>
@@ -165,7 +168,7 @@
         <div class="sg-label"><b>430</b> ширина макета</div>
         <div class="sg-demo sg-demo--430" lang="en">
           <div class="ds-table">
-            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
+            <div class="ds-unit ds-unit--compact" data-preview="media/tamed-form/preview.webp"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
             <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Sila Vetra</p><div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration</p><p class="ds-unit__role">Coordination</p></div></div>
             <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Mark Yavorsky, Elizaveta Alifirenko</p><div class="ds-unit__options"><p class="ds-unit__project">Trubnaya 2</p><p class="ds-unit__format">Art advisory</p><p class="ds-unit__role">Coordination</p></div></div>
             <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Dmitriy Markin</p><div class="ds-unit__options"><p class="ds-unit__project">Tverskaya 9</p><p class="ds-unit__format">Public space</p><p class="ds-unit__role">Product strategy</p></div></div>
@@ -177,7 +180,7 @@
         <div class="sg-label"><b>Во всю ширину</b> запись в одну строку</div>
         <div class="sg-demo" lang="en">
           <div class="ds-table">
-            <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
+            <div class="ds-unit ds-unit--compact" data-preview="media/tamed-form/preview.webp"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
             <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Sila Vetra</p><div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration</p><p class="ds-unit__role">Coordination</p></div></div>
             <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Mark Yavorsky, Elizaveta Alifirenko</p><div class="ds-unit__options"><p class="ds-unit__project">Trubnaya 2</p><p class="ds-unit__format">Art advisory</p><p class="ds-unit__role">Coordination</p></div></div>
             <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Dmitriy Markin</p><div class="ds-unit__options"><p class="ds-unit__project">Tverskaya 9</p><p class="ds-unit__format">Public space</p><p class="ds-unit__role">Product strategy</p></div></div>
@@ -185,6 +188,16 @@
           </div>
         </div>
       </div>
+    <div class="sg-var">
+      <div class="sg-label"><b>Активная строка</b> <code>ds-table--interactive</code>, состояние показано статично · отключено на страницах</div>
+      <div class="sg-demo sg-demo--430" lang="en">
+        <div class="ds-table ds-table--interactive">
+          <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Tamed form, GES-2 (&nbsp;V-A-C foundation&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Front garden workshop</p><p class="ds-unit__format">Event</p><p class="ds-unit__role">Production</p></div></div>
+          <div class="ds-unit ds-unit--compact is-active"><p class="ds-unit__client">Maria Kasatkina (&nbsp;159 Foundation, MR group&nbsp;)</p><div class="ds-unit__options"><p class="ds-unit__project">Demidov 26</p><p class="ds-unit__format">Stationery</p><p class="ds-unit__role">Design</p></div></div>
+          <div class="ds-unit ds-unit--compact"><p class="ds-unit__client">Mary Inkova</p><div class="ds-unit__options"><p class="ds-unit__project">Artist</p><p class="ds-unit__format">Website</p><p class="ds-unit__role">Design</p></div></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============================================================== ds 03 -->
@@ -336,7 +349,7 @@
     </div>
     <div class="sg-doc">
       <div><h3>Состав</h3><ul>
-        <li>Один кейс целиком: Unit <code>--compact --end</code> как шапка, Showcase, Info-string.</li>
+        <li>Один кейс целиком: Unit <code>--compact</code> как шапка — та же строка, что в Table, — Showcase, Info-string.</li>
         <li>Отступ 4 вокруг, 12 между частями.</li>
         <li>В ячейках формата и роли — несколько строк, по одной на каждую роль.</li>
       </ul></div>
@@ -354,7 +367,7 @@
         <div class="sg-label"><b>430</b> как в макете</div>
         <div class="sg-demo sg-demo--430" lang="en">
           <article class="ds-content">
-            <div class="ds-unit ds-unit--compact ds-unit--end">
+            <div class="ds-unit ds-unit--compact">
               <h3 class="ds-unit__client">Sila Vetra</h3>
               <div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration<br>Campaign<br>Cloth<br>Package</p><p class="ds-unit__role">Coordination<br>Production<br>Production<br>Design</p></div>
             </div>
@@ -385,7 +398,7 @@
       <div class="sg-label"><b>Во всю ширину</b> та же разметка</div>
       <div class="sg-demo" lang="en">
         <article class="ds-content">
-          <div class="ds-unit ds-unit--compact ds-unit--end">
+          <div class="ds-unit ds-unit--compact">
             <h3 class="ds-unit__client">Sila Vetra</h3>
             <div class="ds-unit__options"><p class="ds-unit__project">Brand shop</p><p class="ds-unit__format">Collaboration<br>Campaign<br>Cloth<br>Package</p><p class="ds-unit__role">Coordination<br>Production<br>Production<br>Design</p></div>
           </div>
