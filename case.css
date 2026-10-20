@@ -547,14 +547,6 @@
 }
 .case--tech .case-intro p:first-of-type { margin-top: 104.2px; }
 
-/* An exception to the Unit, for Avito alone: on a phone its service and
-   materials do not share a row as two columns of two lines; they wrap into
-   two lines of one, the materials still flush right. */
-@media (max-width: 700px) {
-  .tech-avito .ds-unit__options { flex-wrap: wrap; }
-  .tech-avito .ds-unit__role--fit { margin-left: auto; }
-}
-
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
    overflows; replace once a mobile frame exists.
