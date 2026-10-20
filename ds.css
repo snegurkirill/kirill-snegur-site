@@ -97,6 +97,15 @@
 .ds-unit--compact .ds-unit__format,
 .ds-unit--compact .ds-unit__role { flex-basis: 120px; text-align: right; }
 
+/* A last cell that runs long — a list of materials in place of a role —
+   takes the width of its text instead of the 120 column, so it holds one
+   line wherever the row has room and wraps only where it has not. The
+   project before it also starts from its text, so where the two do not fit
+   they give way in proportion to their length instead of the project
+   dropping to its 120 minimum. Such a Unit usually leaves the format out. */
+.ds-unit--compact .ds-unit__role--fit { flex: 0 1 auto; }
+.ds-unit--compact .ds-unit__project:has(+ .ds-unit__role--fit) { flex-basis: auto; }
+
 /* With a year in front the client fills what the year leaves, rather than
    the 410 column, and the design spaces the three options by the full 10. */
 .ds-unit--compact .ds-unit__year + .ds-unit__client { flex: 1 1 0; }
@@ -210,7 +219,11 @@
    minimum; the row wraps instead, and every frame keeps its proportion. A
    pair holds 320px and never splits, so four portraits are one row from
    2 × 320 + 12 and two by two below it. A frame on its own holds 148px —
-   half a pair less the 12px between frames — so halves and thirds wrap too. Without an --ar a slot takes the 193:415 portrait of the
+   half a pair less the 12px between frames — so halves and thirds wrap too.
+   A wide frame beside two portraits goes in a pair of its own: the two pairs
+   share the row equally, as a 1620 frame is as wide as two 798 portraits
+   and the gap, and on a phone the wide one stands above the two.
+   Without an --ar a slot takes the 193:415 portrait of the
    Figma mobile Content; the photo is cropped to the slot, and --pos moves
    the crop (object-position). */
 

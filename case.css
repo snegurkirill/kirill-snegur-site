@@ -534,6 +534,27 @@
   .cv-client--none { display: none; }
 }
 
+/* --- /tech-production ----------------------------------------------------
+   The /index blocks without the table or the outro: the intro line, then a
+   Content per case. The intro line sits flush with the signature here, not
+   inset 10 as on /index. The page ends on the last Showcase, 262 above the
+   foot of the design. ------------------------------------------------------ */
+
+.case--tech {
+  --gap-section: 96px;
+  padding-top: 99px;
+  padding-bottom: 258px;
+}
+.case--tech .case-intro p:first-of-type { margin-top: 104.2px; }
+
+/* An exception to the Unit, for Avito alone: on a phone its service and
+   materials do not share a row as two columns of two lines; they wrap into
+   two lines of one, the materials still flush right. */
+@media (max-width: 700px) {
+  .tech-avito .ds-unit__options { flex-wrap: wrap; }
+  .tech-avito .ds-unit__role--fit { margin-left: auto; }
+}
+
 /* --- narrow screens ------------------------------------------------------
    Not designed. The column goes fluid and the margin collapses so nothing
    overflows; replace once a mobile frame exists.
