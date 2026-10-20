@@ -49,3 +49,7 @@ assets/life-photos/*
 media/**/*.png
 media/**/*.jpg
 media/**/*.jpeg
+
+# tech-production page: only the compressed derivatives are tracked.
+assets/tech-production/*
+!assets/tech-production/Сжатые/
