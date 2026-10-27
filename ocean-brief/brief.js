@@ -314,7 +314,7 @@
     const s = screen('done');
     const h = text('h2', 'bf-h', '');
     const lead = text('p', 'bf-text', '');
-    const vpn = text('p', 'bf-text', 'Для надёжности — отключите, пожалуйста, VPN перед отправкой.');
+    const vpn = text('p', 'bf-text', 'Для надёжности, пожалуйста, отключите VPN перед отправкой.');
     const status = el('p', 'bf-note bf-label bf-status');
     status.setAttribute('role', 'status');
     const actions = el('div', 'bf-actions');
