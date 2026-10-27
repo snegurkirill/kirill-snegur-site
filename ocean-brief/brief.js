@@ -155,15 +155,12 @@
 
   function buildWelcome() {
     const s = screen('welcome');
-    s.card.append(
-      text('h1', 'bf-h', B.title),
-      ...B.intro.map((p) => text('p', 'bf-text', p))
-    );
-    const voice = el('p', 'bf-text bf-hint');
-    voice.innerHTML = CAN_RECORD
-      ? 'Отвечать можно голосом: <b>кнопка микрофона</b> в поле ответа. Записей к одному вопросу может быть несколько.'
-      : 'Запись голоса в этом браузере недоступна. Надиктовать можно с клавиатуры: на Mac — дважды Fn, на Windows — Win + H, на телефоне — микрофон на клавиатуре.';
-    s.card.append(voice);
+    s.card.append(text('h1', 'bf-h', B.title));
+    // Подсказка — только там, где кнопки микрофона не будет.
+    if (!CAN_RECORD) {
+      s.card.append(text('p', 'bf-text bf-text--aux',
+        'Запись голоса в этом браузере недоступна. Надиктовать можно с клавиатуры: на Mac — дважды Fn, на Windows — Win + H, на телефоне — микрофон на клавиатуре.'));
+    }
 
     const note = text('p', 'bf-text', 'Черновик в этом браузере не сохраняется, например в приватном режиме. Отправляйте части по мере заполнения.');
     note.id = 'draft-note';
@@ -181,16 +178,12 @@
       'Отправляя ответы, вы соглашаетесь на обработку указанных в них данных, в том числе записей голоса, для работы над проектом. Ответы передаются через сервис Forminit.'));
   }
 
-  function buildCover(section) {
+  // Заставка перед каждой группой — «Открытая витрина: Предназначение»;
+  // у раздела без групп — его название.
+  function buildCover(section, group) {
     const s = screen('cover', { section });
-    s.card.append(text('h2', 'bf-h', section.title));
-    const named = section.groups.filter((g) => g.title);
-    if (named.length) {
-      const list = el('ul', 'bf-groups');
-      for (const g of named) list.append(text('li', '', g.title));
-      s.card.append(list);
-    }
-    s.card.append(okButton('Начать раздел'));
+    s.card.append(text('h2', 'bf-h', group && group.title ? `${section.title}: ${group.title}` : section.title));
+    s.card.append(okButton('Начать'));
   }
 
   function buildQuestion(q) {
@@ -260,8 +253,7 @@
     s.card.append(
       text('p', 'bf-label', `Часть ${part.id} из ${B.parts.length}`),
       text('h2', 'bf-h', part.title),
-      text('p', 'bf-text bf-text--aux bf-summary', ''),
-      text('p', 'bf-text', 'Отправьте эту часть сейчас: ответы дойдут, даже если остальное вы заполните позже или на другом устройстве.')
+      text('p', 'bf-text bf-text--aux bf-summary', '')
     );
     const actions = el('div', 'bf-actions');
     const send = button('Отправить часть', 'bf-btn', { 'data-send': part.id });
@@ -302,8 +294,12 @@
   const byQ = {};
   buildWelcome();
   for (const section of B.sections) {
-    if (section.cover) buildCover(section);
-    for (const group of section.groups) for (const q of group.questions) buildQuestion(questions.find((x) => x.id === q.id));
+    const titled = section.groups.some((g) => g.title);
+    if (section.cover && !titled) buildCover(section);
+    for (const group of section.groups) {
+      if (section.cover && group.title) buildCover(section, group);
+      for (const q of group.questions) buildQuestion(questions.find((x) => x.id === q.id));
+    }
     const next = B.sections[B.sections.indexOf(section) + 1];
     if (!next || next.part !== section.part) buildSend(B.parts.find((p) => p.id === section.part));
   }

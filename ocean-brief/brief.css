@@ -200,13 +200,6 @@
 .bf-text--aux { color: var(--bf-muted); }
 .bf-text + .bf-text { margin-top: 12px; }
 
-.bf-groups {
-  display: grid;
-  gap: 8px;
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
-}
 
 /* --- поле ответа ---------------------------------------------------------
    Одна «капсула»: текст, плашки записей, кнопка микрофона справа. В покое —
