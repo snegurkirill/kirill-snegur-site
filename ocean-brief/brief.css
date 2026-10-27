@@ -88,6 +88,10 @@
   line-height: 16px;
   color: var(--bf-ink);
 }
+/* На приветствии в шапке только «Экономика океана»: «Бриф о витрине» — заголовок. */
+.is-welcome .bf-brand__more { display: none; }
+.bf-status.is-sent { color: var(--bf-ink); }
+.bf-status.is-sent::before { content: "✓ "; }
 .bf-test {
   margin: 0;
   font-family: var(--ds-font-grotesk);
@@ -365,31 +369,6 @@
   .bf-keys { display: none; }
 }
 
-/* --- отправка частей ---------------------------------------------------- */
-
-.bf-parts {
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0;
-  border-top: 1px solid var(--bf-line);
-}
-.bf-parts li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--bf-line);
-}
-.bf-parts .bf-btn { height: 36px; padding: 0 14px !important; }
-.bf-status.is-sent { color: var(--bf-ink); }
-.bf-status.is-sent::before { content: "✓ "; }
-.bf-status.is-error { color: #d8362b; }
-
-.bf-consent { margin-top: 32px; max-width: 520px; }
 
 .bf-trap {
   position: absolute;

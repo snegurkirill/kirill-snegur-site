@@ -1,17 +1,17 @@
 /* ---------------------------------------------------------------------------
    Бриф — /ocean-brief
-   Экраны строятся из data.js: приветствие, вопросы, заставки разделов, экраны
-   отправки трёх частей и финал. Виден один экран, переходы — классами
-   is-past / is-on (brief.css). Ответы и записи голоса — черновик в IndexedDB
-   этого браузера; каждая часть уходит в Forminit отдельной отправкой.
+   Экраны строятся из data.js: приветствие, вопросы, заставки групп и финал.
+   Виден один экран, переходы — классами is-past / is-on (brief.css). Ответы и
+   записи голоса — черновик в IndexedDB этого браузера; на финале бриф сам
+   уходит в Forminit одной отправкой.
    --------------------------------------------------------------------------- */
 
 (() => {
   'use strict';
 
   // Forminit form: inputs are named fi-{type}-{name}. Rules: https://forminit.com/setup.md
-  // Здесь полей в разметке нет: FormData собирает sendPart(). Ответ — fi-text-q1_1_3,
-  // записи — fi-file-audio[] с именем файла «1.1.3-1.webm», часть — fi-text-part,
+  // Здесь полей в разметке нет: FormData собирает formOf(). Ответ — fi-text-q1_1_3,
+  // записи к нему — fi-file-q1_1_3_audio[] (имя должно отличаться от текстового),
   // кто заполняет — fi-text-respondent (не fi-sender-fullName: запятая в «Анна, директор»
   // отклонила бы всю отправку).
   const FORM_ID = 'qa4fs1lrrc9';
@@ -78,8 +78,14 @@
     return {
       get: (k) => run('kv', 'readonly', (s) => s.get(k)),
       set: (k, v) => run('kv', 'readwrite', (s) => s.put(v, k)),
-      clips: () => run('clips', 'readonly', (s) => s.getAll()),
-      putClip: (c) => run('clips', 'readwrite', (s) => s.put(c)),
+      // Записи лежат байтами, не Blob: Safari на iOS отдаёт Blob из IndexedDB
+      // пустым или нечитаемым, и отправка такой записи падает.
+      clips: async () => (await run('clips', 'readonly', (s) => s.getAll()))
+        .map((r) => r.blob ? r : Object.assign(r, { blob: new Blob([r.data], { type: r.type }) })),
+      putClip: async (c) => {
+        const data = await c.blob.arrayBuffer();
+        return run('clips', 'readwrite', (s) => s.put({ id: c.id, q: c.q, type: c.type, ms: c.ms, at: c.at, data }));
+      },
       delClip: (id) => run('clips', 'readwrite', (s) => s.delete(id))
     };
   })();
@@ -94,7 +100,7 @@
     });
   }
 
-  const state = { answers: {}, clips: [], sent: {}, pos: 0 };
+  const state = { answers: {}, clips: [], sent: null, pos: 0 };
 
   let saveTimer = 0;
   function saveAnswers() {
@@ -112,7 +118,6 @@
       for (const q of group.questions) questions.push(Object.assign({ section, group }, q));
     }
   }
-  const partQuestions = (partId) => questions.filter((q) => q.section.part === partId);
 
   function el(tag, cls, html) {
     const node = document.createElement(tag);
@@ -158,24 +163,36 @@
     s.card.append(text('h1', 'bf-h', B.title));
     // Подсказка — только там, где кнопки микрофона не будет.
     if (!CAN_RECORD) {
-      s.card.append(text('p', 'bf-text bf-text--aux',
-        'Запись голоса в этом браузере недоступна. Надиктовать можно с клавиатуры: на Mac — дважды Fn, на Windows — Win + H, на телефоне — микрофон на клавиатуре.'));
+      const why = !window.isSecureContext ? 'страница открыта не по защищённому соединению'
+        : !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ? 'браузер не даёт доступа к микрофону'
+        : 'браузер не умеет записывать звук';
+      s.card.append(text('p', 'bf-text bf-text--aux', `Запись голоса недоступна: ${why}. Ответить можно текстом.`));
     }
 
-    const note = text('p', 'bf-text', 'Черновик в этом браузере не сохраняется, например в приватном режиме. Отправляйте части по мере заполнения.');
+    const note = text('p', 'bf-text bf-text--aux', 'Черновик в этом браузере не сохраняется, например в приватном режиме. Лучше заполнить бриф за один раз.');
     note.id = 'draft-note';
     note.hidden = true;
     s.card.append(note);
 
+    // «Начать», а у вернувшегося — «Продолжить» и рядом, куда она ведёт.
     const actions = el('div', 'bf-actions');
     const start = el('button', 'bf-btn', 'Начать <small>↵</small>');
     start.type = 'button';
     start.dataset.next = '';
     start.id = 'start';
-    actions.append(start, text('p', 'bf-label bf-keys', 'или нажмите Enter ↵'));
+    const where = text('p', 'bf-label', '');
+    where.id = 'resume-at';
+    where.hidden = true;
+    actions.append(start, where);
     s.card.append(actions);
-    s.card.append(text('p', 'bf-label bf-consent',
-      'Отправляя ответы, вы соглашаетесь на обработку указанных в них данных, в том числе записей голоса, для работы над проектом. Ответы передаются через сервис Forminit.'));
+  }
+
+  // Куда ведёт «Продолжить»: номер вопроса, заставка группы или отправка.
+  function describe(s) {
+    if (s.type === 'q') return `с вопроса ${s.q.id}`;
+    if (s.type === 'cover') return 'с ' + s.card.querySelector('.bf-h').textContent;
+    if (s.type === 'done') return 'к отправке';
+    return '';
   }
 
   // Заставка перед каждой группой — «Открытая витрина: Предназначение»;
@@ -248,47 +265,20 @@
     byQ[q.id] = s;
   }
 
-  function buildSend(part) {
-    const s = screen('send', { part });
-    s.card.append(
-      text('p', 'bf-label', `Часть ${part.id} из ${B.parts.length}`),
-      text('h2', 'bf-h', part.title),
-      text('p', 'bf-text bf-text--aux bf-summary', '')
-    );
-    const actions = el('div', 'bf-actions');
-    const send = button('Отправить часть', 'bf-btn', { 'data-send': part.id });
-    const later = el('button', 'bf-btn bf-btn--ghost', 'Отправлю позже');
-    later.type = 'button';
-    later.dataset.next = '';
-    actions.append(send, later);
-    const status = el('p', 'bf-note bf-label bf-status');
-    status.setAttribute('role', 'status');
-    s.card.append(actions, status);
-    Object.assign(s, { send, later, status });
-  }
-
+  // Финал: открылся — бриф уходит сам, одной отправкой. Кнопка — только чтобы
+  // повторить после ошибки.
   function buildDone() {
     const s = screen('done');
-    const h = text('h2', 'bf-h', 'Спасибо!');
+    const h = text('h2', 'bf-h', '');
     const lead = text('p', 'bf-text', '');
-    const list = el('ul', 'bf-parts');
-    const rows = {};
-    for (const part of B.parts) {
-      const li = el('li');
-      const status = text('span', 'bf-status bf-label', '');
-      const send = button('Отправить', 'bf-btn', { 'data-send': part.id });
-      const label = el('span');
-      label.append(text('span', 'bf-label', `Часть ${part.id}  `), document.createTextNode(part.title));
-      const right = el('span', 'bf-actions');
-      right.style.margin = '0';
-      right.append(status, send);
-      li.append(label, right);
-      list.append(li);
-      rows[part.id] = { status, send };
-    }
-    s.card.append(h, lead, list,
-      text('p', 'bf-text', 'Черновик хранится в этом браузере: можно вернуться по той же ссылке и дополнить ответы. Изменённую часть отправьте ещё раз.'));
-    Object.assign(s, { h, lead, rows });
+    const status = el('p', 'bf-note bf-label bf-status');
+    status.setAttribute('role', 'status');
+    const actions = el('div', 'bf-actions');
+    const send = button('Отправить ещё раз', 'bf-btn', { 'data-send': '1' });
+    send.hidden = true;
+    actions.append(send);
+    s.card.append(h, lead, actions, status);
+    Object.assign(s, { h, lead, send, status });
   }
 
   const byQ = {};
@@ -300,8 +290,6 @@
       if (section.cover && group.title) buildCover(section, group);
       for (const q of group.questions) buildQuestion(questions.find((x) => x.id === q.id));
     }
-    const next = B.sections[B.sections.indexOf(section) + 1];
-    if (!next || next.part !== section.part) buildSend(B.parts.find((p) => p.id === section.part));
   }
   buildDone();
 
@@ -326,7 +314,8 @@
     progress.style.width = (i / (screens.length - 1) * 100) + '%';
     prevBtn.disabled = i === 0;
     nextBtn.disabled = i === screens.length - 1;
-    if (s.type === 'send' || s.type === 'done') renderParts();
+    document.body.classList.toggle('is-welcome', s.type === 'welcome');
+    if (s.type === 'done') onDone();
     if (s.type === 'q') autosize(s.input);
     if (!opts.silent) persist(store.set('pos', i));
     // На телефоне фокус на поле сразу открыл бы клавиатуру: фокусируем карточку.
@@ -346,7 +335,7 @@
     if ('next' in t.dataset) go(state.pos + 1);
     else if (t.dataset.go) go(Number(t.dataset.go));
     else if (t.dataset.mic) recorder.toggle(t.dataset.mic);
-    else if (t.dataset.send) sendPart(Number(t.dataset.send));
+    else if (t.dataset.send) sendAll();
     else if (t.dataset.play) player.toggle(t.dataset.play, t);
     else if (t.dataset.del) removeClip(t.dataset.del);
   });
@@ -561,68 +550,97 @@
     renderClips(clip.q);
   }
 
-  /* --- отправка частей --------------------------------------------------- */
+  /* --- отправка ----------------------------------------------------------
+     Бриф уходит одной отправкой, сам, когда человек доходит до финала. Ответ —
+     fi-text-q1_1_3, записи к нему — сразу под ним, fi-file-q1_1_3_audio[]: в
+     кабинете Forminit файл стоит под своим вопросом (имя файла сервис меняет
+     на своё). Больше 24 МБ или 20 вопросов с записями — несколько пачек. */
 
   const trap = $('#trap');
+  const MAX_FILE_FIELDS = 20;   // Forminit: не больше 20 файловых блоков в отправке
   let sending = false;
   let lastSendAt = 0;
   let forminit;   // создаётся при первой отправке
 
-  function partData(partId) {
-    const qs = partQuestions(partId).filter((q) => q.kind !== 'name');
-    const ids = new Set(qs.map((q) => q.id));
-    const clips = state.clips.filter((c) => ids.has(c.q))
-      .sort((a, b) => questions.findIndex((q) => q.id === a.q) - questions.findIndex((q) => q.id === b.q) || a.at - b.at);
+  const fieldOf = (qid) => 'q' + qid.replace(/\./g, '_');
+
+  function briefData() {
+    const qs = questions.filter((q) => q.kind !== 'name');
+    const clips = qs.flatMap((q) => clipsOf(q.id));
     const answered = qs.filter((q) => (state.answers[q.id] || '').trim() || clips.some((c) => c.q === q.id)).length;
     const bytes = clips.reduce((n, c) => n + c.blob.size, 0);
     const sig = JSON.stringify([state.answers['0.0.0'] || '', qs.map((q) => state.answers[q.id] || ''), clips.map((c) => c.id)]);
     return { qs, clips, answered, bytes, sig };
   }
 
-  function partState(partId) {
-    const d = partData(partId);
-    const sent = state.sent[partId];
-    if (!d.answered) return { d, key: 'empty', label: 'Пока нет ответов' };
-    if (sent && sent.sig === d.sig) return { d, key: 'sent', label: 'Отправлено ' + new Date(sent.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) };
-    if (sent) return { d, key: 'changed', label: 'Ответы изменились после отправки' };
-    return { d, key: 'new', label: 'Не отправлено' };
+  function doneKey(d) {
+    if (!d.answered) return 'empty';
+    if (state.sent && state.sent.sig === d.sig) return 'sent';
+    return state.sent ? 'changed' : 'new';
   }
 
-  function renderParts(error) {
-    const s = screens[state.pos];
-    if (s.type === 'send') {
-      const ps = partState(s.part.id);
-      const total = ps.d.qs.length;
-      s.card.querySelector('.bf-summary').textContent =
-        `Ответов: ${ps.d.answered} из ${total}` +
-        (ps.d.clips.length ? ` · ${ps.d.clips.length} ${plural(ps.d.clips.length, 'запись', 'записи', 'записей')}, ${mb(ps.d.bytes)}` : '');
-      const done = ps.key === 'sent';
-      s.send.hidden = done;
-      s.send.disabled = ps.key === 'empty';
-      s.send.textContent = ps.key === 'changed' ? 'Отправить ещё раз' : 'Отправить часть';
-      s.later.className = done ? 'bf-btn' : 'bf-btn bf-btn--ghost';
-      s.later.innerHTML = done ? 'Дальше <small>↵</small>' : 'Отправлю позже';
-      setStatus(s.status, error || (ps.key === 'new' ? '' : ps.label), error ? 'error' : ps.key);
+  // Записи идут по порядку вопросов; пачка — до 24 МБ и до 20 вопросов с файлами.
+  function batchesOf(d) {
+    const batches = [{ clips: [], fields: new Set(), bytes: 0 }];
+    for (const c of d.clips) {
+      let b = batches[batches.length - 1];
+      const full = b.bytes + c.blob.size > MAX_BYTES || (!b.fields.has(c.q) && b.fields.size >= MAX_FILE_FIELDS);
+      if (b.clips.length && full) { b = { clips: [], fields: new Set(), bytes: 0 }; batches.push(b); }
+      b.clips.push(c);
+      b.fields.add(c.q);
+      b.bytes += c.blob.size;
     }
-    if (s.type === 'done') {
-      let all = true;
-      for (const part of B.parts) {
-        const ps = partState(part.id);
-        const row = s.rows[part.id];
-        if (ps.key !== 'sent') all = false;
-        setStatus(row.status, ps.label, ps.key);
-        row.send.hidden = ps.key === 'sent' || ps.key === 'empty';
-        row.send.textContent = ps.key === 'changed' ? 'Отправить ещё раз' : 'Отправить';
-      }
-      if (error) setStatus(s.lead, error, 'error');
-      else {
-        s.h.textContent = all ? 'Спасибо!' : 'Почти готово';
-        s.lead.className = 'bf-text';
-        s.lead.textContent = all
-          ? 'Все части отправлены. Ответы пришли мне на почту — я свяжусь, если что-то нужно уточнить.'
-          : 'Ответы приходят мне по частям. То, что ещё не отправлено, можно отправить здесь.';
-      }
+    return batches;
+  }
+
+  function formOf(d, batch, i, n) {
+    const fd = new FormData();
+    fd.append('fi-text-respondent', (state.answers['0.0.0'] || '').trim());
+    if (n > 1) fd.append('fi-text-batch', `${i + 1} из ${n}`);
+    for (const q of d.qs) {
+      if (i === 0) fd.append('fi-text-' + fieldOf(q.id), state.answers[q.id] || '');
+      const all = clipsOf(q.id);
+      for (const c of batch.clips) if (c.q === q.id) fd.append(`fi-file-${fieldOf(q.id)}_audio[]`, fileOf(c, all.indexOf(c) + 1));
     }
+    fd.append('_gotcha', trap.value);   // ловушка Forminit для ботов
+    return fd;
+  }
+
+  function summary(d) {
+    return `Ответов: ${d.answered} из ${d.qs.length}` +
+      (d.clips.length ? ` · ${d.clips.length} ${plural(d.clips.length, 'запись', 'записи', 'записей')}, ${mb(d.bytes)}` : '');
+  }
+
+  // phase: 'sending' | 'error' | undefined — тогда по состоянию черновика.
+  function renderDone(phase, msg, code) {
+    const s = screens[screens.length - 1];
+    const d = briefData();
+    const key = doneKey(d);
+    let h, lead, status = '', retry = false;
+    if (phase === 'sending') {
+      h = 'Отправляем бриф…'; lead = summary(d); status = msg || '';
+    } else if (phase === 'error') {
+      h = 'Не получилось отправить'; lead = msg; status = code ? 'Код ошибки: ' + code : ''; retry = true;
+    } else if (key === 'empty') {
+      h = 'Ответов пока нет'; lead = 'Вернитесь к вопросам: бриф отправится, когда вы снова дойдёте до этого экрана.';
+    } else if (key === 'sent') {
+      h = 'Спасибо!';
+      lead = 'Бриф отправлен. Чтобы что-то дополнить, вернитесь к вопросам: изменения отправятся, когда вы снова дойдёте до этого экрана.';
+      status = 'Отправлено ' + new Date(state.sent.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+    } else {
+      h = 'Бриф ещё не отправлен'; lead = summary(d); retry = true;
+    }
+    s.h.textContent = h;
+    s.lead.textContent = lead;
+    s.send.hidden = !retry;
+    s.send.textContent = phase === 'error' ? 'Отправить ещё раз' : 'Отправить';
+    setStatus(s.status, status, key === 'sent' && !phase ? 'sent' : phase === 'error' ? 'aux' : '');
+  }
+
+  function onDone() {
+    const key = doneKey(briefData());
+    if (!sending && (key === 'new' || key === 'changed')) sendAll();
+    else if (!sending) renderDone();
   }
 
   function setStatus(node, msg, key) {
@@ -635,8 +653,9 @@
   function errorText(error) {
     const field = (error && error.fieldName) || ((/['"]([^'"]+)['"]/.exec((error && error.message) || '') || [])[1]);
     if (field && FIELD_ERRORS[field]) return FIELD_ERRORS[field];
+    if (field && /_audio$/.test(field)) return FIELD_ERRORS.audio;
     if (error && error.error === 'TOO_MANY_REQUESTS') return 'Подождите несколько секунд и отправьте ещё раз.';
-    return 'Не получилось отправить. Ответы сохранены — проверьте интернет и попробуйте ещё раз.';
+    return 'Ответы сохранены в этом браузере. Проверьте интернет и отправьте ещё раз.';
   }
 
   function fileOf(clip, k) {
@@ -656,71 +675,41 @@
     return forminit.submit(FORM_ID, fd);
   }
 
-  async function sendPart(partId) {
+  async function sendAll() {
     if (sending) return;
     if (recorder.active) await recorder.stop();
-    const part = B.parts.find((p) => p.id === partId);
-    const d = partData(partId);
-    if (!d.answered) return;
+    const d = briefData();
+    if (!d.answered) { renderDone(); return; }
+    const batches = batchesOf(d);
+    const s = screens[screens.length - 1];
 
-    const big = d.clips.find((c) => c.blob.size > MAX_BYTES);
-    if (big) { renderParts(`Запись к вопросу ${big.q} больше 24 МБ — удалите её и запишите короче.`); return; }
-
-    // Записи делятся на пачки до 24 МБ; тексты уходят в первой.
-    const batches = [[]];
-    let size = 0;
-    for (const c of d.clips) {
-      if (size + c.blob.size > MAX_BYTES && batches[batches.length - 1].length) { batches.push([]); size = 0; }
-      batches[batches.length - 1].push(c);
-      size += c.blob.size;
-    }
-
-    renderParts('');                         // до флага: ничего, что может бросить, между флагом и try
+    renderDone('sending', '');               // до флага: ничего, что может бросить, между флагом и try
     sending = true;
-    const btns = document.querySelectorAll('[data-send]');
-    btns.forEach((b) => { b.disabled = true; });
-    const status = (msg) => {
-      const s = screens[state.pos];
-      const node = s.type === 'send' ? s.status : s.type === 'done' ? s.rows[partId].status : null;
-      if (node) setStatus(node, msg, 'new');
-    };
-
+    s.send.disabled = true;
     try {
       for (let i = 0; i < batches.length; i++) {
-        const fd = new FormData();
-        fd.append('fi-text-part', `${part.id}. ${part.title}` + (batches.length > 1 ? ` — пачка ${i + 1} из ${batches.length}` : ''));
-        fd.append('fi-text-respondent', (state.answers['0.0.0'] || '').trim());
-        if (i === 0) for (const q of d.qs) fd.append('fi-text-q' + q.id.replace(/\./g, '_'), state.answers[q.id] || '');
-        for (const c of batches[i]) fd.append('fi-file-audio[]', fileOf(c, clipsOf(c.q).indexOf(c) + 1));
-        fd.append('_gotcha', trap.value);   // ловушка Forminit для ботов
-
+        const fd = formOf(d, batches[i], i, batches.length);
+        const step = batches.length > 1 ? `Пачка ${i + 1} из ${batches.length}` : '';
         const wait = lastSendAt + SEND_GAP_MS - Date.now();
-        if (wait > 0) {
-          status(batches.length > 1 ? `Отправляю записи: ${i + 1} из ${batches.length}…` : 'Отправляю…');
-          await new Promise((r) => setTimeout(r, wait));
-        }
-        status(batches.length > 1 ? `Отправляю: ${i + 1} из ${batches.length}…` : 'Отправляю…');
+        if (wait > 0) { renderDone('sending', step); await new Promise((r) => setTimeout(r, wait)); }
+        renderDone('sending', step);
         lastSendAt = Date.now();
         const { data, error } = await submit(fd);
         if (error || typeof (data && data.hashId) !== 'string') {
           console.error('Forminit:', error || data);
-          renderParts(errorText(error));
+          renderDone('error', errorText(error), error && (error.error || error.code));
           return;
         }
       }
-      state.sent[partId] = { sig: d.sig, at: Date.now() };
+      state.sent = { sig: d.sig, at: Date.now() };
       persist(store.set('sent', state.sent));
-      renderParts();
-      const s = screens[state.pos];
-      if (s.type === 'send' && s.part.id === partId) setTimeout(() => { if (screens[state.pos] === s) go(state.pos + 1); }, 900);
+      renderDone();
     } catch (err) {
       console.error('Forminit:', err);
-      renderParts('Не получилось отправить. Ответы сохранены — проверьте интернет и попробуйте ещё раз.');
+      renderDone('error', errorText(null), err && (err.name + (err.message ? ': ' + err.message : '')));
     } finally {
       sending = false;
-      btns.forEach((b) => { b.disabled = false; });
-      const s = screens[state.pos];
-      if (s.type === 'send') s.send.disabled = partState(s.part.id).key === 'empty';
+      s.send.disabled = false;
     }
   }
 
@@ -736,7 +725,7 @@
     try {
       const [answers, sent, pos, clips] = await Promise.all([store.get('answers'), store.get('sent'), store.get('pos'), store.clips()]);
       state.answers = answers || {};
-      state.sent = sent || {};
+      state.sent = sent && sent.sig ? sent : null;
       state.clips = clips || [];
       state.pos = Number(pos) || 0;
     } catch (err) {
@@ -752,6 +741,9 @@
       start.innerHTML = 'Продолжить <small>↵</small>';
       delete start.dataset.next;
       start.dataset.go = resumeAt;
+      const where = $('#resume-at');
+      where.textContent = describe(screens[resumeAt]);
+      where.hidden = !where.textContent;
     }
     go(0, { silent: true, instant: true });
   })();
