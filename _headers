@@ -14,3 +14,8 @@
 
 /assets/*
   Cache-Control: public, max-age=604800
+
+# Бриф: SDK и отправка Forminit, запись голоса (микрофон, blob: для прослушивания).
+/ocean-brief/*
+  Permissions-Policy: camera=(), microphone=(self), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self' https://forminit.com; connect-src https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'

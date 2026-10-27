@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+<title>Бриф: Витрина индустрии — Kirill Snegur</title>
+<meta name="description" content="Бриф к проекту «Витрина индустрии» для АНО «Экономика океана».">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../ds.css?v=8">
+<link rel="stylesheet" href="brief.css?v=1">
+</head>
+<body class="bf-body">
+<div class="bf" id="app">
+  <div class="bf-progress" aria-hidden="true"><i id="progress"></i></div>
+
+  <header class="bf-top">
+    <img class="bf-sign" src="../assets/signature-ru.svg" alt="Кирилл Снегур" width="430" height="42">
+    <p class="bf-test" id="test-mode" hidden>Тестовый режим: ответы не отправляются</p>
+  </header>
+
+  <main class="bf-stage" id="stage" aria-live="polite"></main>
+
+  <nav class="bf-nav" aria-label="Переход между вопросами">
+    <button class="bf-nav__btn" id="prev" type="button" aria-label="Предыдущий вопрос">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10.5 8 5.5l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+    </button>
+    <button class="bf-nav__btn" id="next" type="button" aria-label="Следующий вопрос">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5 8 10.5l5-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+    </button>
+  </nav>
+
+  <!-- Ловушка для ботов: человек это поле не видит и не заполняет. -->
+  <label class="bf-trap" aria-hidden="true">Не заполняйте <input id="trap" type="text" tabindex="-1" autocomplete="off"></label>
+</div>
+<noscript><p class="bf-noscript">Для брифа нужен JavaScript. Включите его или напишите мне в Телеграм.</p></noscript>
+<script src="https://forminit.com/sdk/v1/forminit.js"></script>
+<script src="data.js?v=1"></script>
+<script src="brief.js?v=1"></script>
+</body>
+</html>

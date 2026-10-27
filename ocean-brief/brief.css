@@ -1,0 +1,426 @@
+/* ---------------------------------------------------------------------------
+   Бриф — /ocean-brief
+   Форма по одному вопросу на экран, с переходами в духе Typeform. Шрифты и
+   цвета приходят из styles.css (Source Sans 3, wght 420, трекинг -4%,
+   чёрный, серый #A9A9A9, ссылочный синий), подписи — compact-стиль из ds.css.
+   Поле ответа: при записи голоса заливается чёрным, как диктофон, кнопка
+   микрофона становится белой «стоп». Записи — плашки внутри поля.
+   --------------------------------------------------------------------------- */
+
+.bf-body {
+  /* Страница не масштабируется по --u, как и блоки ds.css: всё в пикселях. */
+  font-size: 20px;
+  line-height: 20px;
+  color: var(--ink-strong);
+  overflow: hidden;
+}
+
+.bf {
+  --bf-ink: var(--ink-strong);
+  --bf-muted: var(--ink);
+  --bf-line: var(--stroke);
+  --bf-chip: #f2f2f2;
+  --bf-ease: cubic-bezier(.2, .7, .2, 1);
+  --bf-small: 13px;
+  --bf-measure: 720px;
+
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+}
+
+.bf [hidden] { display: none !important; }   /* кнопки ниже задают свой display */
+
+.bf button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.bf button:focus-visible,
+.bf textarea:focus-visible,
+.bf input:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+
+/* Подписи: номер вопроса, раздел, статусы — compact Unit, 13/12. */
+.bf-label {
+  margin: 0;
+  font-family: var(--ds-font-grotesk);
+  font-size: var(--bf-small);
+  line-height: 12px;
+  letter-spacing: -0.04em;
+  color: var(--bf-muted);
+}
+
+/* --- рамка: прогресс, подпись, навигация -------------------------------- */
+
+.bf-progress {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--bf-line);
+  z-index: 3;
+}
+.bf-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--bf-ink);
+  transition: width .6s var(--bf-ease);
+}
+
+.bf-top {
+  position: absolute;
+  inset: 3px 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.bf-sign { display: block; width: 150px; height: auto; }
+.bf-test {
+  margin: 0;
+  font-family: var(--ds-font-grotesk);
+  font-size: var(--bf-small);
+  line-height: 12px;
+  padding: 6px 8px;
+  background: var(--link);
+  border-radius: 6px;
+}
+
+.bf-nav {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 2px;
+  z-index: 2;
+}
+.bf-nav__btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 32px;
+  background: var(--bf-ink) !important;
+  color: var(--paper) !important;
+}
+.bf-nav__btn:first-child { border-radius: 8px 0 0 8px; }
+.bf-nav__btn:last-child  { border-radius: 0 8px 8px 0; }
+.bf-nav__btn:disabled { opacity: .25; cursor: default; }
+
+/* --- сцена: экраны лежат стопкой, виден один --------------------------- */
+
+.bf-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.bf-screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  padding: 96px 24px 96px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(48px);
+  transition: opacity .5s var(--bf-ease), transform .6s var(--bf-ease), visibility 0s .6s;
+}
+.bf-screen.is-past { transform: translateY(-48px); }
+.bf-screen.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity .5s var(--bf-ease) .1s, transform .6s var(--bf-ease) .1s, visibility 0s;
+}
+
+.bf-card {
+  width: 100%;
+  max-width: var(--bf-measure);
+  margin: auto;            /* по центру, пока помещается; длинный экран прокручивается */
+}
+
+/* --- вопрос -------------------------------------------------------------- */
+
+.bf-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 14px;
+}
+.bf-meta b { font-weight: inherit; color: var(--bf-ink); }
+
+.bf-lead {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+  color: var(--bf-muted);
+  text-wrap: balance;
+}
+.bf-lead b { font-weight: inherit; color: var(--bf-ink); }
+
+.bf-q {
+  margin: 0;
+  font-size: 30px;
+  line-height: 31px;
+  letter-spacing: -0.04em;
+  font-weight: 420;
+  text-wrap: balance;
+}
+.bf-q__label { color: var(--link); }
+
+.bf-h {
+  margin: 0;
+  font-size: 44px;
+  line-height: 42px;
+  letter-spacing: -0.045em;
+  font-weight: 420;
+  text-wrap: balance;
+}
+.bf-text {
+  margin: 20px 0 0;
+  color: var(--bf-muted);
+  max-width: 560px;
+  text-wrap: balance;
+}
+.bf-text + .bf-text { margin-top: 12px; }
+
+.bf-groups {
+  display: grid;
+  gap: 8px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bf-groups li { display: flex; gap: 12px; align-items: baseline; }
+.bf-groups .bf-label { width: 28px; flex: none; }
+
+/* --- поле ответа ---------------------------------------------------------
+   Одна «капсула»: текст, плашки записей, кнопка микрофона справа. В покое —
+   только линия снизу, при записи вся капсула чёрная. Отступы одинаковы в
+   обоих состояниях, поэтому заливка не сдвигает текст. */
+
+.bf-field {
+  position: relative;
+  margin-top: 32px;
+  padding: 12px 64px 12px 14px;
+  box-shadow: inset 0 -1px 0 var(--bf-line);
+  transition: background-color .25s ease, box-shadow .25s ease, color .25s ease, border-radius .25s ease;
+}
+.bf-field:focus-within { box-shadow: inset 0 -2px 0 var(--bf-ink); }
+.bf-field.is-rec {
+  border-radius: 14px;
+  background: var(--bf-ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+
+.bf-input {
+  display: block;
+  width: 100%;
+  min-height: 31px;
+  margin: 0;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 24px;
+  line-height: 26px;
+  letter-spacing: -0.03em;
+  resize: none;
+  overflow: hidden;
+  outline: none !important;   /* фокус показывает линия поля */
+}
+.bf-input::placeholder { color: var(--bf-muted); opacity: 1; }
+.bf-field.is-rec .bf-input::placeholder { color: transparent; }
+
+.bf-mic {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bf-ink) !important;
+  color: var(--paper) !important;
+  transition: background-color .25s ease, color .25s ease, transform .15s ease;
+}
+.bf-mic:active { transform: scale(.94); }
+.bf-field.is-rec .bf-mic {
+  background: var(--paper) !important;
+  color: var(--bf-ink) !important;
+}
+.bf-mic .bf-ico-stop { display: none; }
+.bf-field.is-rec .bf-mic .bf-ico-mic { display: none; }
+.bf-field.is-rec .bf-mic .bf-ico-stop { display: block; }
+
+.bf-rec {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  left: 14px;
+  top: 22px;                /* на одной линии с кнопкой, пока записей нет */
+  font-family: var(--ds-font-grotesk);
+  font-size: var(--bf-small);
+  line-height: 12px;
+}
+.bf-rec::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4b3e;
+  animation: bf-blink 1.2s steps(2, start) infinite;
+}
+.bf-field.is-rec .bf-rec { display: flex; }
+.bf-field.is-rec .bf-input { visibility: hidden; }
+@keyframes bf-blink { to { visibility: hidden; } }
+
+/* Плашки записей: ▶ 0:42 × */
+.bf-clips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bf-clips:not(:empty) { margin-top: 10px; }
+
+.bf-clip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--bf-chip);
+  font-family: var(--ds-font-grotesk);
+  font-size: var(--bf-small);
+  line-height: 12px;
+  color: var(--bf-ink);
+}
+.bf-field.is-rec .bf-clip { background: rgba(255, 255, 255, .16); color: var(--paper); }
+.bf-clip__play {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 4px 0 10px !important;
+}
+.bf-clip__play svg { flex: none; }
+.bf-clip .bf-ico-pause { display: none; }
+.bf-clip.is-playing .bf-ico-play { display: none; }
+.bf-clip.is-playing .bf-ico-pause { display: block; }
+.bf-clip__del {
+  display: grid !important;
+  place-items: center;
+  width: 28px;
+  height: 30px;
+  opacity: .5;
+}
+.bf-clip__del:hover { opacity: 1; }
+
+.bf-note {
+  margin: 10px 0 0;
+  min-height: 12px;
+}
+.bf-note.is-error { color: #d8362b; }
+
+/* --- кнопки и подсказки -------------------------------------------------- */
+
+.bf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 24px;
+}
+.bf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px !important;
+  border-radius: 10px;
+  background: var(--bf-ink) !important;
+  color: var(--paper) !important;
+}
+.bf-btn[disabled] { opacity: .4; cursor: default; }
+.bf-btn--ghost {
+  background: transparent !important;
+  color: var(--bf-ink) !important;
+  box-shadow: inset 0 0 0 1px var(--bf-line);
+}
+.bf-btn small { font-size: var(--bf-small); opacity: .6; }
+.bf-hint b { font-weight: inherit; color: var(--bf-ink); }
+
+/* Подсказки клавиатуры нужны только там, где есть клавиатура. */
+@media (hover: none), (pointer: coarse) {
+  .bf-keys { display: none; }
+}
+
+/* --- отправка частей ---------------------------------------------------- */
+
+.bf-parts {
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--bf-line);
+}
+.bf-parts li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--bf-line);
+}
+.bf-parts .bf-btn { height: 36px; padding: 0 14px !important; }
+.bf-status.is-sent { color: var(--bf-ink); }
+.bf-status.is-sent::before { content: "✓ "; }
+.bf-status.is-error { color: #d8362b; }
+
+.bf-consent { margin-top: 32px; max-width: 520px; }
+
+.bf-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.bf-noscript { padding: 96px 24px; }
+
+/* --- телефон ------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .bf-top { padding: 14px 16px 0; }
+  .bf-sign { width: 120px; }
+  .bf-screen { padding: 72px 16px 88px; }
+  .bf-card { margin: 0 auto auto; padding-top: 8vh; }
+  .bf-q { font-size: 24px; line-height: 25px; }
+  .bf-h { font-size: 34px; line-height: 33px; }
+  .bf-lead { font-size: 17px; line-height: 18px; }
+  .bf-input { font-size: 20px; line-height: 22px; }
+  .bf-nav { right: 16px; bottom: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-screen,
+  .bf-screen.is-past,
+  .bf-screen.is-on { transform: none; transition: opacity .2s linear, visibility 0s; }
+  .bf-progress i { transition: none; }
+  .bf-rec::before { animation: none; }
+}
