@@ -151,7 +151,7 @@
     const b = el('button', 'bf-btn', `${label} <small>↵</small>`);
     b.type = 'button';
     b.dataset.next = '';
-    wrap.append(b, backButton());
+    wrap.append(backButton(), b);
     return wrap;
   }
 
@@ -283,7 +283,7 @@
     const actions = el('div', 'bf-actions');
     const send = button('Отправить ещё раз', 'bf-btn', { 'data-send': '1' });
     send.hidden = true;
-    actions.append(send, backButton());
+    actions.append(backButton(), send);
     s.card.append(h, lead, actions, status);
     Object.assign(s, { h, lead, send, status });
   }

@@ -154,10 +154,11 @@
   font-size: 18px !important;
   line-height: 19px;
   text-wrap: balance;
-  background: var(--bf-ink) !important;
-  color: var(--paper) !important;
+  background: var(--paper) !important;
+  color: var(--bf-ink) !important;
+  box-shadow: inset 0 0 0 1px var(--bf-line);
 }
-.bf-menu__q.is-done { background: var(--bf-done) !important; }
+.bf-menu__q.is-done { background: var(--bf-done) !important; color: var(--paper) !important; box-shadow: none; }
 .bf-menu__q.is-current { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--link); }
 
 /* --- сцена: экраны лежат стопкой, виден один --------------------------- */
@@ -251,11 +252,11 @@
 .bf-field {
   position: relative;
   margin-top: 32px;
-  padding: 12px 104px 12px 14px;
+  padding: 12px 84px 12px 14px;
   box-shadow: inset 0 -1px 0 var(--bf-line);
   transition: background-color .25s ease, box-shadow .25s ease, color .25s ease, border-radius .25s ease;
 }
-.bf-field.has-mic { min-height: 100px; }   /* кнопка 80 + отступы 10 */
+.bf-field.has-mic { min-height: 80px; }    /* кнопка 60 + отступы 10 */
 .bf-field:focus-within { box-shadow: inset 0 -2px 0 var(--bf-ink); }
 .bf-field.is-rec {
   border-radius: 14px;
@@ -290,15 +291,15 @@
   bottom: 10px;
   display: grid;
   place-items: center;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: var(--bf-ink) !important;
   color: var(--paper) !important;
   transition: background-color .25s ease, color .25s ease, transform .15s ease;
 }
-.bf-mic svg { width: 36px; height: 36px; }
-.bf-mic .bf-ico-stop { width: 26px; height: 26px; }
+.bf-mic svg { width: 26px; height: 26px; }
+.bf-mic .bf-ico-stop { width: 20px; height: 20px; }
 .bf-mic:active { transform: scale(.94); }
 .bf-field.is-rec .bf-mic {
   background: var(--paper) !important;
@@ -314,7 +315,7 @@
   gap: 8px;
   position: absolute;
   left: 14px;
-  top: 44px;                /* на одной линии с кнопкой, пока записей нет */
+  top: 34px;                /* на одной линии с кнопкой, пока записей нет */
   font-family: var(--ds-font-grotesk);
   font-size: var(--bf-small);
   line-height: 12px;
