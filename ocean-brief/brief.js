@@ -9,15 +9,17 @@
 (() => {
   'use strict';
 
-  /* Куда уходит бриф. 'beget' — свой обработчик на российском хостинге
-     (_api/ в репозитории): из российских сетей соединения с Forminit (AWS
-     CloudFront) рвутся после ~16 КБ, и записи голоса не доходили. 'forminit'
-     оставлен рабочим — откат одной строкой. */
-  const TRANSPORT = 'beget';
-  const ENDPOINT = {
+  /* Куда уходит бриф — по порядку, пока какой-то не примет. 'beget' — свой
+     обработчик на российском хостинге (_api/ в репозитории): из российских
+     сетей соединения с Forminit (AWS CloudFront) рвутся после ~16 КБ, и записи
+     голоса не доходили. Всё — только на своём хостинге: Forminit не берёт записи
+     с iPhone. Код для него оставлен: ['beget', 'forminit'] — запасной после
+     своего, ['forminit'] — только он. */
+  const TRANSPORTS = ['beget'];
+  const ENDPOINTS = {
     beget: 'https://brief.snegur.space/submit.php',
     forminit: 'https://forminit.com/f/qa4fs1lrrc9'
-  }[TRANSPORT];
+  };
 
   // Forminit form: inputs are named fi-{type}-{name}. Rules: https://forminit.com/setup.md
   // Здесь полей в разметке нет: FormData собирает formOf(). Ответ — fi-text-q1_1_3,
@@ -40,9 +42,7 @@
   const LIMITS = {
     beget: { bytes: 15 * 1024 * 1024, files: 18, fields: 99, gap: 0 },
     forminit: { bytes: 24 * 1024 * 1024, files: 999, fields: 20, gap: 6000 }
-  }[TRANSPORT];
-  const MAX_BYTES = LIMITS.bytes;
-  const SEND_GAP_MS = LIMITS.gap;
+  };
   const TOUCH = matchMedia('(hover: none), (pointer: coarse)').matches;
   const CAN_RECORD = !!(window.isSecureContext && navigator.mediaDevices &&
                         navigator.mediaDevices.getUserMedia && window.MediaRecorder);
@@ -662,7 +662,7 @@
   const trap = $('#trap');
   let sending = false;
   let draftId = '';   // один на браузер: связывает отправки одного человека
-  let lastSendAt = 0;
+  const lastSendAt = {};   // по сервису: у Forminit без ключа — 1 запрос в 5 с
 
   const fieldOf = (qid) => 'q' + qid.replace(/\./g, '_');
 
@@ -685,12 +685,12 @@
   }
 
   // Записи идут по порядку вопросов; пачка — до 24 МБ и до 20 вопросов с файлами.
-  function batchesOf(clips) {
+  function batchesOf(clips, lim) {
     const batches = [{ clips: [], fields: new Set(), bytes: 0 }];
     for (const c of clips) {
       let b = batches[batches.length - 1];
-      const full = b.bytes + c.blob.size > MAX_BYTES || b.clips.length >= LIMITS.files ||
-        (!b.fields.has(c.q) && b.fields.size >= LIMITS.fields);
+      const full = b.bytes + c.blob.size > lim.bytes || b.clips.length >= lim.files ||
+        (!b.fields.has(c.q) && b.fields.size >= lim.fields);
       if (b.clips.length && full) { b = { clips: [], fields: new Set(), bytes: 0 }; batches.push(b); }
       b.clips.push(c);
       b.fields.add(c.q);
@@ -701,8 +701,8 @@
 
   const labelOf = (q) => [q.section.title, q.group.title, (q.label ? q.label + '. ' : '') + q.text].filter(Boolean).join(' · ');
 
-  function formOf(d, batch, i, n, sendId) {
-    if (TRANSPORT === 'beget') {
+  function formOf(d, batch, i, n, sendId, t) {
+    if (t === 'beget') {
       const fd = new FormData();
       fd.append('payload', JSON.stringify({
         draft: draftId, send: sendId, batch: { i, n },
@@ -789,9 +789,12 @@
   }
 
   // Тот же ответ, что у SDK: { data } с hashId при успехе, иначе { error } с кодом.
-  function post(fd, onProgress) {
+  // error.transport — сервис не ответил по-человечески (обрыв, таймаут, 5xx,
+  // страница вместо JSON): тогда стоит попробовать следующий из TRANSPORTS.
+  function post(fd, onProgress, t) {
     if (TEST) {
-      console.info('[тест] отправка', ENDPOINT, [...fd.entries()]
+      if (QS.get('fail') === t) return Promise.resolve({ error: { error: 'NETWORK_ERROR', code: 0, message: '', sent: 0, ms: 0, transport: true } });
+      console.info('[тест] отправка', ENDPOINTS[t], [...fd.entries()]
         .map(([k, v]) => [k, v instanceof File ? `${v.name} (${v.type}, ${v.size} Б)` : v]));
       return new Promise((r) => setTimeout(() => r({ data: { hashId: 'test' } }), 700));
     }
@@ -799,8 +802,8 @@
       const xhr = new XMLHttpRequest();
       const t0 = Date.now();
       let sent = 0;   // доля тела, ушедшая на сервер, — для диагностики обрыва
-      const fail = (code) => resolve({ error: { error: code, code: 0, message: '', sent, ms: Date.now() - t0 } });
-      xhr.open('POST', ENDPOINT);
+      const fail = (code) => resolve({ error: { error: code, code: 0, message: '', sent, ms: Date.now() - t0, transport: true } });
+      xhr.open('POST', ENDPOINTS[t]);
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.timeout = 5 * 60 * 1000;
       xhr.upload.onprogress = (e) => {
@@ -809,15 +812,48 @@
         if (onProgress) onProgress(sent);
       };
       xhr.onload = () => {
-        let body;
-        try { body = JSON.parse(xhr.responseText); } catch (err) { body = { message: xhr.responseText }; }
-        if (xhr.status >= 200 && xhr.status < 300 && body.success !== false) resolve({ data: body.submission });
-        else resolve({ error: { error: body.error || 'HTTP_ERROR', code: body.code || xhr.status, message: body.message || '', fieldName: body.fieldName } });
+        let body = null;
+        try { body = JSON.parse(xhr.responseText); } catch (err) { /* не JSON — заглушка хостинга, VPN или прокси */ }
+        if (!body || typeof body !== 'object') { fail(`BAD_RESPONSE_${xhr.status}`); return; }
+        if (xhr.status >= 200 && xhr.status < 300 && body.success !== false) { resolve({ data: body.submission }); return; }
+        resolve({ error: {
+          error: body.error || 'HTTP_ERROR', code: body.code || xhr.status, message: body.message || '', fieldName: body.fieldName,
+          transport: xhr.status >= 500 || xhr.status === 429
+        } });
       };
       xhr.onerror = () => fail('NETWORK_ERROR');
       xhr.ontimeout = () => fail('TIMEOUT');
       xhr.send(fd);
     });
+  }
+
+  // Одна попытка через сервис t; null — всё дошло, иначе { error, code }.
+  async function sendVia(t, d, clips, s) {
+    const lim = LIMITS[t];
+    const batches = batchesOf(clips, lim);
+    const sendId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    for (let i = 0; i < batches.length; i++) {
+      const fd = formOf(d, batches[i], i, batches.length, sendId, t);
+      const step = batches.length > 1 ? `Пачка ${i + 1} из ${batches.length}` : '';
+      const wait = (lastSendAt[t] || 0) + lim.gap - Date.now();
+      if (wait > 0) { renderDone('sending', step); await new Promise((r) => setTimeout(r, wait)); }
+      renderDone('sending', step);
+      lastSendAt[t] = Date.now();
+      const { data, error } = await post(fd, (p) => {
+        if (batches[i].clips.length) setStatus(s.status, (step ? step + ' · ' : '') + Math.round(p * 100) + '%');
+      }, t);
+      if (!error && typeof (data && data.hashId) === 'string') continue;
+      // Обрыв без ответа сервера: что уходило и докуда дошло — по этой строке
+      // со скриншота видно, где ломается (формат, размер, сеть).
+      let code = `${t}: ${error ? error.error || error.code : 'NO_ID'}`;
+      if (error && 'sent' in error) {
+        const b = batches[i];
+        const types = [...new Set(b.clips.map((c) => c.type || '?'))].join(', ') || 'без записей';
+        code += ` · ${types} · ${b.clips.length} шт., ${mb(b.bytes)} · ушло ${Math.round(error.sent * 100)}% за ${(error.ms / 1000).toFixed(1)} с`;
+      }
+      return { error: error || { error: 'NO_ID' }, code };
+    }
+    return null;
   }
 
   async function sendAll(opts = {}) {
@@ -843,32 +879,19 @@
           return;
         }
       }
-      const batches = batchesOf(clips);
-      const sendId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-      for (let i = 0; i < batches.length; i++) {
-        const fd = formOf(d, batches[i], i, batches.length, sendId);
-        const step = batches.length > 1 ? `Пачка ${i + 1} из ${batches.length}` : '';
-        const wait = lastSendAt + SEND_GAP_MS - Date.now();
-        if (wait > 0) { renderDone('sending', step); await new Promise((r) => setTimeout(r, wait)); }
-        renderDone('sending', step);
-        lastSendAt = Date.now();
-        const { data, error } = await post(fd, (p) => {
-          if (batches[i].clips.length) setStatus(s.status, (step ? step + ' · ' : '') + Math.round(p * 100) + '%');
-        });
-        if (error || typeof (data && data.hashId) !== 'string') {
-          console.error('Forminit:', error || data);
-          // Обрыв без ответа сервера: показываем, что уходило и докуда дошло, —
-          // по этой строке со скриншота видно, где ломается (формат, размер, сеть).
-          let code = error && (error.error || error.code);
-          if (error && 'sent' in error) {
-            const b = batches[i];
-            const types = [...new Set(b.clips.map((c) => c.type || '?'))].join(', ') || 'без записей';
-            code += ` · ${types} · ${b.clips.length} шт., ${mb(b.bytes)} · ушло ${Math.round(error.sent * 100)}% за ${(error.ms / 1000).toFixed(1)} с`;
-          }
-          renderDone('error', errorText(error), code);
-          return;
-        }
+      // По очереди: свой сервер, потом Forminit. Дальше идём, только если
+      // сервис не ответил (обрыв, заглушка, 5xx); отказ по существу — ошибка.
+      let fault = null;
+      const codes = [];
+      for (const t of TRANSPORTS) {
+        if (fault) renderDone('sending', 'Пробую другой сервер…');
+        fault = await sendVia(t, d, clips, s);
+        if (!fault) break;
+        console.error('Отправка через', t, 'не прошла:', fault.error);
+        codes.push(fault.code);
+        if (!fault.error || !fault.error.transport) break;
       }
+      if (fault) { renderDone('error', errorText(fault.error), codes.join(' | ')); return; }
       const noAudio = !!opts.noAudio && d.clips.length > 0;
       state.sent = { sig: noAudio ? null : d.sig, textSig: d.textSig, noAudio, at: Date.now() };
       persist(store.set('sent', state.sent));

@@ -27,7 +27,12 @@
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.timeout = 120000;
       xhr.upload.onprogress = (e) => { if (e.lengthComputable) sent = e.loaded / e.total; };
-      xhr.onload = () => done(xhr.status, xhr.responseText.slice(0, 160));
+      // Ответ сервиса — JSON; HTML или пустота при 200 — заглушка хостинга, VPN или прокси.
+      xhr.onload = () => {
+        let json = true;
+        try { JSON.parse(xhr.responseText); } catch (err) { json = false; }
+        done(json ? xhr.status : -xhr.status, json ? xhr.responseText.slice(0, 160) : 'не JSON: ' + xhr.responseText.replace(/\s+/g, ' ').slice(0, 80));
+      };
       xhr.onerror = () => done(0, 'NETWORK_ERROR');
       xhr.ontimeout = () => done(0, 'TIMEOUT');
       xhr.send(fd);
@@ -120,7 +125,9 @@
       r.li.className = ok ? 'is-ok' : 'is-fail';
       r.small.textContent = ok
         ? `дошло: сервер ответил ${res.status} за ${(res.ms / 1000).toFixed(1)} с`
-        : `не дошло: ${res.text}, ушло ${Math.round(res.sent * 100)}% за ${(res.ms / 1000).toFixed(1)} с`;
+        : res.status < 0
+          ? `ответил не сервер (${-res.status}): ${res.text}`
+          : `не дошло: ${res.text}, ушло ${Math.round(res.sent * 100)}% за ${(res.ms / 1000).toFixed(1)} с`;
     }
     $('#run').disabled = false;
     $('#run').textContent = 'Проверить ещё раз';
