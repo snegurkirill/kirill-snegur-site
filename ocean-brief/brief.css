@@ -82,7 +82,12 @@
   z-index: 2;
   pointer-events: none;
 }
-.bf-sign { display: block; width: 150px; height: auto; }
+.bf-brand {
+  margin: 0;
+  font-size: 16px;
+  line-height: 16px;
+  color: var(--bf-ink);
+}
 .bf-test {
   margin: 0;
   font-family: var(--ds-font-grotesk);
@@ -163,10 +168,9 @@
   margin: 0 0 32px;
   padding: 0;
   list-style: none;
-  color: var(--bf-muted);
   text-wrap: balance;
 }
-.bf-lead b { font-weight: inherit; color: var(--bf-ink); }
+.bf-lead b { font-weight: inherit; }
 
 .bf-q {
   margin: 0;
@@ -186,12 +190,14 @@
   font-weight: 420;
   text-wrap: balance;
 }
+/* Основной текст — чёрный; серым только надзаголовки, плейсхолдеры и
+   подсказки интерфейса (.bf-label, .bf-text--aux). */
 .bf-text {
   margin: 20px 0 0;
-  color: var(--bf-muted);
   max-width: 560px;
   text-wrap: balance;
 }
+.bf-text--aux { color: var(--bf-muted); }
 .bf-text + .bf-text { margin-top: 12px; }
 
 .bf-groups {
@@ -201,8 +207,6 @@
   padding: 0;
   list-style: none;
 }
-.bf-groups li { display: flex; gap: 12px; align-items: baseline; }
-.bf-groups .bf-label { width: 28px; flex: none; }
 
 /* --- поле ответа ---------------------------------------------------------
    Одна «капсула»: текст, плашки записей, кнопка микрофона справа. В покое —
@@ -407,7 +411,7 @@
 
 @media (max-width: 640px) {
   .bf-top { padding: 14px 16px 0; }
-  .bf-sign { width: 120px; }
+  .bf-brand { font-size: 14px; line-height: 14px; }
   .bf-screen { padding: 72px 16px 88px; }
   .bf-card { margin: 0 auto auto; padding-top: 8vh; }
   .bf-q { font-size: 24px; line-height: 25px; }

@@ -132,7 +132,7 @@
     for (const [k, v] of Object.entries(attrs)) b.setAttribute(k, v);
     return b;
   }
-  function okButton(label = 'OK') {
+  function okButton(label = 'Далее') {
     const wrap = el('div', 'bf-actions');
     const b = el('button', 'bf-btn', `${label} <small>↵</small>`);
     b.type = 'button';
@@ -156,7 +156,6 @@
   function buildWelcome() {
     const s = screen('welcome');
     s.card.append(
-      text('p', 'bf-label', 'АНО «Экономика океана» · Витрина индустрии'),
       text('h1', 'bf-h', B.title),
       ...B.intro.map((p) => text('p', 'bf-text', p))
     );
@@ -184,19 +183,11 @@
 
   function buildCover(section) {
     const s = screen('cover', { section });
-    const count = section.groups.reduce((n, g) => n + g.questions.length, 0);
-    s.card.append(
-      text('p', 'bf-label', `Раздел ${section.no} · ${count} ${plural(count, 'вопрос', 'вопроса', 'вопросов')}`),
-      text('h2', 'bf-h', section.title)
-    );
+    s.card.append(text('h2', 'bf-h', section.title));
     const named = section.groups.filter((g) => g.title);
     if (named.length) {
       const list = el('ul', 'bf-groups');
-      for (const g of named) {
-        const li = el('li');
-        li.append(text('span', 'bf-label', g.no), text('span', '', g.title));
-        list.append(li);
-      }
+      for (const g of named) list.append(text('li', '', g.title));
       s.card.append(list);
     }
     s.card.append(okButton('Начать раздел'));
@@ -206,8 +197,9 @@
     const s = screen('q', { q });
     const meta = el('p', 'bf-meta bf-label');
     meta.append(text('b', '', q.id));
-    const where = [q.section.no + '. ' + q.section.title];
-    if (q.group.title) where.push(q.group.no + ' ' + q.group.title);
+    // Номер — только у вопроса; раздел и группа — названиями.
+    const where = [q.section.title];
+    if (q.group.title) where.push(q.group.title);
     if (q.kind !== 'name') meta.append(text('span', '', where.join(' · ')));
     s.card.append(meta);
 
@@ -231,7 +223,7 @@
     const input = el('textarea', 'bf-input');
     input.rows = 1;
     input.maxLength = 5000;                       // лимит поля fi-text-* в Forminit
-    input.placeholder = q.kind === 'name' ? 'Имя и роль' : 'Ваш ответ';
+    input.placeholder = q.kind === 'name' ? 'Имя и роль' : 'Написать';
     input.setAttribute('aria-labelledby', h.id);
     input.dataset.q = q.id;
     field.append(input);
@@ -268,7 +260,7 @@
     s.card.append(
       text('p', 'bf-label', `Часть ${part.id} из ${B.parts.length}`),
       text('h2', 'bf-h', part.title),
-      text('p', 'bf-text bf-summary', ''),
+      text('p', 'bf-text bf-text--aux bf-summary', ''),
       text('p', 'bf-text', 'Отправьте эту часть сейчас: ответы дойдут, даже если остальное вы заполните позже или на другом устройстве.')
     );
     const actions = el('div', 'bf-actions');
