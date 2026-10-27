@@ -308,22 +308,20 @@
     byQ[q.id] = s;
   }
 
-  // Финал: сводка и кнопка «Отправить». После ошибки рядом появляется
-  // «Отправить без записей» — чтобы текст дошёл, даже если записи не уходят.
+  // Финал: сводка, просьба про VPN и кнопка «Отправить». С VPN сервер брифа
+  // часто недоступен (соединение рвётся после ~16 КБ), без него — доходит.
   function buildDone() {
     const s = screen('done');
     const h = text('h2', 'bf-h', '');
     const lead = text('p', 'bf-text', '');
+    const vpn = text('p', 'bf-text', 'Для надёжности — отключите, пожалуйста, VPN перед отправкой.');
     const status = el('p', 'bf-note bf-label bf-status');
     status.setAttribute('role', 'status');
     const actions = el('div', 'bf-actions');
     const send = button('Отправить', 'bf-btn', { 'data-send': '1' });
-    const sendText = button('Отправить без записей', 'bf-btn bf-btn--ghost', { 'data-send-text': '1' });
-    sendText.hidden = true;
-    actions.append(backButton(), send, sendText);
-    s.card.append(h, lead, actions, status);
-    s.sendText = sendText;
-    Object.assign(s, { h, lead, send, status });
+    actions.append(backButton(), send);
+    s.card.append(h, lead, vpn, actions, status);
+    Object.assign(s, { h, lead, vpn, send, status });
   }
 
   const byQ = {};
@@ -432,7 +430,6 @@
     else if (t.dataset.jump) go(screens.indexOf(byQ[t.dataset.jump]));
     else if (t.dataset.go) go(Number(t.dataset.go));
     else if (t.dataset.mic) recorder.toggle(t.dataset.mic);
-    else if (t.dataset.sendText) sendAll({ noAudio: true });
     else if (t.dataset.send) sendAll();
     else if (t.dataset.play) player.toggle(t.dataset.play, t);
     else if (t.dataset.del) removeClip(t.dataset.del);
@@ -672,15 +669,14 @@
     const answered = qs.filter((q) => (state.answers[q.id] || '').trim() || clips.some((c) => c.q === q.id)).length;
     const bytes = clips.reduce((n, c) => n + c.blob.size, 0);
     const texts = [state.answers['0.0.0'] || '', qs.map((q) => state.answers[q.id] || '')];
-    return { qs, clips, answered, bytes, sig: JSON.stringify([texts, clips.map((c) => c.id)]), textSig: JSON.stringify(texts) };
+    return { qs, clips, answered, bytes, sig: JSON.stringify([texts, clips.map((c) => c.id)]) };
   }
 
-  // empty — нечего отправлять; sent — отправлено как есть; textonly — ушёл
-  // только текст; changed — после отправки что-то поменяли; new — не отправляли.
+  // empty — нечего отправлять; sent — отправлено как есть; changed — после
+  // отправки что-то поменяли; new — не отправляли.
   function doneKey(d) {
     if (!d.answered) return 'empty';
     if (state.sent && state.sent.sig === d.sig) return 'sent';
-    if (state.sent && state.sent.noAudio && state.sent.textSig === d.textSig) return 'textonly';
     return state.sent ? 'changed' : 'new';
   }
 
@@ -737,20 +733,17 @@
     const s = screens[screens.length - 1];
     const d = briefData();
     const key = doneKey(d);
-    let h, lead, status = '', send = '', sendText = false;
+    let h, lead, status = '', send = '';
     if (phase === 'sending') {
       h = 'Отправляем бриф…'; lead = summary(d); status = msg || '';
     } else if (phase === 'error') {
       h = 'Не получилось отправить'; lead = msg; status = code ? 'Код ошибки: ' + code : '';
-      send = 'Отправить ещё раз'; sendText = d.clips.length > 0;
+      send = 'Отправить ещё раз';
     } else if (key === 'empty') {
       h = 'Ответов пока нет'; lead = 'Вернитесь к вопросам и ответьте хотя бы на один.';
     } else if (key === 'sent') {
       h = 'Спасибо!'; lead = 'Бриф отправлен. Если захотите что-то дополнить — вернитесь к вопросам и отправьте снова.';
       status = 'Отправлено ' + when(state.sent.at);
-    } else if (key === 'textonly') {
-      h = 'Текст отправлен'; lead = 'Ответы текстом дошли, записи голоса — нет. Можно попробовать отправить всё ещё раз.';
-      status = 'Отправлено ' + when(state.sent.at); send = 'Отправить с записями';
     } else {
       h = key === 'changed' ? 'Ответы изменились' : 'Бриф готов';
       lead = summary(d); send = key === 'changed' ? 'Отправить снова' : 'Отправить';
@@ -759,8 +752,8 @@
     s.lead.textContent = lead;
     s.send.hidden = !send;
     if (send) s.send.textContent = send;
-    s.sendText.hidden = !sendText;
-    setStatus(s.status, status, (key === 'sent' || key === 'textonly') && !phase ? 'sent' : '');
+    s.vpn.hidden = !send;   // просьба про VPN — пока есть что отправлять
+    setStatus(s.status, status, key === 'sent' && !phase ? 'sent' : '');
   }
 
   function onDone() {
@@ -857,17 +850,17 @@
     return null;
   }
 
-  async function sendAll(opts = {}) {
+  async function sendAll() {
     if (sending) return;
     if (recorder.active) await recorder.stop();
     const d = briefData();
     if (!d.answered) { renderDone(); return; }
     const s = screens[screens.length - 1];
-    const clips = opts.noAudio ? [] : d.clips;
+    const clips = d.clips;
 
     renderDone('sending', '');               // до флага: ничего, что может бросить, между флагом и try
     sending = true;
-    s.send.disabled = s.sendText.disabled = true;
+    s.send.disabled = true;
     try {
       // Каждую запись читаем заново в память: нечитаемую лучше назвать по
       // вопросу, чем получить обрыв всей отправки.
@@ -893,8 +886,7 @@
         if (!fault.error || !fault.error.transport) break;
       }
       if (fault) { renderDone('error', errorText(fault.error), codes.join(' | ')); return; }
-      const noAudio = !!opts.noAudio && d.clips.length > 0;
-      state.sent = { sig: noAudio ? null : d.sig, textSig: d.textSig, noAudio, at: Date.now() };
+      state.sent = { sig: d.sig, at: Date.now() };
       persist(store.set('sent', state.sent));
       renderDone();
     } catch (err) {
@@ -902,7 +894,7 @@
       renderDone('error', errorText(null), err && (err.name + (err.message ? ': ' + err.message : '')));
     } finally {
       sending = false;
-      s.send.disabled = s.sendText.disabled = false;
+      s.send.disabled = false;
     }
   }
 
