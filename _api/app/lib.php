@@ -1,7 +1,7 @@
 <?php
 /* ---------------------------------------------------------------------------
    Приём брифа — общие функции. Лежит вне public_html: по сети недоступен.
-   На хостинге: ~/api.snegur.space/app/lib.php, рядом config.php (не в git).
+   На хостинге: ~/brief.snegur.space/app/lib.php, рядом config.php (не в git).
    --------------------------------------------------------------------------- */
 
 declare(strict_types=1);
@@ -28,7 +28,7 @@ function fail(int $status, string $code, string $message = ''): void {
     reply($status, ['success' => false, 'error' => $code, 'code' => $status, 'message' => $message]);
 }
 
-/* Форма живёт на snegur.space, обработчик — на api.snegur.space: нужен CORS.
+/* Форма живёт на snegur.space, обработчик — на brief.snegur.space: нужен CORS.
    Разрешены только адреса из config.php. Предзапрос OPTIONS отвечается сразу. */
 function cors(): void {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

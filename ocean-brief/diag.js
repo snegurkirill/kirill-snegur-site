@@ -2,7 +2,7 @@
    Проверка отправки — /ocean-brief/diag.html
    Шлёт на сервер брифа пакеты растущего размера и записи из черновика
    (IndexedDB «ocean-brief» того же сайта). Ничего не сохраняется: свой
-   обработчик (api.snegur.space) получает diag=1 и выбрасывает тело, Forminit
+   обработчик (brief.snegur.space) получает diag=1 и выбрасывает тело, Forminit
    (?target=forminit) — неверное поле fi-sender-name и отвечает 400.
    Ответ сервера с любым кодом — «дошло»; обрыв без ответа — «не дошло»,
    с долей тела, которая успела уйти.
@@ -12,7 +12,7 @@
   'use strict';
 
   const TARGET = new URLSearchParams(location.search).get('target') === 'forminit' ? 'forminit' : 'beget';
-  const URL_ = TARGET === 'forminit' ? 'https://forminit.com/f/qa4fs1lrrc9' : 'https://api.snegur.space/submit.php';
+  const URL_ = TARGET === 'forminit' ? 'https://forminit.com/f/qa4fs1lrrc9' : 'https://brief.snegur.space/submit.php';
   const GAP_MS = TARGET === 'forminit' ? 6000 : 500;   // Forminit без ключа — 1 запрос в 5 с с IP
   const $ = (s) => document.querySelector(s);
   const KB = 1024;
@@ -128,7 +128,7 @@
 
   const mr = window.MediaRecorder && MediaRecorder.isTypeSupported;
   $('#env').textContent = [
-    'сервер: ' + (TARGET === 'forminit' ? 'Forminit' : 'api.snegur.space'),
+    'сервер: ' + (TARGET === 'forminit' ? 'Forminit' : 'brief.snegur.space'),
     navigator.userAgent,
     'webm/opus: ' + (mr ? MediaRecorder.isTypeSupported('audio/webm;codecs=opus') : 'нет MediaRecorder'),
     'mp4: ' + (mr ? MediaRecorder.isTypeSupported('audio/mp4') : '—')

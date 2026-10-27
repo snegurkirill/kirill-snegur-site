@@ -1,4 +1,4 @@
-# api.snegur.space — приём брифа на Beget
+# brief.snegur.space — приём брифа на Beget
 
 Свой обработчик формы `/ocean-brief` на российском хостинге. Зачем: из
 российских сетей без VPN соединения с Forminit (AWS CloudFront) рвутся после
@@ -9,13 +9,13 @@ iPhone: 2 КБ — да, 50 КБ и больше — обрыв). Forminit в ф
 Папка начинается с `_`, поэтому GitHub Pages (Jekyll) её не публикует.
 
 ```
-app/lib.php              общие функции            → ~/api.snegur.space/app/
+app/lib.php              общие функции            → ~/brief.snegur.space/app/
 app/config.example.php   образец настроек
 app/config.php           настройки, ключ admin     (не в git)
-public_html/submit.php   приём: POST multipart    → ~/api.snegur.space/public_html/
+public_html/submit.php   приём: POST multipart    → ~/brief.snegur.space/public_html/
 public_html/admin.php    ответы и записи по ключу
 public_html/.htaccess    без листинга, без dot-файлов
-                         данные                   → ~/api.snegur.space/data/ (вне веба)
+                         данные                   → ~/brief.snegur.space/data/ (вне веба)
 ```
 
 - **submit.php** — `payload` (JSON: draft, send, batch, respondent, answers с

@@ -1,4 +1,4 @@
-# api.snegur.space — приём брифа. Наружу смотрят только submit.php и admin.php.
+# brief.snegur.space — приём брифа. Наружу смотрят только submit.php и admin.php.
 Options -Indexes
 
 <FilesMatch "^\.">

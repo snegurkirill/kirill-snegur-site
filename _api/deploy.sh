@@ -1,13 +1,13 @@
 #!/bin/sh
 # Выкладка обработчика брифа на Beget: ./_api/deploy.sh LOGIN [HOST]
-# Код — в ~/api.snegur.space/{app,public_html}; data/ на сервере не трогаем.
+# Код — в ~/brief.snegur.space/{app,public_html}; data/ на сервере не трогаем.
 set -eu
 
 LOGIN="${1:?логин Beget первым аргументом}"
 HOST="${2:-$LOGIN.beget.tech}"
 KEY="$HOME/.ssh/beget_brief"
 DIR="$(cd "$(dirname "$0")" && pwd)"
-SITE="api.snegur.space"
+SITE="brief.snegur.space"
 
 [ -f "$DIR/app/config.php" ] || { echo "Нет _api/app/config.php — скопируйте config.example.php и заполните." >&2; exit 1; }
 

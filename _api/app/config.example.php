@@ -8,9 +8,9 @@ return [
 
     // Куда слать уведомление о новом брифе и от чьего имени.
     'notify_email' => 'ssnegurkirill@gmail.com',
-    'mail_from'    => 'brief@api.snegur.space',
+    'mail_from'    => 'brief@brief.snegur.space',
 
-    // Ключ страницы ответов: https://api.snegur.space/admin.php?key=…
+    // Ключ страницы ответов: https://brief.snegur.space/admin.php?key=…
     // Длинная случайная строка; сменить — значит отозвать старую ссылку.
     'admin_key' => 'ЗАМЕНИТЬ-на-длинную-случайную-строку',
 

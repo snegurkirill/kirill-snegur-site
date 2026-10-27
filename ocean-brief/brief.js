@@ -15,7 +15,7 @@
      оставлен рабочим — откат одной строкой. */
   const TRANSPORT = 'beget';
   const ENDPOINT = {
-    beget: 'https://api.snegur.space/submit.php',
+    beget: 'https://brief.snegur.space/submit.php',
     forminit: 'https://forminit.com/f/qa4fs1lrrc9'
   }[TRANSPORT];
 

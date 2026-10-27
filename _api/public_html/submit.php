@@ -1,6 +1,6 @@
 <?php
 /* ---------------------------------------------------------------------------
-   Приём брифа — POST https://api.snegur.space/submit.php
+   Приём брифа — POST https://brief.snegur.space/submit.php
    multipart: payload — JSON { draft, send, batch: { i, n }, respondent,
    answers: [{ id, label, text }] } (ответы — только в первой пачке),
    audio[q1_1_3][] — записи к вопросу 1.1.3, _gotcha — ловушка для ботов.
@@ -113,7 +113,7 @@ $brief = update_json("$dir/brief.json", function (array $b) use ($p, $draft, $se
 if (count($brief['received']) === $brief['batches'] && empty($brief['notified'])) {
     update_json("$dir/brief.json", fn (array $b) => $b + ['notified' => date('c')]);
     $filled = count(array_filter($brief['answers'] ?? [], fn ($a) => trim($a['text']) !== ''));
-    $link = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'api.snegur.space') . '/admin.php?key=' . rawurlencode(config()['admin_key']) . '#' . $draft;
+    $link = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'brief.snegur.space') . '/admin.php?key=' . rawurlencode(config()['admin_key']) . '#' . $draft;
     mail_utf8(
         config()['notify_email'],
         'Бриф о витрине: ' . (($brief['respondent'] ?? '') ?: 'новый ответ'),
