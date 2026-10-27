@@ -15,6 +15,7 @@ app/config.php           настройки, ключ admin     (не в git)
 public_html/submit.php   приём: POST multipart    → ~/brief.snegur.space/public_html/
 public_html/admin.php    ответы и записи по ключу
 public_html/.htaccess    без листинга, без dot-файлов
+public_html/oceantech-vitrina/  короткий адрес: переход на snegur.space/ocean-brief
                          данные                   → ~/brief.snegur.space/data/ (вне веба)
 ```
 
