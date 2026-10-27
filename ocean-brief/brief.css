@@ -20,6 +20,7 @@
   --bf-muted: var(--ink);
   --bf-line: var(--stroke);
   --bf-chip: #f2f2f2;
+  --bf-done: #1f9d55;      /* вопрос с ответом в списке */
   --bf-ease: cubic-bezier(.2, .7, .2, 1);
   --bf-small: 13px;
   --bf-measure: 720px;
@@ -102,25 +103,62 @@
   border-radius: 6px;
 }
 
-.bf-nav {
+/* --- меню: круглая кнопка и список всех вопросов ------------------------ */
+
+.bf-menu-btn {
   position: absolute;
   right: 24px;
   bottom: 24px;
-  display: flex;
-  gap: 2px;
-  z-index: 2;
-}
-.bf-nav__btn {
+  z-index: 5;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 32px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   background: var(--bf-ink) !important;
   color: var(--paper) !important;
 }
-.bf-nav__btn:first-child { border-radius: 8px 0 0 8px; }
-.bf-nav__btn:last-child  { border-radius: 0 8px 8px 0; }
-.bf-nav__btn:disabled { opacity: .25; cursor: default; }
+.bf-menu-btn .bf-ico-close { display: none; }
+.is-menu .bf-menu-btn .bf-ico-menu { display: none; }
+.is-menu .bf-menu-btn .bf-ico-close { display: block; }
+
+.bf-menu {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--paper);
+  padding: 72px 24px 104px;
+}
+.bf-menu__list {
+  max-width: var(--bf-measure);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bf-menu__group {
+  margin: 28px 0 6px;
+  font-size: 20px;
+  line-height: 20px;
+}
+.bf-menu__group:first-child { margin-top: 0; }
+.bf-menu__group .bf-label { font-size: 20px; line-height: 20px; }
+.bf-menu__q {
+  display: block;
+  width: 100%;
+  padding: 14px 16px !important;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 18px !important;
+  line-height: 19px;
+  text-wrap: balance;
+  background: var(--bf-ink) !important;
+  color: var(--paper) !important;
+}
+.bf-menu__q.is-done { background: var(--bf-done) !important; }
+.bf-menu__q.is-current { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--link); }
 
 /* --- сцена: экраны лежат стопкой, виден один --------------------------- */
 
@@ -150,6 +188,7 @@
   transition: opacity .5s var(--bf-ease) .1s, transform .6s var(--bf-ease) .1s, visibility 0s;
 }
 
+.bf-card:focus { outline: none; }   /* фокус на карточке — для чтения с экрана, не рамка */
 .bf-card {
   width: 100%;
   max-width: var(--bf-measure);
@@ -184,7 +223,6 @@
   font-weight: 420;
   text-wrap: balance;
 }
-.bf-q__label { color: var(--link); }
 
 .bf-h {
   margin: 0;
@@ -213,10 +251,11 @@
 .bf-field {
   position: relative;
   margin-top: 32px;
-  padding: 12px 64px 12px 14px;
+  padding: 12px 104px 12px 14px;
   box-shadow: inset 0 -1px 0 var(--bf-line);
   transition: background-color .25s ease, box-shadow .25s ease, color .25s ease, border-radius .25s ease;
 }
+.bf-field.has-mic { min-height: 100px; }   /* кнопка 80 + отступы 10 */
 .bf-field:focus-within { box-shadow: inset 0 -2px 0 var(--bf-ink); }
 .bf-field.is-rec {
   border-radius: 14px;
@@ -251,13 +290,15 @@
   bottom: 10px;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--bf-ink) !important;
   color: var(--paper) !important;
   transition: background-color .25s ease, color .25s ease, transform .15s ease;
 }
+.bf-mic svg { width: 36px; height: 36px; }
+.bf-mic .bf-ico-stop { width: 26px; height: 26px; }
 .bf-mic:active { transform: scale(.94); }
 .bf-field.is-rec .bf-mic {
   background: var(--paper) !important;
@@ -273,7 +314,7 @@
   gap: 8px;
   position: absolute;
   left: 14px;
-  top: 22px;                /* на одной линии с кнопкой, пока записей нет */
+  top: 44px;                /* на одной линии с кнопкой, пока записей нет */
   font-family: var(--ds-font-grotesk);
   font-size: var(--bf-small);
   line-height: 12px;
@@ -287,6 +328,7 @@
   animation: bf-blink 1.2s steps(2, start) infinite;
 }
 .bf-field.is-rec .bf-rec { display: flex; }
+.bf-field.is-rec:has(.bf-clip) .bf-rec { top: 22px; }   /* над плашками записей */
 .bf-field.is-rec .bf-input { visibility: hidden; }
 @keyframes bf-blink { to { visibility: hidden; } }
 
@@ -362,12 +404,10 @@
   box-shadow: inset 0 0 0 1px var(--bf-line);
 }
 .bf-btn small { font-size: var(--bf-small); opacity: .6; }
+.bf-btn--back { width: 44px; padding: 0 !important; justify-content: center; }
+#resume-at { max-width: 360px; text-wrap: balance; }
 .bf-hint b { font-weight: inherit; color: var(--bf-ink); }
 
-/* Подсказки клавиатуры нужны только там, где есть клавиатура. */
-@media (hover: none), (pointer: coarse) {
-  .bf-keys { display: none; }
-}
 
 
 .bf-trap {
@@ -390,7 +430,8 @@
   .bf-h { font-size: 34px; line-height: 33px; }
   .bf-lead { font-size: 17px; line-height: 18px; }
   .bf-input { font-size: 20px; line-height: 22px; }
-  .bf-nav { right: 16px; bottom: 16px; }
+  .bf-menu-btn { right: 16px; bottom: 16px; }
+  .bf-menu { padding: 64px 16px 88px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -10,7 +10,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="stylesheet" href="../styles.css">
 <link rel="stylesheet" href="../ds.css?v=8">
-<link rel="stylesheet" href="brief.css?v=4">
+<link rel="stylesheet" href="brief.css?v=5">
 </head>
 <body class="bf-body">
 <div class="bf" id="app">
@@ -23,14 +23,15 @@
 
   <main class="bf-stage" id="stage" aria-live="polite"></main>
 
-  <nav class="bf-nav" aria-label="Переход между вопросами">
-    <button class="bf-nav__btn" id="prev" type="button" aria-label="Предыдущий вопрос">
-      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10.5 8 5.5l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-    </button>
-    <button class="bf-nav__btn" id="next" type="button" aria-label="Следующий вопрос">
-      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5 8 10.5l5-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-    </button>
+  <!-- Список всех вопросов: зелёный — есть ответ, чёрный — ещё нет. -->
+  <nav class="bf-menu" id="menu" aria-label="Все вопросы" hidden>
+    <div class="bf-menu__list" id="menu-list"></div>
   </nav>
+
+  <button class="bf-menu-btn" id="menu-btn" type="button" aria-controls="menu" aria-expanded="false" aria-label="Все вопросы">
+    <svg class="bf-ico-menu" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 8h16M3 14h16" stroke="currentColor" stroke-width="1.8"/></svg>
+    <svg class="bf-ico-close" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 5l12 12M17 5 5 17" stroke="currentColor" stroke-width="1.8"/></svg>
+  </button>
 
   <!-- Ловушка для ботов: человек это поле не видит и не заполняет. -->
   <label class="bf-trap" aria-hidden="true">Не заполняйте <input id="trap" type="text" tabindex="-1" autocomplete="off"></label>
@@ -38,6 +39,6 @@
 <noscript><p class="bf-noscript">Для брифа нужен JavaScript. Включите его или напишите мне в Телеграм.</p></noscript>
 <script src="https://forminit.com/sdk/v1/forminit.js"></script>
 <script src="data.js?v=3"></script>
-<script src="brief.js?v=5"></script>
+<script src="brief.js?v=6"></script>
 </body>
 </html>

@@ -42,7 +42,8 @@
     stop: '<svg class="bf-ico-stop" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="2" fill="currentColor"/></svg>',
     play: '<svg class="bf-ico-play" width="10" height="12" viewBox="0 0 10 12" aria-hidden="true"><path d="M1 1v10l8.5-5z" fill="currentColor"/></svg>',
     pause: '<svg class="bf-ico-pause" width="10" height="12" viewBox="0 0 10 12" aria-hidden="true"><path d="M1.5 1h2.5v10H1.5zM6 1h2.5v10H6z" fill="currentColor"/></svg>',
-    del: '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7m0-7-7 7" stroke="currentColor" stroke-width="1.5"/></svg>'
+    del: '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7m0-7-7 7" stroke="currentColor" stroke-width="1.5"/></svg>',
+    back: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
   };
 
   /* --- черновик: IndexedDB, а без неё — только память вкладки -------------- */
@@ -137,12 +138,20 @@
     for (const [k, v] of Object.entries(attrs)) b.setAttribute(k, v);
     return b;
   }
+  // «‹» — на экран назад: если Enter нажали случайно, ответ остаётся на месте.
+  function backButton() {
+    const b = el('button', 'bf-btn bf-btn--ghost bf-btn--back', ICON.back);
+    b.type = 'button';
+    b.dataset.back = '';
+    b.setAttribute('aria-label', 'Назад');
+    return b;
+  }
   function okButton(label = 'Далее') {
     const wrap = el('div', 'bf-actions');
     const b = el('button', 'bf-btn', `${label} <small>↵</small>`);
     b.type = 'button';
     b.dataset.next = '';
-    wrap.append(b);
+    wrap.append(b, backButton());
     return wrap;
   }
 
@@ -187,11 +196,11 @@
     s.card.append(actions);
   }
 
-  // Куда ведёт «Продолжить»: номер вопроса, заставка группы или отправка.
+  // Куда ведёт «Продолжить»: вопрос целиком, заставка группы или отправка.
   function describe(s) {
-    if (s.type === 'q') return `с вопроса ${s.q.id}`;
-    if (s.type === 'cover') return 'с ' + s.card.querySelector('.bf-h').textContent;
-    if (s.type === 'done') return 'к отправке';
+    if (s.type === 'q') return (s.q.label ? s.q.label + '. ' : '') + s.q.text;
+    if (s.type === 'cover') return s.card.querySelector('.bf-h').textContent;
+    if (s.type === 'done') return 'К отправке';
     return '';
   }
 
@@ -257,9 +266,7 @@
     note.setAttribute('role', 'status');
     s.card.append(note);
 
-    const actions = okButton();
-    actions.append(text('p', 'bf-label bf-keys', 'Shift ⇧ + Enter ↵ — перенос строки'));
-    s.card.append(actions);
+    s.card.append(okButton());
 
     Object.assign(s, { field, input, note });
     byQ[q.id] = s;
@@ -276,7 +283,7 @@
     const actions = el('div', 'bf-actions');
     const send = button('Отправить ещё раз', 'bf-btn', { 'data-send': '1' });
     send.hidden = true;
-    actions.append(send);
+    actions.append(send, backButton());
     s.card.append(h, lead, actions, status);
     Object.assign(s, { h, lead, send, status });
   }
@@ -296,11 +303,10 @@
   /* --- переходы ---------------------------------------------------------- */
 
   const progress = $('#progress');
-  const prevBtn = $('#prev');
-  const nextBtn = $('#next');
 
   function go(i, opts = {}) {
     i = Math.max(0, Math.min(screens.length - 1, i));
+    menu.close();
     if (recorder.active) recorder.stop();
     player.stop();
     state.pos = i;
@@ -312,8 +318,6 @@
     const s = screens[i];
     s.el.scrollTop = 0;
     progress.style.width = (i / (screens.length - 1) * 100) + '%';
-    prevBtn.disabled = i === 0;
-    nextBtn.disabled = i === screens.length - 1;
     document.body.classList.toggle('is-welcome', s.type === 'welcome');
     if (s.type === 'done') onDone();
     if (s.type === 'q') autosize(s.input);
@@ -326,13 +330,68 @@
     }, opts.instant ? 0 : 350);
   }
 
-  prevBtn.addEventListener('click', () => go(state.pos - 1));
-  nextBtn.addEventListener('click', () => go(state.pos + 1));
+  /* Меню: кнопка с двумя чертами открывает список всех вопросов по группам.
+     Заголовок группы — с номером, вопрос — без: блок зелёный, если на него
+     есть ответ текстом или записью, иначе чёрный. Клик по блоку открывает
+     вопрос. Открытое меню закрывает та же кнопка — она становится крестиком. */
+  const menu = (() => {
+    const box = $('#menu');
+    const list = $('#menu-list');
+    const btn = $('#menu-btn');
+    const blocks = {};
+    let group = null;
+    for (const q of questions) {
+      if (q.group !== group) {
+        group = q.group;
+        const title = q.group.title ? `${q.section.title}: ${q.group.title}` : q.section.title;
+        const no = q.group.no || q.section.no;
+        const h = el('p', 'bf-menu__group');
+        h.append(text('span', 'bf-label', no), document.createTextNode(' ' + title));
+        list.append(h);
+      }
+      const b = el('button', 'bf-menu__q');
+      b.type = 'button';
+      b.dataset.jump = q.id;
+      b.textContent = (q.label ? q.label + '. ' : '') + q.text;
+      list.append(b);
+      blocks[q.id] = b;
+    }
+    const answered = (qid) => !!((state.answers[qid] || '').trim() || state.clips.some((c) => c.q === qid));
+    function open() {
+      const cur = screens[state.pos];
+      for (const [qid, b] of Object.entries(blocks)) {
+        b.classList.toggle('is-done', answered(qid));
+        b.classList.toggle('is-current', cur.type === 'q' && cur.q.id === qid);
+        b.setAttribute('aria-label', b.textContent + (answered(qid) ? ' — есть ответ' : ' — без ответа'));
+      }
+      box.hidden = false;
+      $('#stage').inert = true;
+      btn.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-label', 'Закрыть список');
+      document.body.classList.add('is-menu');
+      const target = list.querySelector('.is-current') || list.querySelector('.bf-menu__q');
+      target.scrollIntoView({ block: 'center' });
+      target.focus({ preventScroll: true });
+    }
+    function close() {
+      if (box.hidden) return;
+      box.hidden = true;
+      $('#stage').inert = false;
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'Все вопросы');
+      document.body.classList.remove('is-menu');
+    }
+    btn.addEventListener('click', () => (box.hidden ? open() : close()));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    return { close, isOpen: () => !box.hidden };
+  })();
 
   document.addEventListener('click', (e) => {
     const t = e.target.closest('button');
     if (!t) return;
     if ('next' in t.dataset) go(state.pos + 1);
+    else if ('back' in t.dataset) go(state.pos - 1);
+    else if (t.dataset.jump) go(screens.indexOf(byQ[t.dataset.jump]));
     else if (t.dataset.go) go(Number(t.dataset.go));
     else if (t.dataset.mic) recorder.toggle(t.dataset.mic);
     else if (t.dataset.send) sendAll();
@@ -342,6 +401,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' || e.shiftKey || e.isComposing || e.altKey || e.metaKey || e.ctrlKey) return;
+    if (menu.isOpen()) return;
     const t = e.target;
     if (t.matches && t.matches('textarea')) {
       if (TOUCH) return;                       // на телефоне Enter — перенос строки
