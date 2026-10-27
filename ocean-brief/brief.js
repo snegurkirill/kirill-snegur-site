@@ -438,7 +438,12 @@
       player.stop();
       let stream;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+        // Шумоподавление и эхоподавление браузера дают «подводный», рваный голос,
+        // а эха нет: во время записи ничего не звучит. Автоусиление оставлено —
+        // оно выравнивает тихий голос.
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: true }
+        });
       } catch (err) {
         console.warn('Микрофон:', err);
         note(qid, err && err.name === 'NotAllowedError'
@@ -451,7 +456,9 @@
       const mime = pickMime();
       let mr;
       try {
-        mr = new MediaRecorder(stream, Object.assign({ audioBitsPerSecond: 32000 }, mime ? { mimeType: mime } : {}));
+        // Opus звучит чисто с 64 кбит/с, AAC (Safari) на тех же битах хуже — ему 96.
+        const bits = /mp4/.test(mime) ? 96000 : 64000;
+        mr = new MediaRecorder(stream, Object.assign({ audioBitsPerSecond: bits }, mime ? { mimeType: mime } : {}));
       } catch (err) {
         stream.getTracks().forEach((t) => t.stop());
         note(qid, 'Запись в этом браузере не работает. Можно ответить текстом.', true);
