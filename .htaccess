@@ -16,7 +16,7 @@
   # The brief at /ocean-brief/ records voice and posts to Forminit — mirrors _headers.
   <If "%{REQUEST_URI} =~ m#^/ocean-brief/#">
     Header always set Permissions-Policy "camera=(), microphone=(self), geolocation=(), payment=()"
-    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src https://api.snegur.space https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
   </If>
 </IfModule>
 

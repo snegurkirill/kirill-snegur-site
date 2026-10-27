@@ -1,8 +1,9 @@
 /* ---------------------------------------------------------------------------
    Проверка отправки — /ocean-brief/diag.html
-   Шлёт в форму Forminit пакеты растущего размера и записи из черновика брифа
-   (IndexedDB «ocean-brief» того же сайта). В каждом пакете неверное поле
-   fi-sender-name: если тело дошло, сервер отвечает 400 и ничего не хранит.
+   Шлёт на сервер брифа пакеты растущего размера и записи из черновика
+   (IndexedDB «ocean-brief» того же сайта). Ничего не сохраняется: свой
+   обработчик (api.snegur.space) получает diag=1 и выбрасывает тело, Forminit
+   (?target=forminit) — неверное поле fi-sender-name и отвечает 400.
    Ответ сервера с любым кодом — «дошло»; обрыв без ответа — «не дошло»,
    с долей тела, которая успела уйти.
    --------------------------------------------------------------------------- */
@@ -10,8 +11,9 @@
 (() => {
   'use strict';
 
-  const URL_ = 'https://forminit.com/f/qa4fs1lrrc9';
-  const GAP_MS = 6000;   // без ключа — 1 запрос в 5 с с одного IP
+  const TARGET = new URLSearchParams(location.search).get('target') === 'forminit' ? 'forminit' : 'beget';
+  const URL_ = TARGET === 'forminit' ? 'https://forminit.com/f/qa4fs1lrrc9' : 'https://api.snegur.space/submit.php';
+  const GAP_MS = TARGET === 'forminit' ? 6000 : 500;   // Forminit без ключа — 1 запрос в 5 с с IP
   const $ = (s) => document.querySelector(s);
   const KB = 1024;
 
@@ -40,6 +42,12 @@
 
   function form(file, extra) {
     const fd = new FormData();
+    if (TARGET === 'beget') {
+      fd.append('diag', '1');                       // обработчик примет и выбросит
+      fd.append('note', extra || 'проверка');
+      if (file) fd.append('audio[q1_1_1][]', file);
+      return fd;
+    }
     fd.append('fi-sender-name', 'diag');          // неверное поле: сервер отклонит, не сохранит
     fd.append('fi-text-diag', extra || 'проверка');
     if (file) fd.append('fi-file-q1_1_1_audio[]', file);
@@ -105,7 +113,7 @@
       const [title, make] = tests[i];
       const r = row(title);
       if (!make) { r.li.className = 'is-fail'; r.small.textContent = 'запись повреждена'; continue; }
-      if (i) { r.small.textContent = 'пауза 6 с…'; await new Promise((res) => setTimeout(res, GAP_MS)); }
+      if (i && GAP_MS > 1000) { r.small.textContent = 'пауза 6 с…'; await new Promise((res) => setTimeout(res, GAP_MS)); }
       r.small.textContent = 'отправляю…';
       const res = await post(await make());
       const ok = res.status > 0;
@@ -120,6 +128,7 @@
 
   const mr = window.MediaRecorder && MediaRecorder.isTypeSupported;
   $('#env').textContent = [
+    'сервер: ' + (TARGET === 'forminit' ? 'Forminit' : 'api.snegur.space'),
     navigator.userAgent,
     'webm/opus: ' + (mr ? MediaRecorder.isTypeSupported('audio/webm;codecs=opus') : 'нет MediaRecorder'),
     'mp4: ' + (mr ? MediaRecorder.isTypeSupported('audio/mp4') : '—')

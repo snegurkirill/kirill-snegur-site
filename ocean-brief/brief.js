@@ -9,25 +9,40 @@
 (() => {
   'use strict';
 
+  /* Куда уходит бриф. 'beget' — свой обработчик на российском хостинге
+     (_api/ в репозитории): из российских сетей соединения с Forminit (AWS
+     CloudFront) рвутся после ~16 КБ, и записи голоса не доходили. 'forminit'
+     оставлен рабочим — откат одной строкой. */
+  const TRANSPORT = 'beget';
+  const ENDPOINT = {
+    beget: 'https://api.snegur.space/submit.php',
+    forminit: 'https://forminit.com/f/qa4fs1lrrc9'
+  }[TRANSPORT];
+
   // Forminit form: inputs are named fi-{type}-{name}. Rules: https://forminit.com/setup.md
   // Здесь полей в разметке нет: FormData собирает formOf(). Ответ — fi-text-q1_1_3,
   // записи к нему — fi-file-q1_1_3_audio[] (имя должно отличаться от текстового),
   // кто заполняет — fi-text-respondent (не fi-sender-fullName: запятая в «Анна, директор»
   // отклонила бы всю отправку).
-  const FORM_ID = 'qa4fs1lrrc9';
   const FIELD_ERRORS = {
     audio: 'Сервис не принял одну из записей. Запишите её ещё раз или ответьте текстом.'
   };
 
   // На localhost и с ?test ничего не уходит: отправка подменяется, а в шапке
-  // горит плашка. Живые отправки попадают на почту и тратят квоту формы.
-  const TEST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) ||
-               new URLSearchParams(location.search).has('test');
+  // горит плашка. ?live на localhost шлёт по-настоящему — проверить обработчик.
+  const QS = new URLSearchParams(location.search);
+  const TEST = (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || QS.has('test')) && !QS.has('live');
 
   const MAX_CLIP_MS = 5 * 60 * 1000;          // одна запись — до 5 минут
   const MIN_CLIP_MS = 700;                    // короче — случайное нажатие
-  const MAX_BYTES = 24 * 1024 * 1024;         // лимит Forminit — 25 МБ на отправку
-  const SEND_GAP_MS = 6000;                   // без ключа — 1 запрос в 5 с с одного IP
+  // Пачка: Forminit — до 25 МБ и 20 файловых полей, 1 запрос в 5 с с одного IP;
+  // PHP на хостинге — до 20 файлов (max_file_uploads) и post_max_size.
+  const LIMITS = {
+    beget: { bytes: 15 * 1024 * 1024, files: 18, fields: 99, gap: 0 },
+    forminit: { bytes: 24 * 1024 * 1024, files: 999, fields: 20, gap: 6000 }
+  }[TRANSPORT];
+  const MAX_BYTES = LIMITS.bytes;
+  const SEND_GAP_MS = LIMITS.gap;
   const TOUCH = matchMedia('(hover: none), (pointer: coarse)').matches;
   const CAN_RECORD = !!(window.isSecureContext && navigator.mediaDevices &&
                         navigator.mediaDevices.getUserMedia && window.MediaRecorder);
@@ -640,13 +655,13 @@
      кабинете Forminit файл стоит под своим вопросом (имя файла сервис меняет
      на своё). Больше 24 МБ или 20 вопросов с записями — несколько пачек.
 
-     Отправляем сами, XMLHttpRequest'ом, а не SDK (он внутри — fetch): с iPhone
-     fetch с файлами записей обрывался «Load failed», хотя текст доходил. Запрос
-     тот же, что у SDK: POST forminit.com/f/<id>, multipart, ответ — JSON. */
+     Отправляем сами, XMLHttpRequest'ом: SDK Forminit — тот же POST через fetch.
+     Для 'beget' поля свои (submit.php): payload — JSON с ответами и подписями
+     вопросов, audio[q1_1_3][] — записи. Ответ у обоих — { success, submission }. */
 
   const trap = $('#trap');
-  const MAX_FILE_FIELDS = 20;   // Forminit: не больше 20 файловых блоков в отправке
   let sending = false;
+  let draftId = '';   // один на браузер: связывает отправки одного человека
   let lastSendAt = 0;
 
   const fieldOf = (qid) => 'q' + qid.replace(/\./g, '_');
@@ -674,7 +689,8 @@
     const batches = [{ clips: [], fields: new Set(), bytes: 0 }];
     for (const c of clips) {
       let b = batches[batches.length - 1];
-      const full = b.bytes + c.blob.size > MAX_BYTES || (!b.fields.has(c.q) && b.fields.size >= MAX_FILE_FIELDS);
+      const full = b.bytes + c.blob.size > MAX_BYTES || b.clips.length >= LIMITS.files ||
+        (!b.fields.has(c.q) && b.fields.size >= LIMITS.fields);
       if (b.clips.length && full) { b = { clips: [], fields: new Set(), bytes: 0 }; batches.push(b); }
       b.clips.push(c);
       b.fields.add(c.q);
@@ -683,7 +699,20 @@
     return batches;
   }
 
-  function formOf(d, batch, i, n) {
+  const labelOf = (q) => [q.section.title, q.group.title, (q.label ? q.label + '. ' : '') + q.text].filter(Boolean).join(' · ');
+
+  function formOf(d, batch, i, n, sendId) {
+    if (TRANSPORT === 'beget') {
+      const fd = new FormData();
+      fd.append('payload', JSON.stringify({
+        draft: draftId, send: sendId, batch: { i, n },
+        respondent: (state.answers['0.0.0'] || '').trim(),
+        answers: i === 0 ? d.qs.map((q) => ({ id: q.id, label: labelOf(q), text: state.answers[q.id] || '' })) : []
+      }));
+      for (const c of batch.clips) fd.append(`audio[${fieldOf(c.q)}][]`, fileOf(c, clipsOf(c.q).indexOf(c) + 1));
+      fd.append('_gotcha', trap.value);
+      return fd;
+    }
     const fd = new FormData();
     fd.append('fi-text-respondent', (state.answers['0.0.0'] || '').trim());
     if (n > 1) fd.append('fi-text-batch', `${i + 1} из ${n}`);
@@ -762,7 +791,7 @@
   // Тот же ответ, что у SDK: { data } с hashId при успехе, иначе { error } с кодом.
   function post(fd, onProgress) {
     if (TEST) {
-      console.info('[тест] отправка в Forminit', FORM_ID, [...fd.entries()]
+      console.info('[тест] отправка', ENDPOINT, [...fd.entries()]
         .map(([k, v]) => [k, v instanceof File ? `${v.name} (${v.type}, ${v.size} Б)` : v]));
       return new Promise((r) => setTimeout(() => r({ data: { hashId: 'test' } }), 700));
     }
@@ -771,7 +800,7 @@
       const t0 = Date.now();
       let sent = 0;   // доля тела, ушедшая на сервер, — для диагностики обрыва
       const fail = (code) => resolve({ error: { error: code, code: 0, message: '', sent, ms: Date.now() - t0 } });
-      xhr.open('POST', `https://forminit.com/f/${FORM_ID}`);
+      xhr.open('POST', ENDPOINT);
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.timeout = 5 * 60 * 1000;
       xhr.upload.onprogress = (e) => {
@@ -815,8 +844,9 @@
         }
       }
       const batches = batchesOf(clips);
+      const sendId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
       for (let i = 0; i < batches.length; i++) {
-        const fd = formOf(d, batches[i], i, batches.length);
+        const fd = formOf(d, batches[i], i, batches.length, sendId);
         const step = batches.length > 1 ? `Пачка ${i + 1} из ${batches.length}` : '';
         const wait = lastSendAt + SEND_GAP_MS - Date.now();
         if (wait > 0) { renderDone('sending', step); await new Promise((r) => setTimeout(r, wait)); }
@@ -862,13 +892,18 @@
 
   (async () => {
     try {
-      const [answers, sent, pos, clips] = await Promise.all([store.get('answers'), store.get('sent'), store.get('pos'), store.clips()]);
+      const [answers, sent, pos, clips, draft] = await Promise.all([store.get('answers'), store.get('sent'), store.get('pos'), store.clips(), store.get('draft')]);
+      draftId = draft || '';
       state.answers = answers || {};
       state.sent = sent && sent.sig ? sent : null;
       state.clips = await store.migrate(clips || []);
       state.pos = Number(pos) || 0;
     } catch (err) {
       persist(Promise.reject(err));
+    }
+    if (!draftId) {
+      draftId = 'd' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      persist(store.set('draft', draftId));
     }
     for (const s of screens) if (s.type === 'q') s.input.value = state.answers[s.q.id] || '';
     for (const q of questions) renderClips(q.id);

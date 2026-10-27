@@ -53,3 +53,6 @@ media/**/*.jpeg
 # tech-production page: only the compressed derivatives are tracked.
 assets/tech-production/*
 !assets/tech-production/Сжатые/
+
+# Brief API on Beget: secrets stay on the server.
+_api/app/config.php

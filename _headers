@@ -18,4 +18,4 @@
 # Бриф: отправка в Forminit, запись голоса (микрофон, blob: для прослушивания).
 /ocean-brief/*
   Permissions-Policy: camera=(), microphone=(self), geolocation=(), payment=()
-  Content-Security-Policy: default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src https://api.snegur.space https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
