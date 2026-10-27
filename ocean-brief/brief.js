@@ -768,18 +768,25 @@
     }
     return new Promise((resolve) => {
       const xhr = new XMLHttpRequest();
+      const t0 = Date.now();
+      let sent = 0;   // доля тела, ушедшая на сервер, — для диагностики обрыва
+      const fail = (code) => resolve({ error: { error: code, code: 0, message: '', sent, ms: Date.now() - t0 } });
       xhr.open('POST', `https://forminit.com/f/${FORM_ID}`);
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.timeout = 5 * 60 * 1000;
-      xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      xhr.upload.onprogress = (e) => {
+        if (!e.lengthComputable) return;
+        sent = e.loaded / e.total;
+        if (onProgress) onProgress(sent);
+      };
       xhr.onload = () => {
         let body;
         try { body = JSON.parse(xhr.responseText); } catch (err) { body = { message: xhr.responseText }; }
         if (xhr.status >= 200 && xhr.status < 300 && body.success !== false) resolve({ data: body.submission });
         else resolve({ error: { error: body.error || 'HTTP_ERROR', code: body.code || xhr.status, message: body.message || '', fieldName: body.fieldName } });
       };
-      xhr.onerror = () => resolve({ error: { error: 'NETWORK_ERROR', code: 0, message: '' } });
-      xhr.ontimeout = () => resolve({ error: { error: 'TIMEOUT', code: 0, message: '' } });
+      xhr.onerror = () => fail('NETWORK_ERROR');
+      xhr.ontimeout = () => fail('TIMEOUT');
       xhr.send(fd);
     });
   }
@@ -820,7 +827,15 @@
         });
         if (error || typeof (data && data.hashId) !== 'string') {
           console.error('Forminit:', error || data);
-          renderDone('error', errorText(error), error && (error.error || error.code));
+          // Обрыв без ответа сервера: показываем, что уходило и докуда дошло, —
+          // по этой строке со скриншота видно, где ломается (формат, размер, сеть).
+          let code = error && (error.error || error.code);
+          if (error && 'sent' in error) {
+            const b = batches[i];
+            const types = [...new Set(b.clips.map((c) => c.type || '?'))].join(', ') || 'без записей';
+            code += ` · ${types} · ${b.clips.length} шт., ${mb(b.bytes)} · ушло ${Math.round(error.sent * 100)}% за ${(error.ms / 1000).toFixed(1)} с`;
+          }
+          renderDone('error', errorText(error), code);
           return;
         }
       }
