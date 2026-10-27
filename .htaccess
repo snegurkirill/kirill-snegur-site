@@ -13,10 +13,10 @@
   Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; connect-src https://eu.i.posthog.com https://eu-assets.i.posthog.com; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
   # Enable once HTTPS is confirmed working on the live domain:
   # Header always set Strict-Transport-Security "max-age=15552000"
-  # The brief at /ocean-brief/ records voice and sends to Forminit — mirrors _headers.
+  # The brief at /ocean-brief/ records voice and posts to Forminit — mirrors _headers.
   <If "%{REQUEST_URI} =~ m#^/ocean-brief/#">
     Header always set Permissions-Policy "camera=(), microphone=(self), geolocation=(), payment=()"
-    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self' https://forminit.com; connect-src https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
   </If>
 </IfModule>
 

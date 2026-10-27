@@ -2,8 +2,8 @@
    Бриф — /ocean-brief
    Экраны строятся из data.js: приветствие, вопросы, заставки групп и финал.
    Виден один экран, переходы — классами is-past / is-on (brief.css). Ответы и
-   записи голоса — черновик в IndexedDB этого браузера; на финале бриф сам
-   уходит в Forminit одной отправкой.
+   записи голоса — черновик в IndexedDB этого браузера; на финале бриф
+   уходит в Forminit одной отправкой по кнопке «Отправить».
    --------------------------------------------------------------------------- */
 
 (() => {
@@ -293,8 +293,8 @@
     byQ[q.id] = s;
   }
 
-  // Финал: открылся — бриф уходит сам, одной отправкой. Кнопка — только чтобы
-  // повторить после ошибки.
+  // Финал: сводка и кнопка «Отправить». После ошибки рядом появляется
+  // «Отправить без записей» — чтобы текст дошёл, даже если записи не уходят.
   function buildDone() {
     const s = screen('done');
     const h = text('h2', 'bf-h', '');
@@ -302,10 +302,12 @@
     const status = el('p', 'bf-note bf-label bf-status');
     status.setAttribute('role', 'status');
     const actions = el('div', 'bf-actions');
-    const send = button('Отправить ещё раз', 'bf-btn', { 'data-send': '1' });
-    send.hidden = true;
-    actions.append(backButton(), send);
+    const send = button('Отправить', 'bf-btn', { 'data-send': '1' });
+    const sendText = button('Отправить без записей', 'bf-btn bf-btn--ghost', { 'data-send-text': '1' });
+    sendText.hidden = true;
+    actions.append(backButton(), send, sendText);
     s.card.append(h, lead, actions, status);
+    s.sendText = sendText;
     Object.assign(s, { h, lead, send, status });
   }
 
@@ -415,6 +417,7 @@
     else if (t.dataset.jump) go(screens.indexOf(byQ[t.dataset.jump]));
     else if (t.dataset.go) go(Number(t.dataset.go));
     else if (t.dataset.mic) recorder.toggle(t.dataset.mic);
+    else if (t.dataset.sendText) sendAll({ noAudio: true });
     else if (t.dataset.send) sendAll();
     else if (t.dataset.play) player.toggle(t.dataset.play, t);
     else if (t.dataset.del) removeClip(t.dataset.del);
@@ -632,16 +635,19 @@
   }
 
   /* --- отправка ----------------------------------------------------------
-     Бриф уходит одной отправкой, сам, когда человек доходит до финала. Ответ —
+     Бриф уходит одной отправкой по кнопке «Отправить» на финале. Ответ —
      fi-text-q1_1_3, записи к нему — сразу под ним, fi-file-q1_1_3_audio[]: в
      кабинете Forminit файл стоит под своим вопросом (имя файла сервис меняет
-     на своё). Больше 24 МБ или 20 вопросов с записями — несколько пачек. */
+     на своё). Больше 24 МБ или 20 вопросов с записями — несколько пачек.
+
+     Отправляем сами, XMLHttpRequest'ом, а не SDK (он внутри — fetch): с iPhone
+     fetch с файлами записей обрывался «Load failed», хотя текст доходил. Запрос
+     тот же, что у SDK: POST forminit.com/f/<id>, multipart, ответ — JSON. */
 
   const trap = $('#trap');
   const MAX_FILE_FIELDS = 20;   // Forminit: не больше 20 файловых блоков в отправке
   let sending = false;
   let lastSendAt = 0;
-  let forminit;   // создаётся при первой отправке
 
   const fieldOf = (qid) => 'q' + qid.replace(/\./g, '_');
 
@@ -650,20 +656,23 @@
     const clips = qs.flatMap((q) => clipsOf(q.id));
     const answered = qs.filter((q) => (state.answers[q.id] || '').trim() || clips.some((c) => c.q === q.id)).length;
     const bytes = clips.reduce((n, c) => n + c.blob.size, 0);
-    const sig = JSON.stringify([state.answers['0.0.0'] || '', qs.map((q) => state.answers[q.id] || ''), clips.map((c) => c.id)]);
-    return { qs, clips, answered, bytes, sig };
+    const texts = [state.answers['0.0.0'] || '', qs.map((q) => state.answers[q.id] || '')];
+    return { qs, clips, answered, bytes, sig: JSON.stringify([texts, clips.map((c) => c.id)]), textSig: JSON.stringify(texts) };
   }
 
+  // empty — нечего отправлять; sent — отправлено как есть; textonly — ушёл
+  // только текст; changed — после отправки что-то поменяли; new — не отправляли.
   function doneKey(d) {
     if (!d.answered) return 'empty';
     if (state.sent && state.sent.sig === d.sig) return 'sent';
+    if (state.sent && state.sent.noAudio && state.sent.textSig === d.textSig) return 'textonly';
     return state.sent ? 'changed' : 'new';
   }
 
   // Записи идут по порядку вопросов; пачка — до 24 МБ и до 20 вопросов с файлами.
-  function batchesOf(d) {
+  function batchesOf(clips) {
     const batches = [{ clips: [], fields: new Set(), bytes: 0 }];
-    for (const c of d.clips) {
+    for (const c of clips) {
       let b = batches[batches.length - 1];
       const full = b.bytes + c.blob.size > MAX_BYTES || (!b.fields.has(c.q) && b.fields.size >= MAX_FILE_FIELDS);
       if (b.clips.length && full) { b = { clips: [], fields: new Set(), bytes: 0 }; batches.push(b); }
@@ -692,36 +701,41 @@
       (d.clips.length ? ` · ${d.clips.length} ${plural(d.clips.length, 'запись', 'записи', 'записей')}, ${mb(d.bytes)}` : '');
   }
 
+  const when = (t) => new Date(t).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+
   // phase: 'sending' | 'error' | undefined — тогда по состоянию черновика.
   function renderDone(phase, msg, code) {
     const s = screens[screens.length - 1];
     const d = briefData();
     const key = doneKey(d);
-    let h, lead, status = '', retry = false;
+    let h, lead, status = '', send = '', sendText = false;
     if (phase === 'sending') {
       h = 'Отправляем бриф…'; lead = summary(d); status = msg || '';
     } else if (phase === 'error') {
-      h = 'Не получилось отправить'; lead = msg; status = code ? 'Код ошибки: ' + code : ''; retry = true;
+      h = 'Не получилось отправить'; lead = msg; status = code ? 'Код ошибки: ' + code : '';
+      send = 'Отправить ещё раз'; sendText = d.clips.length > 0;
     } else if (key === 'empty') {
-      h = 'Ответов пока нет'; lead = 'Вернитесь к вопросам: бриф отправится, когда вы снова дойдёте до этого экрана.';
+      h = 'Ответов пока нет'; lead = 'Вернитесь к вопросам и ответьте хотя бы на один.';
     } else if (key === 'sent') {
-      h = 'Спасибо!';
-      lead = 'Бриф отправлен. Чтобы что-то дополнить, вернитесь к вопросам: изменения отправятся, когда вы снова дойдёте до этого экрана.';
-      status = 'Отправлено ' + new Date(state.sent.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+      h = 'Спасибо!'; lead = 'Бриф отправлен. Если захотите что-то дополнить — вернитесь к вопросам и отправьте снова.';
+      status = 'Отправлено ' + when(state.sent.at);
+    } else if (key === 'textonly') {
+      h = 'Текст отправлен'; lead = 'Ответы текстом дошли, записи голоса — нет. Можно попробовать отправить всё ещё раз.';
+      status = 'Отправлено ' + when(state.sent.at); send = 'Отправить с записями';
     } else {
-      h = 'Бриф ещё не отправлен'; lead = summary(d); retry = true;
+      h = key === 'changed' ? 'Ответы изменились' : 'Бриф готов';
+      lead = summary(d); send = key === 'changed' ? 'Отправить снова' : 'Отправить';
     }
     s.h.textContent = h;
     s.lead.textContent = lead;
-    s.send.hidden = !retry;
-    s.send.textContent = phase === 'error' ? 'Отправить ещё раз' : 'Отправить';
-    setStatus(s.status, status, key === 'sent' && !phase ? 'sent' : phase === 'error' ? 'aux' : '');
+    s.send.hidden = !send;
+    if (send) s.send.textContent = send;
+    s.sendText.hidden = !sendText;
+    setStatus(s.status, status, (key === 'sent' || key === 'textonly') && !phase ? 'sent' : '');
   }
 
   function onDone() {
-    const key = doneKey(briefData());
-    if (!sending && (key === 'new' || key === 'changed')) sendAll();
-    else if (!sending) renderDone();
+    if (!sending) renderDone();
   }
 
   function setStatus(node, msg, key) {
@@ -745,31 +759,46 @@
     return new File([clip.blob], `${clip.q}-${k}.${mp4 ? 'mp4' : 'webm'}`, { type: mp4 ? 'video/mp4' : 'audio/webm' });
   }
 
-  async function submit(fd) {
+  // Тот же ответ, что у SDK: { data } с hashId при успехе, иначе { error } с кодом.
+  function post(fd, onProgress) {
     if (TEST) {
       console.info('[тест] отправка в Forminit', FORM_ID, [...fd.entries()]
         .map(([k, v]) => [k, v instanceof File ? `${v.name} (${v.type}, ${v.size} Б)` : v]));
-      await new Promise((r) => setTimeout(r, 700));
-      return { data: { hashId: 'test' } };
+      return new Promise((r) => setTimeout(() => r({ data: { hashId: 'test' } }), 700));
     }
-    if (!forminit) forminit = new window.Forminit();
-    return forminit.submit(FORM_ID, fd);
+    return new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://forminit.com/f/${FORM_ID}`);
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.timeout = 5 * 60 * 1000;
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      xhr.onload = () => {
+        let body;
+        try { body = JSON.parse(xhr.responseText); } catch (err) { body = { message: xhr.responseText }; }
+        if (xhr.status >= 200 && xhr.status < 300 && body.success !== false) resolve({ data: body.submission });
+        else resolve({ error: { error: body.error || 'HTTP_ERROR', code: body.code || xhr.status, message: body.message || '', fieldName: body.fieldName } });
+      };
+      xhr.onerror = () => resolve({ error: { error: 'NETWORK_ERROR', code: 0, message: '' } });
+      xhr.ontimeout = () => resolve({ error: { error: 'TIMEOUT', code: 0, message: '' } });
+      xhr.send(fd);
+    });
   }
 
-  async function sendAll() {
+  async function sendAll(opts = {}) {
     if (sending) return;
     if (recorder.active) await recorder.stop();
     const d = briefData();
     if (!d.answered) { renderDone(); return; }
     const s = screens[screens.length - 1];
+    const clips = opts.noAudio ? [] : d.clips;
 
     renderDone('sending', '');               // до флага: ничего, что может бросить, между флагом и try
     sending = true;
-    s.send.disabled = true;
+    s.send.disabled = s.sendText.disabled = true;
     try {
-      // Каждую запись читаем заново в память: нечитаемый файл в FormData Safari
-      // не отправляет совсем («Load failed»), и тогда непонятно, что именно сломано.
-      for (const c of d.clips) {
+      // Каждую запись читаем заново в память: нечитаемую лучше назвать по
+      // вопросу, чем получить обрыв всей отправки.
+      for (const c of clips) {
         try {
           c.blob = new Blob([await c.blob.arrayBuffer()], { type: c.type });
         } catch (err) {
@@ -778,7 +807,7 @@
           return;
         }
       }
-      const batches = batchesOf(d);
+      const batches = batchesOf(clips);
       for (let i = 0; i < batches.length; i++) {
         const fd = formOf(d, batches[i], i, batches.length);
         const step = batches.length > 1 ? `Пачка ${i + 1} из ${batches.length}` : '';
@@ -786,17 +815,17 @@
         if (wait > 0) { renderDone('sending', step); await new Promise((r) => setTimeout(r, wait)); }
         renderDone('sending', step);
         lastSendAt = Date.now();
-        const { data, error } = await submit(fd);
+        const { data, error } = await post(fd, (p) => {
+          if (batches[i].clips.length) setStatus(s.status, (step ? step + ' · ' : '') + Math.round(p * 100) + '%');
+        });
         if (error || typeof (data && data.hashId) !== 'string') {
           console.error('Forminit:', error || data);
-          // GENERIC_ERROR — запрос не дошёл до Forminit: сообщение браузера
-          // («Load failed») не содержит ответов человека, его можно показать.
-          const code = error && (error.error || error.code);
-          renderDone('error', errorText(error), code === 'GENERIC_ERROR' && error.message ? `${code} · ${error.message}` : code);
+          renderDone('error', errorText(error), error && (error.error || error.code));
           return;
         }
       }
-      state.sent = { sig: d.sig, at: Date.now() };
+      const noAudio = !!opts.noAudio && d.clips.length > 0;
+      state.sent = { sig: noAudio ? null : d.sig, textSig: d.textSig, noAudio, at: Date.now() };
       persist(store.set('sent', state.sent));
       renderDone();
     } catch (err) {
@@ -804,7 +833,7 @@
       renderDone('error', errorText(null), err && (err.name + (err.message ? ': ' + err.message : '')));
     } finally {
       sending = false;
-      s.send.disabled = false;
+      s.send.disabled = s.sendText.disabled = false;
     }
   }
 
