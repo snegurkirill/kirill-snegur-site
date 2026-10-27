@@ -779,7 +779,8 @@
     if (field && FIELD_ERRORS[field]) return FIELD_ERRORS[field];
     if (field && /_audio$/.test(field)) return FIELD_ERRORS.audio;
     if (error && error.error === 'TOO_MANY_REQUESTS') return 'Подождите несколько секунд и отправьте ещё раз.';
-    return 'Ответы сохранены в этом браузере. Проверьте интернет и отправьте ещё раз.';
+    // С некоторыми VPN сервер брифа недоступен совсем; ответы при этом целы.
+    return 'Ответы сохранены в этом браузере. Если включён VPN — выключите его и отправьте ещё раз. Если нет — проверьте интернет.';
   }
 
   function fileOf(clip, k) {
