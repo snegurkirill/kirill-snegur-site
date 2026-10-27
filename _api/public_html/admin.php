@@ -1,7 +1,7 @@
 <?php
 /* ---------------------------------------------------------------------------
    Ответы брифа — https://brief.snegur.space/admin.php?key=…
-   Без ключа из config.php — 404. Каждый черновик (человек в одном браузере) —
+   Ключ — admin_key или view_key из config.php; без них — 404. Каждый черновик (человек в одном браузере) —
    блок; сверху последняя отправка целиком, прежние — свёрнуты. Записи
    играют прямо здесь: admin.php?key=…&f=<draft>/<send>/<файл>, с Range —
    без него Safari не проигрывает аудио.
@@ -10,8 +10,12 @@
 declare(strict_types=1);
 require __DIR__ . '/../app/lib.php';
 
+// Пускают два ключа: admin_key — ваш, view_key — ссылка с финала брифа для
+// заполняющих (видят все ответы, включая коллег). Страница только читает.
 $key = (string) ($_GET['key'] ?? '');
-if ($key === '' || !hash_equals(config()['admin_key'], $key)) {
+$cfg = config();
+$known = array_filter([$cfg['admin_key'] ?? '', $cfg['view_key'] ?? ''], 'strlen');
+if ($key === '' || !array_filter($known, fn ($k) => hash_equals($k, $key))) {
     http_response_code(404);
     exit;
 }

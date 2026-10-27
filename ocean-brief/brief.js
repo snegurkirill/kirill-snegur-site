@@ -20,6 +20,9 @@
     beget: 'https://brief.snegur.space/submit.php',
     forminit: 'https://forminit.com/f/qa4fs1lrrc9'
   };
+  // Все ответы, включая коллег, — ссылка на финале. view_key из _api/app/config.php:
+  // сменить его там — отозвать эту ссылку (свой admin_key остаётся отдельным).
+  const ANSWERS_URL = 'https://brief.snegur.space/admin.php?key=fba6da0aa4635ef85d8800b4';
 
   // Forminit form: inputs are named fi-{type}-{name}. Rules: https://forminit.com/setup.md
   // Здесь полей в разметке нет: FormData собирает formOf(). Ответ — fi-text-q1_1_3,
@@ -742,14 +745,23 @@
     } else if (key === 'empty') {
       h = 'Ответов пока нет'; lead = 'Вернитесь к вопросам и ответьте хотя бы на один.';
     } else if (key === 'sent') {
-      h = 'Спасибо!'; lead = 'Бриф отправлен. Если захотите что-то дополнить — вернитесь к вопросам и отправьте снова.';
+      h = 'Большое спасибо!'; lead = null;   // абзац со ссылкой — ниже
       status = 'Отправлено ' + when(state.sent.at);
     } else {
       h = key === 'changed' ? 'Ответы изменились' : 'Бриф готов';
       lead = summary(d); send = key === 'changed' ? 'Отправить снова' : 'Отправить';
     }
     s.h.textContent = h;
-    s.lead.textContent = lead;
+    if (lead === null) {
+      const a = text('a', '', 'посмотреть все ответы');
+      a.href = ANSWERS_URL;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      s.lead.textContent = 'Ответы станут основой архитектуры. Если захотите, их можно поменять и отправить снова или ';
+      s.lead.append(a, document.createTextNode(', включая коллег.'));
+    } else {
+      s.lead.textContent = lead;
+    }
     s.send.hidden = !send;
     if (send) s.send.textContent = send;
     s.vpn.hidden = !send;   // просьба про VPN — пока есть что отправлять
