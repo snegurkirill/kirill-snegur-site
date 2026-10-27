@@ -83,6 +83,26 @@
       // пустым или нечитаемым, и отправка такой записи падает.
       clips: async () => (await run('clips', 'readonly', (s) => s.getAll()))
         .map((r) => r.blob ? r : Object.assign(r, { blob: new Blob([r.data], { type: r.type }) })),
+      // Записи из первых версий лежат Blob'ом: пробуем прочитать и переложить
+      // байтами; нечитаемые убираем — их всё равно нельзя отправить.
+      migrate: async (rows) => {
+        const out = [];
+        for (const r of rows) {
+          if (!r.data) {
+            try {
+              r.blob = new Blob([await r.blob.arrayBuffer()], { type: r.type });
+              await store.putClip(r);
+            } catch (err) {
+              console.warn('Запись не читается, убрана:', r.id, err);
+              await store.delClip(r.id).catch(() => {});
+              lostClips.push(r.q);
+              continue;
+            }
+          }
+          out.push(r);
+        }
+        return out;
+      },
       putClip: async (c) => {
         const data = await c.blob.arrayBuffer();
         return run('clips', 'readwrite', (s) => s.put({ id: c.id, q: c.q, type: c.type, ms: c.ms, at: c.at, data }));
@@ -91,6 +111,7 @@
     };
   })();
 
+  const lostClips = [];   // вопросы, чьи старые записи не прочитались
   let persistent = true;
   function persist(promise) {
     promise.catch((err) => {
@@ -740,13 +761,24 @@
     if (recorder.active) await recorder.stop();
     const d = briefData();
     if (!d.answered) { renderDone(); return; }
-    const batches = batchesOf(d);
     const s = screens[screens.length - 1];
 
     renderDone('sending', '');               // до флага: ничего, что может бросить, между флагом и try
     sending = true;
     s.send.disabled = true;
     try {
+      // Каждую запись читаем заново в память: нечитаемый файл в FormData Safari
+      // не отправляет совсем («Load failed»), и тогда непонятно, что именно сломано.
+      for (const c of d.clips) {
+        try {
+          c.blob = new Blob([await c.blob.arrayBuffer()], { type: c.type });
+        } catch (err) {
+          console.error('Запись не читается:', c.id, err);
+          renderDone('error', `Запись к вопросу ${c.q} не читается. Удалите её крестиком и запишите заново.`, 'CLIP_UNREADABLE');
+          return;
+        }
+      }
+      const batches = batchesOf(d);
       for (let i = 0; i < batches.length; i++) {
         const fd = formOf(d, batches[i], i, batches.length);
         const step = batches.length > 1 ? `Пачка ${i + 1} из ${batches.length}` : '';
@@ -757,7 +789,10 @@
         const { data, error } = await submit(fd);
         if (error || typeof (data && data.hashId) !== 'string') {
           console.error('Forminit:', error || data);
-          renderDone('error', errorText(error), error && (error.error || error.code));
+          // GENERIC_ERROR — запрос не дошёл до Forminit: сообщение браузера
+          // («Load failed») не содержит ответов человека, его можно показать.
+          const code = error && (error.error || error.code);
+          renderDone('error', errorText(error), code === 'GENERIC_ERROR' && error.message ? `${code} · ${error.message}` : code);
           return;
         }
       }
@@ -786,13 +821,14 @@
       const [answers, sent, pos, clips] = await Promise.all([store.get('answers'), store.get('sent'), store.get('pos'), store.clips()]);
       state.answers = answers || {};
       state.sent = sent && sent.sig ? sent : null;
-      state.clips = clips || [];
+      state.clips = await store.migrate(clips || []);
       state.pos = Number(pos) || 0;
     } catch (err) {
       persist(Promise.reject(err));
     }
     for (const s of screens) if (s.type === 'q') s.input.value = state.answers[s.q.id] || '';
     for (const q of questions) renderClips(q.id);
+    for (const qid of new Set(lostClips)) note(qid, 'Старая запись к этому вопросу не сохранилась — запишите её заново.', true);
     // Вернувшийся видит приветствие с «Продолжить» — к экрану, где остановился.
     // Сохранённая позиция не затирается, пока он не нажал кнопку.
     const resumeAt = state.pos > 0 && state.pos < screens.length ? state.pos : 0;
