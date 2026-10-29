@@ -122,6 +122,32 @@
 .is-menu .bf-menu-btn .bf-ico-menu { display: none; }
 .is-menu .bf-menu-btn .bf-ico-close { display: block; }
 
+/* «Отправить» в списке — чёрная, той же высоты, что круглая, и слева от неё
+   через 12px. Второй строкой — подсказка или сколько ответов новых. Когда
+   всё уже отправлено — серая с чёрным текстом. */
+.bf-menu-send {
+  position: absolute;
+  right: 88px;              /* 24 + 52 + 12 */
+  bottom: 24px;
+  z-index: 5;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4px;
+  min-height: 52px;
+  max-width: calc(100% - 112px);
+  padding: 8px 22px !important;
+  border-radius: 26px;
+  text-align: left;
+  background: var(--bf-ink) !important;
+  color: var(--paper) !important;
+}
+.is-menu .bf-menu-send { display: flex; }
+.bf-menu-send__title { font-size: 18px; line-height: 18px; }
+.bf-menu-send .bf-menu-send__sub { color: inherit; opacity: .7; }
+.bf-menu-send.is-sent { background: #e6e6e6 !important; color: var(--bf-ink) !important; }
+
 .bf-menu {
   position: absolute;
   inset: 0;
@@ -432,6 +458,7 @@
   .bf-lead { font-size: 17px; line-height: 18px; }
   .bf-input { font-size: 20px; line-height: 22px; }
   .bf-menu-btn { right: 16px; bottom: 16px; }
+  .bf-menu-send { right: 80px; bottom: 16px; max-width: calc(100% - 96px); padding: 8px 18px !important; }
   .bf-menu { padding: 64px 16px 88px; }
 }
 

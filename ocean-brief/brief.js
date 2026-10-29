@@ -372,11 +372,15 @@
   /* Меню: кнопка с двумя чертами открывает список всех вопросов по группам.
      Заголовок группы — с номером, вопрос — без: блок зелёный, если на него
      есть ответ текстом или записью, иначе чёрный. Клик по блоку открывает
-     вопрос. Открытое меню закрывает та же кнопка — она становится крестиком. */
+     вопрос. Открытое меню закрывает та же кнопка — она становится крестиком.
+     Слева от неё — «Отправить»: ведёт на финал и сразу отправляет. После
+     первой отправки — «Отправить снова» и сколько ответов новых, а без
+     изменений — серая «Ответы отправлены». */
   const menu = (() => {
     const box = $('#menu');
     const list = $('#menu-list');
     const btn = $('#menu-btn');
+    const send = $('#menu-send');
     const blocks = {};
     let group = null;
     for (const q of questions) {
@@ -396,7 +400,25 @@
       blocks[q.id] = b;
     }
     const answered = (qid) => !!((state.answers[qid] || '').trim() || state.clips.some((c) => c.q === qid));
+    function paintSend() {
+      const [title, sub] = send.children;
+      const d = briefData();
+      const done = !!state.sent && doneKey(d) === 'sent';
+      send.classList.toggle('is-sent', done);
+      if (!state.sent) {
+        title.textContent = 'Отправить';
+        sub.textContent = 'Ответы сохранятся и их можно обновлять';
+      } else if (done) {
+        title.textContent = 'Ответы отправлены';
+        sub.textContent = 'Их можно обновлять';
+      } else {
+        const n = freshCount(d);
+        title.textContent = 'Отправить снова';
+        sub.textContent = n ? `${n} ${plural(n, 'новый ответ', 'новых ответа', 'новых ответов')}` : 'Ответы изменились';
+      }
+    }
     function open() {
+      paintSend();
       const cur = screens[state.pos];
       for (const [qid, b] of Object.entries(blocks)) {
         b.classList.toggle('is-done', answered(qid));
@@ -421,6 +443,13 @@
       document.body.classList.remove('is-menu');
     }
     btn.addEventListener('click', () => (box.hidden ? open() : close()));
+    // Без новых ответов — только финал со «Спасибо», повторно не шлём.
+    send.addEventListener('click', async () => {
+      if (recorder.active) await recorder.stop();
+      const key = doneKey(briefData());
+      go(screens.length - 1);
+      if (key === 'new' || key === 'changed') sendAll();
+    });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
     return { close, isOpen: () => !box.hidden };
   })();
@@ -683,6 +712,29 @@
     return state.sent ? 'changed' : 'new';
   }
 
+  // Отпечаток ответа на вопрос — текст и записи. По отпечаткам прошлой
+  // отправки кнопка в списке считает новые и изменённые ответы.
+  const keyOf = (qid) => JSON.stringify([(state.answers[qid] || '').trim(), clipsOf(qid).map((c) => c.id)]);
+  const keysOf = (d) => Object.fromEntries(d.qs.map((q) => [q.id, keyOf(q.id)]));
+
+  function sentKeys() {
+    if (!state.sent) return {};
+    if (state.sent.keys) return state.sent.keys;
+    // Отправки до появления отпечатков хранят только sig — достаём их из него.
+    try {
+      const [[, texts], ids] = JSON.parse(state.sent.sig);
+      return Object.fromEntries(questions.filter((q) => q.kind !== 'name').map((q, k) =>
+        [q.id, JSON.stringify([(texts[k] || '').trim(), ids.filter((id) => id.startsWith(q.id + '-'))])]));
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function freshCount(d) {
+    const was = sentKeys();
+    return d.qs.filter((q) => ((state.answers[q.id] || '').trim() || clipsOf(q.id).length) && keyOf(q.id) !== was[q.id]).length;
+  }
+
   // Записи идут по порядку вопросов; пачка — до 24 МБ и до 20 вопросов с файлами.
   function batchesOf(clips, lim) {
     const batches = [{ clips: [], fields: new Set(), bytes: 0 }];
@@ -898,7 +950,7 @@
         if (!fault.error || !fault.error.transport) break;
       }
       if (fault) { renderDone('error', errorText(fault.error), codes.join(' | ')); return; }
-      state.sent = { sig: d.sig, at: Date.now() };
+      state.sent = { sig: d.sig, at: Date.now(), keys: keysOf(d) };
       persist(store.set('sent', state.sent));
       renderDone();
     } catch (err) {
