@@ -374,7 +374,8 @@
      есть ответ текстом или записью, иначе чёрный. Клик по блоку открывает
      вопрос. Открытое меню закрывает та же кнопка — она становится крестиком.
      Слева от неё — «Отправить»: ведёт на финал и сразу отправляет. После
-     первой отправки — «Отправить обновление» и сколько ответов новых. */
+     первой отправки — «Отправить снова» и сколько ответов новых, а без
+     изменений — серая «Ответы отправлены». */
   const menu = (() => {
     const box = $('#menu');
     const list = $('#menu-list');
@@ -401,16 +402,20 @@
     const answered = (qid) => !!((state.answers[qid] || '').trim() || state.clips.some((c) => c.q === qid));
     function paintSend() {
       const [title, sub] = send.children;
+      const d = briefData();
+      const done = !!state.sent && doneKey(d) === 'sent';
+      send.classList.toggle('is-sent', done);
       if (!state.sent) {
         title.textContent = 'Отправить';
         sub.textContent = 'Ответы сохранятся и их можно обновлять';
-        return;
+      } else if (done) {
+        title.textContent = 'Ответы отправлены';
+        sub.textContent = 'Их можно обновлять';
+      } else {
+        const n = freshCount(d);
+        title.textContent = 'Отправить снова';
+        sub.textContent = n ? `${n} ${plural(n, 'новый ответ', 'новых ответа', 'новых ответов')}` : 'Ответы изменились';
       }
-      const d = briefData();
-      const n = freshCount(d);
-      title.textContent = 'Отправить обновление';
-      sub.textContent = n ? `${n} ${plural(n, 'новый ответ', 'новых ответа', 'новых ответов')}`
-        : doneKey(d) === 'sent' ? 'Новых ответов нет' : 'Ответы изменились';
     }
     function open() {
       paintSend();
