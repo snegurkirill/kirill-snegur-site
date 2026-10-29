@@ -10,7 +10,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="stylesheet" href="../styles.css">
 <link rel="stylesheet" href="../ds.css?v=8">
-<link rel="stylesheet" href="brief.css?v=6">
+<link rel="stylesheet" href="brief.css?v=7">
 </head>
 <body class="bf-body">
 <div class="bf" id="app">
@@ -28,6 +28,12 @@
     <div class="bf-menu__list" id="menu-list"></div>
   </nav>
 
+  <!-- Отправка из списка: видна, пока он открыт, слева от круглой кнопки. -->
+  <button class="bf-menu-send" id="menu-send" type="button">
+    <span class="bf-menu-send__title">Отправить</span>
+    <span class="bf-menu-send__sub bf-label">Ответы сохранятся и их можно обновлять</span>
+  </button>
+
   <button class="bf-menu-btn" id="menu-btn" type="button" aria-controls="menu" aria-expanded="false" aria-label="Все вопросы">
     <svg class="bf-ico-menu" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 8h16M3 14h16" stroke="currentColor" stroke-width="1.8"/></svg>
     <svg class="bf-ico-close" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 5l12 12M17 5 5 17" stroke="currentColor" stroke-width="1.8"/></svg>
@@ -38,6 +44,6 @@
 </div>
 <noscript><p class="bf-noscript">Для брифа нужен JavaScript. Включите его или напишите мне в Телеграм.</p></noscript>
 <script src="data.js?v=3"></script>
-<script src="brief.js?v=16"></script>
+<script src="brief.js?v=17"></script>
 </body>
 </html>
