@@ -214,7 +214,8 @@ table is filled out.
   is dropped. Rows keep the template's 28px height when they fit on one line.
 - **Cases** — Tamed form, Sila Vetra, AstroTour, RAUM, Yandex, LIM coffee,
   Everytale, and Personal behind a rule. Raiffeisen and the NightCall bar are
-  not in this design and are gone from the page.
+  not in this design and are gone from the page. The NightCall row in the
+  index is hidden too, kept in an HTML comment.
 - **Info-string** only where the design has text: Sila Vetra and AstroTour.
   The old Russian INFO texts are not carried over.
 - **Copy fixes** against the PDF: `[Wave Lenght]` → Length, `Edducational
