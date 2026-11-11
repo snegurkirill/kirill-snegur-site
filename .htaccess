@@ -18,6 +18,10 @@
     Header always set Permissions-Policy "camera=(), microphone=(self), geolocation=(), payment=()"
     Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src https://brief.snegur.space https://forminit.com; media-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
   </If>
+  # The map concept at /ocean-map-concept/ fetches its land outlines from the same site — mirrors _headers.
+  <If "%{REQUEST_URI} =~ m#^/ocean-map-concept/#">
+    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+  </If>
 </IfModule>
 
 <IfModule mod_expires.c>

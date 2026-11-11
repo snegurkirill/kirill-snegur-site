@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Экономика океана</title>
+<meta name="description" content="Витрина синей экономики России: 65 организаций по категориям и на карте.">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, follow">
+<link rel="stylesheet" href="app.css?v=2">
+</head>
+<body>
+<div class="os" id="app" data-view="radial">
+
+  <header class="os-top">
+    <h1>Экономика океана</h1>
+  </header>
+
+  <!-- Вид «По категориям»: колесо организаций -->
+  <section class="os-view os-radial" id="view-radial" aria-label="По категориям">
+    <svg id="wheel" tabindex="0" role="listbox" aria-label="Колесо организаций. Стрелки вверх и вниз — соседняя организация">
+      <g id="w-rings"></g>
+      <g id="w-window"></g>
+      <g id="w-rot">
+        <g id="w-bands"></g>
+        <g id="w-chords"></g>
+        <g id="w-nodes"></g>
+      </g>
+    </svg>
+  </section>
+
+  <!-- Вид «На карте»: глобус с организациями по городам -->
+  <section class="os-view os-geo" id="view-geo" aria-label="На карте" hidden>
+    <canvas id="globe"></canvas>
+    <svg id="pins" tabindex="0" aria-label="Карта организаций. Стрелки — соседняя организация"></svg>
+    <div class="os-bubble" id="bubble"><img alt=""></div>
+    <div class="os-zoom">
+      <button id="zin" aria-label="Приблизить">+</button>
+      <button id="zout" aria-label="Отдалить">−</button>
+    </div>
+  </section>
+
+  <!-- Островок: превью текущей организации -->
+  <article class="os-card" id="card" aria-live="polite">
+    <button class="os-card__open" id="card-open" aria-label="Открыть профиль">
+      <span class="os-card__head">
+        <span class="os-card__logo"><img id="card-logo" alt=""></span>
+        <span class="os-card__cat"><i class="os-dot" id="card-dot"></i><span id="card-cat"></span></span>
+      </span>
+      <span class="os-card__name" id="card-name"></span>
+      <span class="os-card__text" id="card-text"></span>
+      <span class="os-card__place" id="card-place"></span>
+      <span class="os-card__go" aria-hidden="true">›</span>
+    </button>
+  </article>
+
+  <nav class="os-bar" aria-label="Вид">
+    <button class="os-chip" id="all">все компании</button>
+    <div class="os-seg" role="tablist">
+      <button role="tab" data-view="radial" aria-selected="true">по категориям</button>
+      <button role="tab" data-view="geo" aria-selected="false">на карте</button>
+    </div>
+  </nav>
+</div>
+
+<!-- Шторки: список и профиль -->
+<div class="os-scrim" id="scrim"></div>
+<aside class="os-sheet" id="sheet-list" aria-hidden="true" aria-labelledby="list-title">
+  <div class="os-sheet__grip"></div>
+  <header class="os-sheet__head">
+    <h2 id="list-title">Все компании</h2>
+    <button class="os-sheet__close" data-close aria-label="Закрыть">×</button>
+  </header>
+  <div class="os-sheet__body" id="list"></div>
+</aside>
+<aside class="os-sheet" id="sheet-profile" aria-hidden="true" aria-labelledby="p-name">
+  <div class="os-sheet__grip"></div>
+  <header class="os-sheet__head">
+    <p class="os-profile__meta"><span id="p-no"></span> · <i class="os-dot" id="p-dot"></i><span id="p-cat"></span></p>
+    <button class="os-sheet__close" data-close aria-label="Закрыть">×</button>
+  </header>
+  <div class="os-sheet__body">
+    <div class="os-profile__logo"><img id="p-logo" alt=""></div>
+    <h2 class="os-profile__name" id="p-name"></h2>
+    <p class="os-profile__full" id="p-full"></p>
+    <p class="os-profile__place" id="p-place"></p>
+    <p class="os-profile__links">
+      <a id="p-site" target="_blank" rel="noopener">Сайт ↗</a>
+      <button id="p-radial">По категориям</button>
+      <button id="p-geo">На карте</button>
+    </p>
+    <div class="os-profile__rel" id="p-rel"></div>
+  </div>
+</aside>
+
+<script src="../ocean-map/data.js?v=1"></script>
+<script src="links.js?v=1"></script>
+<script src="geo-data.js?v=1"></script>
+<script src="vendor/d3-array.min.js"></script>
+<script src="vendor/d3-geo.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script src="app.js?v=3"></script>
+<script src="radial.js?v=2"></script>
+<script src="geo.js?v=3"></script>
+</body>
+</html>
