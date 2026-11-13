@@ -7,6 +7,17 @@
   if (!deck) return;
 
   var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+
+  // geometry lives in data attributes, not inline styles, so a strict CSP
+  // (style-src 'self') still lets it through: CSSOM writes aren't blocked
+  deck.querySelectorAll('[data-rect]').forEach(function (a) {
+    var r = a.getAttribute('data-rect').split(' ');
+    a.style.setProperty('--x', r[0]); a.style.setProperty('--y', r[1]);
+    a.style.setProperty('--w', r[2]); a.style.setProperty('--h', r[3]);
+  });
+  deck.querySelectorAll('[data-pos]').forEach(function (img) {
+    img.style.setProperty('--pos', img.getAttribute('data-pos'));
+  });
   var portrait = window.matchMedia('(orientation: portrait) and (max-width: 1100px)');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   var progress = document.querySelector('.progress');
