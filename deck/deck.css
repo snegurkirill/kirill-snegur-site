@@ -1,0 +1,266 @@
+/* Deck — a presentation as a web page.
+   Desktop / landscape: every slide is its full render, fitted into the window
+   like an image with Fit — original proportion, black where the window is wider
+   or taller than 16:9.
+   Phone / portrait: each slide unfolds into parts (text first, then photos),
+   each part one screen. The markup carries both; CSS picks one by orientation. */
+
+@font-face {
+  font-family: "ABC Diatype";
+  src: url("fonts/abc-diatype-cyrillic-regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "ABC Diatype";
+  src: url("fonts/abc-diatype-cyrillic-bold.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("fonts/eb-garamond-latin-800-italic.woff2") format("woff2");
+  font-weight: 800; font-style: italic; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("fonts/eb-garamond-cyrillic-800-italic.woff2") format("woff2");
+  font-weight: 800; font-style: italic; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+:root {
+  --ink: #667799;
+  --paper: #ffffff;
+  --gutter: 16px;
+  /* the fitted 16:9 slide box */
+  --cw: min(100vw, 100dvh * 16 / 9);
+  --ch: calc(var(--cw) * 9 / 16);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: #000;
+  color: var(--ink);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+h1, h2, p, figure { margin: 0; }
+a { color: inherit; }
+
+/* ---------- track ---------- */
+
+.deck {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.deck::-webkit-scrollbar { display: none; }
+
+.slide {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: grid;
+  place-items: center;
+}
+
+/* desktop render, fitted */
+.canvas {
+  position: relative;
+  width: var(--cw);
+  height: var(--ch);
+  background: var(--paper);
+}
+.canvas img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* links that live on the render, positioned in slide percentages */
+.hot {
+  position: absolute;
+  left: calc(var(--x) / 1920 * 100%);
+  top: calc(var(--y) / 1080 * 100%);
+  width: calc(var(--w) / 1920 * 100%);
+  height: calc(var(--h) / 1080 * 100%);
+  font-size: 0;
+  color: transparent;
+}
+.hot:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.part { display: none; }
+
+/* ---------- progress ---------- */
+
+.progress {
+  position: fixed;
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+  transition: opacity .4s ease;
+  /* desktop: sits on the top edge of the fitted slide */
+  left: calc((100vw - var(--cw)) / 2 + 16px);
+  width: calc(var(--cw) - 32px);
+  top: calc((100dvh - var(--ch)) / 2 + 6px);
+}
+.idle .progress { opacity: 0; }
+
+.seg {
+  flex: 1 1 0;
+  height: 4px;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.seg-line {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ink);
+  opacity: .25;
+  transition: opacity .25s ease;
+}
+.seg.is-done .seg-line,
+.seg.is-current .seg-line { opacity: 1; }
+
+.seg-dots {
+  display: none;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.seg-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: .25;
+  transition: opacity .25s ease;
+}
+.seg-dots i.is-on { opacity: 1; }
+.seg.is-open .seg-line { display: none; }
+.seg.is-open .seg-dots { display: flex; }
+
+/* the slide header row, used on phones */
+.deck-head { display: none; }
+
+/* ---------- phone / portrait ---------- */
+
+@media (orientation: portrait) and (max-width: 1100px) {
+  body { background: var(--paper); }
+
+  .slide { display: contents; }
+  .canvas { display: none; }
+
+  .part {
+    flex: 0 0 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding:
+      calc(env(safe-area-inset-top) + 64px)
+      var(--gutter)
+      calc(env(safe-area-inset-bottom) + var(--gutter));
+    background: var(--paper);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    font-family: "ABC Diatype", "Helvetica Neue", Arial, sans-serif;
+    font-size: clamp(15px, 4.1vw, 18px);
+    line-height: 1.2;
+  }
+
+  .progress {
+    left: var(--gutter);
+    width: calc(100vw - 2 * var(--gutter));
+    top: calc(env(safe-area-inset-top) + 10px);
+  }
+
+  .deck-head {
+    position: fixed;
+    z-index: 2;
+    top: calc(env(safe-area-inset-top) + 24px);
+    left: var(--gutter);
+    right: var(--gutter);
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 14px;
+    font: 400 12px/1.4 "Inter", "Helvetica Neue", Arial, sans-serif;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .no-head .deck-head { opacity: 0; }
+
+  /* type, scaled down from the 1920 slide */
+  .part h2 {
+    font-weight: 700;
+    font-size: 1.3em;
+    line-height: 1.32;
+    letter-spacing: -.02em;
+  }
+  .part p + p { margin-top: 1.2em; }
+
+  .display {
+    font-family: "EB Garamond", Georgia, serif;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+  }
+
+  /* cover and section openers: the title's top edge on the middle line, as on the slide */
+  .part--cover,
+  .part--section { padding-top: 50dvh; }
+  .part--cover .display { font-size: clamp(30px, 8.6vw, 40px); }
+  .part--section .display { font-size: clamp(56px, 16vw, 72px); }
+  .part--cover .foot {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* photos fill the screen top-down: heading, then the photos share all the
+     height that is left. Images are uncropped originals laid into the frame
+     like Fill — --pos moves the crop when Figma's crop is off-centre. */
+  .part--photo { gap: 12px; }
+  .part figure {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .part figure img {
+    display: block;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    height: 0;
+    object-fit: cover;
+    object-position: var(--pos, 50% 50%);
+  }
+
+  .part figcaption {
+    font: 400 12px/1.4 "Inter", "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress, .seg-line, .seg-dots i, .deck-head { transition: none; }
+}

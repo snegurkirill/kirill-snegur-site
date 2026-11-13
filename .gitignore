@@ -56,3 +56,8 @@ assets/tech-production/*
 
 # Brief API on Beget: secrets stay on the server.
 _api/app/config.php
+
+# vds-mosbuild deck: only the compressed derivatives are tracked (2x PNG slide
+# exports from Figma stay local in src/).
+assets/vds-mosbuild/*
+!assets/vds-mosbuild/Сжатые/
