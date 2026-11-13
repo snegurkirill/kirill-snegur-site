@@ -229,6 +229,16 @@ a { color: inherit; }
   .part--section { padding-top: 50dvh; }
   .part--cover .display { font-size: clamp(30px, 8.6vw, 40px); }
   .part--section .display { font-size: clamp(56px, 16vw, 72px); }
+  /* closing: muted display line with ink dots, contacts at the foot */
+  .part--closing { padding-top: 50dvh; }
+  .part--closing .display {
+    font-size: min(calc((100vw - 2 * var(--gutter)) / 9.9), 64px);
+    white-space: nowrap;
+  }
+  .display--muted { color: #cfcfcf; }
+  .display--muted .dot { color: var(--ink); }
+  .contacts { margin-top: auto; }
+  .contacts a { text-decoration: none; }
   .part--cover .foot {
     margin-top: auto;
     display: flex;
