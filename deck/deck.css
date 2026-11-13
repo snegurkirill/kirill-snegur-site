@@ -232,7 +232,8 @@ a { color: inherit; }
   /* closing: muted display line with ink dots, contacts at the foot */
   .part--closing { padding-top: 50dvh; }
   .part--closing .display {
-    font-size: min(calc((100vw - 2 * var(--gutter)) / 9.9), 64px);
+    /* «.идем.дальше.» is 6em wide: fill the measure */
+    font-size: min(calc((100vw - 2 * var(--gutter)) / 6.1), 96px);
     white-space: nowrap;
   }
   .display--muted { color: #cfcfcf; }
