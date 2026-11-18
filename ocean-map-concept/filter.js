@@ -103,8 +103,9 @@
     this.render();
   };
   // cx, cy — центр круга в колонке шириной W; подписи не выходят за край колонки
-  Dial.prototype.place = function (cx, cy, R, W) {
-    this.R = R; this.cx = cx; this.W = W;
+  // full — круг виден целиком (широкий экран): подписи держатся внутри круга
+  Dial.prototype.place = function (cx, cy, R, W, full) {
+    this.R = R; this.cx = cx; this.W = W; this.full = !!full;
     var st = this.el.style;
     st.width = st.height = 2 * R + 'px';
     st.left = (cx - R) + 'px';
@@ -125,7 +126,10 @@
       else { sp.style.left = (R - dx) + 'px'; sp.style.right = 'auto'; }
       sp.style.top = y + 'px';
       var anchor = self.side === 'left' ? self.cx + dx : self.cx - dx;
-      sp.style.maxWidth = Math.max(60, self.side === 'left' ? anchor - 4 : self.W - anchor - 12) + 'px';
+      var room = self.full
+        ? (self.side === 'left' ? anchor - (self.cx - R) - 16 : (self.cx + R) - anchor - 16)
+        : (self.side === 'left' ? anchor - 4 : self.W - anchor - 12);
+      sp.style.maxWidth = Math.max(60, room) + 'px';
       sp.style.opacity = (1 - Math.pow(Math.abs(a) / self.MAXA, 2) * .85).toFixed(2);
       sp.classList.toggle('is-sel', i === cur);
       sp.setAttribute('aria-selected', i === cur ? 'true' : 'false');
@@ -220,7 +224,7 @@
     var g = groups[gi], it = values.items[i];
     if (!it || F.pick[g.id] === it.id) return;
     F.set(g.id, it.id);
-    head(); placeCloud();
+    head(); placeCloud(); markGroups();
   });
   var groupDial = new Dial($('#dial-groups'), 'right', function (i) {
     if (i === gi) return;
@@ -244,21 +248,32 @@
     $('#fm-picked').textContent = picked.join(' · ');
   }
 
+  // Точка перед группой, в которой выбрано что-то кроме «Все»
+  function markGroups() {
+    groupDial.items.forEach(function (it, i) {
+      if (it.span) it.span.classList.toggle('has-pick', !!F.pick[groups[i].id]);
+    });
+  }
+
   function layoutDials() {
     if (!box) return;
-    values.place(box.lx, box.cy, box.R, box.W);
-    groupDial.place(box.rx, box.cy, box.R, box.W);
+    values.place(box.lx, box.cy, box.R, box.W, box.full);
+    groupDial.place(box.rx, box.cy, box.R, box.W, box.full);
+    markGroups();
   }
 
   function layout() {
     var W = col.clientWidth, H = col.clientHeight;
-    var R = Math.min(W * .35, H * .2, 190);
-    var cy = H - R - Math.max(28, H * .05);
-    var gap = Math.max(10, W * .03);
+    // Телефон: круги уходят за края экрана, как в макете. Широкий экран:
+    // круги целиком, рядом друг с другом.
+    var full = window.innerWidth >= 900;
+    var R = full ? Math.min(H * .22, (W - 96) / 4, 210) : Math.min(W * .35, H * .2, 190);
+    var cy = H - R - (full ? 36 : Math.max(28, H * .05));
+    var gap = full ? 28 : Math.max(10, W * .03);
     var headB = $('#fm-head').getBoundingClientRect().bottom - col.getBoundingClientRect().top;
     var top = headB + 14, bottom = cy - R - 14;
     box = {
-      W: W, R: R, cy: cy,
+      W: W, R: R, cy: cy, full: full,
       lx: W / 2 - gap / 2 - R,
       rx: W / 2 + gap / 2 + R,
       cloud: { x: W / 2, y: (top + bottom) / 2, r: Math.max(40, Math.min(W * .4, (bottom - top) / 2)), max: Math.min(72, W * .17) }
