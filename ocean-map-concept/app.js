@@ -80,9 +80,9 @@
   // Три группы — три регулятора одного выбора. В группе выбрано одно значение
   // или «все»; группы между собой сужают выборку.
   var GROUPS = [
-    { id: 'cat',  name: 'Категория',  opts: cats.map(function (c) { return { id: c.id, name: c.short, color: c.color }; }), get: function (o) { return [o.cat.id]; } },
-    { id: 'tech', name: 'Технология', opts: FX.tech, get: function (o) { return o.tech; } },
-    { id: 'ind',  name: 'Отрасль применения', opts: FX.ind, get: function (o) { return o.ind; } }
+    { id: 'cat',  name: 'Категории',  opts: cats.map(function (c) { return { id: c.id, name: c.short, color: c.color }; }), get: function (o) { return [o.cat.id]; } },
+    { id: 'tech', name: 'Технологии', opts: FX.tech, get: function (o) { return o.tech; } },
+    { id: 'ind',  name: 'Отрасли применения', opts: FX.ind, get: function (o) { return o.ind; } }
   ].filter(function (g) { return g.opts.length; });
   var pick = {}, okMap = {}, nOk = orgs.length;
   GROUPS.forEach(function (g) { pick[g.id] = null; });

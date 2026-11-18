@@ -391,15 +391,19 @@ a { color: inherit; }
 .fm-dial--values span.is-empty { color: var(--fm-off); }
 .fm-dial--groups span { color: var(--fm-off); }
 .fm-dial span.is-sel { color: var(--ink-strong); font-weight: 600; }
-.fm__hint {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-  margin: 0;
-  text-align: center;
-  font-size: 12px;
-  color: rgba(16, 36, 62, .55);
-  pointer-events: none;
+.fm-dial--groups span.has-pick::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+@media (min-width: 900px) {
+  .fm__col { max-width: none; overflow: visible; }
 }
 @media (prefers-reduced-motion: reduce) {
   .fm, .fm-logo { transition: none; }
