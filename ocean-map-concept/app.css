@@ -386,10 +386,10 @@ a { color: inherit; }
   cursor: pointer;
 }
 .fm-dial span small { font-size: 12px; color: var(--ink-muted); }
-.fm-dial--values span { text-align: right; white-space: nowrap; font-size: 15px; overflow: hidden; text-overflow: ellipsis; }
-.fm-dial--values span small { margin-right: 6px; }
+.fm-dial--values span { text-align: left; white-space: nowrap; font-size: 15px; overflow: hidden; text-overflow: ellipsis; }
+.fm-dial--values span small { margin-left: 6px; }
 .fm-dial--values span.is-empty { color: var(--fm-off); }
-.fm-dial--groups span { color: var(--fm-off); }
+.fm-dial--groups span { color: var(--fm-off); text-align: right; }
 .fm-dial span.is-sel { color: var(--ink-strong); font-weight: 600; }
 .fm-dial--groups span.has-pick::before {
   content: "";

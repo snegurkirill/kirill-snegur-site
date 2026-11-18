@@ -2,8 +2,8 @@
 
    Открывается кнопкой «все компании». Сверху название и число компаний,
    в центре — гроздь логотипов тех, что проходят фильтр, внизу два белых
-   регулятора: левый крутит значения выбранной группы («Все», НИИ, Финансы…),
-   правый — саму группу (категория, технология, отрасль применения).
+   регулятора: левый выбирает группу (категории, технологии, отрасли
+   применения), правый крутит её значения («Все», НИИ, Финансы…).
    Значение под указателем (точка круга, обращённая к середине экрана) —
    выбранное. Нажатие вне регуляторов возвращает к колесу; нажатие на логотип —
    к этой организации.
@@ -220,13 +220,13 @@
     values.setItems(items, sel);
   }
 
-  var values = new Dial($('#dial-values'), 'left', function (i) {
+  var values = new Dial($('#dial-values'), 'right', function (i) {
     var g = groups[gi], it = values.items[i];
     if (!it || F.pick[g.id] === it.id) return;
     F.set(g.id, it.id);
     head(); placeCloud(); markGroups();
   });
-  var groupDial = new Dial($('#dial-groups'), 'right', function (i) {
+  var groupDial = new Dial($('#dial-groups'), 'left', function (i) {
     if (i === gi) return;
     gi = i;
     loadValues();
@@ -257,8 +257,8 @@
 
   function layoutDials() {
     if (!box) return;
-    values.place(box.lx, box.cy, box.R, box.W, box.full);
-    groupDial.place(box.rx, box.cy, box.R, box.W, box.full);
+    groupDial.place(box.lx, box.cy, box.R, box.W, box.full);
+    values.place(box.rx, box.cy, box.R, box.W, box.full);
     markGroups();
   }
 
