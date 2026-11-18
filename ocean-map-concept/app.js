@@ -11,6 +11,7 @@
      докручивается до организации и по дороге вызывает setCurrent. */
 (function () {
   var D = window.OCEAN_MAP, L = window.OCEAN_LINKS || { links: [], types: {} }, G = window.OCEAN_GEO || { cities: {}, orgs: {}, check: {} };
+  var FX = window.OCEAN_FACETS || { tech: [], ind: [], orgs: {} };
   var $ = function (s) { return document.querySelector(s); };
 
   var COLORS = {
@@ -53,6 +54,8 @@
         label: SHORT_NAME[c.id] || c.name,
         cityId: cityId, city: cityId ? G.cities[cityId] : null,
         check: G.check[c.id] || '',
+        tech: (FX.orgs[c.id] || [])[0] || [],
+        ind: (FX.orgs[c.id] || [])[1] || [],
         links: []
       };
       orgs.push(o); byId[c.id] = o; cat.items.push(o);
@@ -72,6 +75,49 @@
     return (a.city.lon - b.city.lon) || (catIndex[a.cat.id] - catIndex[b.cat.id]) || (a.id - b.id);
   });
 
+  /* --- фильтр -------------------------------------------------------------- */
+
+  // Три группы — три регулятора одного выбора. В группе выбрано одно значение
+  // или «все»; группы между собой сужают выборку.
+  var GROUPS = [
+    { id: 'cat',  name: 'Категория',  opts: cats.map(function (c) { return { id: c.id, name: c.short, color: c.color }; }), get: function (o) { return [o.cat.id]; } },
+    { id: 'tech', name: 'Технология', opts: FX.tech, get: function (o) { return o.tech; } },
+    { id: 'ind',  name: 'Отрасль применения', opts: FX.ind, get: function (o) { return o.ind; } }
+  ].filter(function (g) { return g.opts.length; });
+  var pick = {}, okMap = {}, nOk = orgs.length;
+  GROUPS.forEach(function (g) { pick[g.id] = null; });
+
+  function passes(o) {
+    return GROUPS.every(function (g) { return !pick[g.id] || g.get(o).indexOf(pick[g.id]) >= 0; });
+  }
+  function isFiltered() { return GROUPS.some(function (g) { return pick[g.id]; }); }
+  function applyFilter() {
+    okMap = {}; nOk = 0;
+    orgs.forEach(function (o) { if (passes(o)) { okMap[o.id] = true; nOk++; } });
+    var on = isFiltered();
+    OS.filtered = on && nOk > 0;
+    $('#app').classList.toggle('is-filtered', OS.filtered);
+    document.querySelectorAll('.w-node[data-id], .g-pin[data-id]').forEach(function (g) {
+      g.classList.toggle('is-out', OS.filtered && !okMap[g.dataset.id]);
+    });
+    $('#reset').hidden = !on;
+    updateChip();
+  }
+  function setPick(gid, vid) { pick[gid] = vid || null; applyFilter(); }
+  // Подходит ли организация под фильтр; пустой результат фильтра не гасит витрину
+  function ok(id) { return !OS.filtered || !!okMap[id]; }
+  // Если текущая организация отфильтрована — перейти к первой подходящей в порядке вида
+  function ensureCurrent() {
+    if (ok(OS.current)) return;
+    var order = OS.viewName === 'geo' ? geoOrder.concat(orgs) : orgs;
+    for (var i = 0; i < order.length; i++) if (ok(order[i].id)) return go(order[i].id);
+  }
+  function resetFilter() {
+    GROUPS.forEach(function (g) { pick[g.id] = null; });
+    applyFilter();
+    ensureCurrent();
+  }
+
   function plural(n, one, few, many) {
     var m10 = n % 10, m100 = n % 100;
     if (m10 === 1 && m100 !== 11) return one;
@@ -85,6 +131,11 @@
   var OS = window.OS = {
     COLORS: COLORS, cats: cats, orgs: orgs, byId: byId, links: links, geoOrder: geoOrder,
     cities: G.cities, linkTypes: L.types, plural: plural,
+    ok: ok, filtered: false,
+    filter: {
+      groups: GROUPS, pick: pick, set: setPick, reset: resetFilter, ensure: ensureCurrent,
+      isOn: isFiltered, has: function (id) { return !!okMap[id]; }, count: function () { return nOk; }
+    },
     current: null,
     viewName: null,
     region: null,
@@ -164,8 +215,8 @@
   /* --- переключатель вида и «все компании» --------------------------------- */
 
   function updateChip() {
-    var o = byId[OS.current], chip = $('#all');
-    if (OS.viewName === 'geo' && o && o.city) chip.textContent = 'все компании ' + o.city.gen;
+    var chip = $('#all');
+    if (isFiltered()) chip.textContent = nOk ? nOk + ' из ' + orgs.length : 'нет совпадений';
     else chip.textContent = 'все компании';
   }
 
@@ -200,64 +251,22 @@
     $('#scrim').classList.toggle('is-on', !!el);
     if (el) { el.classList.add('is-on'); el.setAttribute('aria-hidden', 'false'); }
   }
-  function closeSheet() {
+  function hideSheet() {
     if (!openSheet) return;
     openSheet.classList.remove('is-on');
     openSheet.setAttribute('aria-hidden', 'true');
     openSheet = null;
     $('#scrim').classList.remove('is-on');
   }
+  // Закрыть шторку; если фильтр отбросил текущую организацию — перейти к подходящей
+  function closeSheet() { hideSheet(); ensureCurrent(); }
   $('#scrim').addEventListener('click', closeSheet);
   document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', closeSheet); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
 
-  // Список: по категориям в колесе, по городам на карте (текущий город первым)
-  function list() {
-    var box = $('#list'), cur = byId[OS.current];
-    box.textContent = '';
-    var groups = [];
-    if (OS.viewName === 'geo') {
-      var byCity = {};
-      geoOrder.forEach(function (o) { (byCity[o.cityId] = byCity[o.cityId] || []).push(o); });
-      var ids = Object.keys(byCity).sort(function (a, b) { return byCity[b].length - byCity[a].length; });
-      if (cur && cur.cityId) ids.sort(function (a, b) { return (b === cur.cityId) - (a === cur.cityId); });
-      ids.forEach(function (id) { groups.push({ title: G.cities[id].name, items: byCity[id], sub: 'cat' }); });
-      var none = orgs.filter(function (o) { return !o.city; });
-      if (none.length) groups.push({ title: 'Город не указан', items: none, sub: 'cat' });
-      $('#list-title').textContent = cur && cur.city ? 'Все компании ' + cur.city.gen : 'Все компании';
-    } else {
-      cats.forEach(function (c) { groups.push({ title: c.name, items: c.items, color: c.color, sub: 'city' }); });
-      $('#list-title').textContent = 'Все компании';
-    }
-    var curEl = null;
-    groups.forEach(function (g) {
-      var sec = document.createElement('section');
-      sec.className = 'os-list-group';
-      var h = document.createElement('h3');
-      if (g.color) { var dot = document.createElement('i'); dot.className = 'os-dot'; dot.style.setProperty('--c', g.color); h.appendChild(dot); }
-      h.appendChild(document.createTextNode(g.title + ' '));
-      var small = document.createElement('small'); small.textContent = g.items.length; h.appendChild(small);
-      sec.appendChild(h);
-      g.items.forEach(function (o) {
-        var b = document.createElement('button');
-        b.className = 'os-list-item' + (o.id === OS.current ? ' is-current' : '');
-        var dot = document.createElement('i'); dot.className = 'os-dot'; dot.style.setProperty('--c', o.cat.color);
-        var span = document.createElement('span');
-        span.textContent = o.c.name;
-        var sm = document.createElement('small');
-        sm.textContent = g.sub === 'cat' ? o.cat.name : place(o);
-        span.appendChild(sm);
-        b.appendChild(dot); b.appendChild(span);
-        b.addEventListener('click', function () { closeSheet(); go(o.id); });
-        sec.appendChild(b);
-        if (o.id === OS.current) curEl = b;
-      });
-      box.appendChild(sec);
-    });
-    sheet($('#sheet-list'));
-    if (curEl) curEl.scrollIntoView({ block: 'center' });
-  }
-  $('#all').addEventListener('click', list);
+  // «Все компании» открывает режим фильтра (filter.js)
+  $('#all').addEventListener('click', function () { if (OS.filterMode) OS.filterMode.open(); });
+  $('#reset').addEventListener('click', resetFilter);
 
   // Профиль
   function profile(o) {
@@ -268,6 +277,28 @@
     $('#p-name').textContent = o.c.name;
     $('#p-full').textContent = o.c.full && o.c.full !== o.c.name ? o.c.full : '';
     $('#p-place').textContent = o.city ? o.city.name + (o.check ? ' — ' + o.check.charAt(0).toLowerCase() + o.check.slice(1) : '') : 'Город не указан';
+    var tags = $('#p-tags');
+    tags.textContent = '';
+    [['tech', o.tech], ['ind', o.ind]].forEach(function (pair) {
+      var g = GROUPS.filter(function (x) { return x.id === pair[0]; })[0];
+      if (!g) return;
+      pair[1].forEach(function (v) {
+        var opt = g.opts.filter(function (x) { return x.id === v; })[0];
+        if (!opt) return;
+        var b = document.createElement('button');
+        b.className = 'os-fchip';
+        b.textContent = opt.name;
+        b.title = 'Все организации: ' + g.name.toLowerCase() + ' — ' + opt.name;
+        b.addEventListener('click', function () {
+          hideSheet();
+          GROUPS.forEach(function (x) { pick[x.id] = null; });
+          pick[g.id] = v;
+          applyFilter();
+          if (OS.filterMode) OS.filterMode.open(g.id);
+        });
+        tags.appendChild(b);
+      });
+    });
     var site = $('#p-site');
     if (o.c.site) { site.href = o.c.site; site.hidden = false; } else site.hidden = true;
     $('#p-radial').hidden = OS.viewName === 'radial';
@@ -290,7 +321,7 @@
         var b = document.createElement('button');
         var dot = document.createElement('i'); dot.className = 'os-dot'; dot.style.setProperty('--c', x.cat.color);
         b.appendChild(dot); b.appendChild(document.createTextNode(x.c.name));
-        b.addEventListener('click', function () { closeSheet(); go(x.id); });
+        b.addEventListener('click', function () { hideSheet(); go(x.id); });
         lst.appendChild(b);
       });
       g.appendChild(lst); rel.appendChild(g);

@@ -128,7 +128,11 @@
 
   function nearest() {
     var best = nodes[0], bd = 999;
-    nodes.forEach(function (n) { var d = Math.abs(wrap(n.a + theta)); if (d < bd) { bd = d; best = n; } });
+    // При фильтре колесо останавливается только на подходящих организациях
+    nodes.forEach(function (n) {
+      if (!OS.ok(n.o.id)) return;
+      var d = Math.abs(wrap(n.a + theta)); if (d < bd) { bd = d; best = n; }
+    });
     return best;
   }
 
@@ -258,7 +262,14 @@
     wheelTimer = setTimeout(snap, 160);
   }, { passive: false });
 
-  function by(d) { var k = (current.o.k + d + nodes.length) % nodes.length; goTo(nodes[k].o.id, 380); }
+  function by(d) {
+    var step1 = d > 0 ? 1 : -1, k = current.o.k, left = Math.abs(d), guard = nodes.length;
+    while (left > 0 && guard-- > 0) {
+      k = (k + step1 + nodes.length) % nodes.length;
+      if (OS.ok(nodes[k].o.id)) left--;
+    }
+    goTo(nodes[k].o.id, 380);
+  }
   svg.addEventListener('keydown', function (e) {
     var keys = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1, PageDown: 5, PageUp: -5 };
     if (keys[e.key]) { e.preventDefault(); by(keys[e.key]); }

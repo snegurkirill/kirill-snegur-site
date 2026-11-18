@@ -183,7 +183,7 @@
     var best = null, bd = Infinity;
     Object.keys(pins).forEach(function (id) {
       var p = pins[id];
-      if (!p.vis) return;
+      if (!p.vis || !OS.ok(p.o.id)) return;
       var d = (p.x - F.x) * (p.x - F.x) + (p.y - F.y) * (p.y - F.y);
       if (d < bd) { bd = d; best = p.o.id; }
     });
@@ -343,7 +343,8 @@
     var keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
     if (keys[e.key]) {
       e.preventDefault();
-      var list = OS.geoOrder, i = list.indexOf(OS.byId[OS.current]);
+      var list = OS.geoOrder.filter(function (o) { return OS.ok(o.id); }), i = list.indexOf(OS.byId[OS.current]);
+      if (!list.length) return;
       var next = list[(Math.max(0, i) + keys[e.key] + list.length) % list.length];
       flyTo(next.id);
     } else if (e.key === '+' || e.key === '=') flyTo(OS.current, 300, st.k * 2);

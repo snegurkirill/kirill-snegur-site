@@ -7,7 +7,7 @@
 <meta name="description" content="Витрина синей экономики России: 65 организаций по категориям и на карте.">
 <meta name="theme-color" content="#ffffff">
 <meta name="robots" content="noindex, follow">
-<link rel="stylesheet" href="app.css?v=2">
+<link rel="stylesheet" href="app.css?v=8">
 </head>
 <body>
 <div class="os" id="app" data-view="radial">
@@ -56,6 +56,7 @@
 
   <nav class="os-bar" aria-label="Вид">
     <button class="os-chip" id="all">все компании</button>
+    <button class="os-chip os-chip--x" id="reset" aria-label="Сбросить фильтр" hidden>×</button>
     <div class="os-seg" role="tablist">
       <button role="tab" data-view="radial" aria-selected="true">по категориям</button>
       <button role="tab" data-view="geo" aria-selected="false">на карте</button>
@@ -63,16 +64,23 @@
   </nav>
 </div>
 
-<!-- Шторки: список и профиль -->
+<!-- Режим фильтра: гроздь логотипов и два регулятора -->
+<section class="fm" id="fm" hidden aria-label="Фильтр компаний">
+  <div class="fm__col" id="fm-col">
+    <header class="fm__head" id="fm-head">
+      <h2>Экономика океана</h2>
+      <p class="fm__count"><b id="fm-n"></b><span id="fm-total"></span></p>
+      <p class="fm__picked" id="fm-picked"></p>
+    </header>
+    <div class="fm__cloud" id="fm-cloud"></div>
+    <div class="fm-dial fm-dial--values" id="dial-values" role="listbox" tabindex="0" aria-label="Значение. Стрелки вверх и вниз — соседнее"></div>
+    <div class="fm-dial fm-dial--groups" id="dial-groups" role="listbox" tabindex="0" aria-label="Группа параметров. Стрелки вверх и вниз — соседняя"></div>
+    <p class="fm__hint">Нажмите вне регуляторов, чтобы вернуться</p>
+  </div>
+</section>
+
+<!-- Шторка: профиль -->
 <div class="os-scrim" id="scrim"></div>
-<aside class="os-sheet" id="sheet-list" aria-hidden="true" aria-labelledby="list-title">
-  <div class="os-sheet__grip"></div>
-  <header class="os-sheet__head">
-    <h2 id="list-title">Все компании</h2>
-    <button class="os-sheet__close" data-close aria-label="Закрыть">×</button>
-  </header>
-  <div class="os-sheet__body" id="list"></div>
-</aside>
 <aside class="os-sheet" id="sheet-profile" aria-hidden="true" aria-labelledby="p-name">
   <div class="os-sheet__grip"></div>
   <header class="os-sheet__head">
@@ -84,6 +92,7 @@
     <h2 class="os-profile__name" id="p-name"></h2>
     <p class="os-profile__full" id="p-full"></p>
     <p class="os-profile__place" id="p-place"></p>
+    <div class="os-profile__tags" id="p-tags"></div>
     <p class="os-profile__links">
       <a id="p-site" target="_blank" rel="noopener">Сайт ↗</a>
       <button id="p-radial">По категориям</button>
@@ -96,11 +105,13 @@
 <script src="data.js?v=1"></script>
 <script src="links.js?v=1"></script>
 <script src="geo-data.js?v=1"></script>
+<script src="facets.js?v=3"></script>
 <script src="vendor/d3-array.min.js"></script>
 <script src="vendor/d3-geo.min.js"></script>
 <script src="vendor/topojson-client.min.js"></script>
-<script src="app.js?v=3"></script>
-<script src="radial.js?v=2"></script>
-<script src="geo.js?v=3"></script>
+<script src="app.js?v=8"></script>
+<script src="radial.js?v=3"></script>
+<script src="geo.js?v=4"></script>
+<script src="filter.js?v=3"></script>
 </body>
 </html>
