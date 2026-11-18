@@ -40,6 +40,8 @@
   /* the fitted 16:9 slide box */
   --cw: min(100vw, 100dvh * 16 / 9);
   --ch: calc(var(--cw) * 9 / 16);
+  /* one Figma pixel of the 1920×1080 slide, for slides set in HTML */
+  --px: calc(var(--cw) / 1920);
 }
 
 * { box-sizing: border-box; }
@@ -158,6 +160,119 @@ a { color: inherit; }
 /* the slide header row, used on phones */
 .deck-head { display: none; }
 
+/* ---------- desktop slides set in HTML, not rendered images ----------
+   Opt in with <body class="deck-html">. Every size is a Figma pixel of the
+   1920×1080 slide times --px, so the slide scales as one picture, but copy
+   and photos stay editable in the markup. The header row is the shared
+   .deck-head, pinned to the top-left of the fitted slide. */
+
+.canvas--html {
+  overflow: hidden;
+  font-family: "ABC Diatype", "Helvetica Neue", Arial, sans-serif;
+  font-size: calc(30 * var(--px));
+  line-height: 1.2;
+  color: var(--ink);
+}
+.canvas--html .c-display {
+  position: absolute;
+  left: calc(16 * var(--px));
+  top: calc(540 * var(--px));
+  width: calc(1210 * var(--px));
+  font: italic 800 calc(64 * var(--px)) / 1.2 "EB Garamond", Georgia, serif;
+  letter-spacing: -.02em;
+}
+.canvas--html .c-display--big {
+  width: auto;
+  white-space: nowrap;
+  font-size: calc(128 * var(--px));
+}
+.canvas--html .c-display--muted { color: #cfcfcf; }
+.canvas--html .c-display--muted .dot { color: var(--ink); }
+
+/* cover foot: three columns on the bottom line */
+.canvas--html .c-foot {
+  position: absolute;
+  left: calc(16 * var(--px));
+  right: calc(16 * var(--px));
+  top: calc(1031 * var(--px));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: calc(12 * var(--px));
+  font-size: calc(28 * var(--px));
+  line-height: calc(37 * var(--px));
+}
+.canvas--html .c-contacts {
+  position: absolute;
+  left: calc(966 * var(--px));
+  top: calc(953 * var(--px));
+  font-size: calc(28 * var(--px));
+  line-height: calc(37 * var(--px));
+}
+.canvas--html .c-contacts a { text-decoration: none; }
+
+/* content slides: heading at y80, copy at y140, photos fill down to y1064 */
+.canvas--html .c-body {
+  position: absolute;
+  left: calc(16 * var(--px));
+  right: calc(16 * var(--px));
+  top: calc(80 * var(--px));
+  bottom: calc(16 * var(--px));
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--px));
+}
+.canvas--html .c-body h2 {
+  font-weight: 700;
+  font-size: calc(36 * var(--px));
+  line-height: 1.32;
+}
+.canvas--html .c-text p + p { margin-top: calc(12 * var(--px)); }
+.canvas--html .c-photos {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  gap: calc(12 * var(--px));
+}
+.canvas--html .c-photos figure {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--px));
+}
+.canvas--html .c-photos img {
+  display: block;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  height: 0;
+  object-fit: cover;
+  object-position: var(--pos, 50% 50%);
+}
+/* drawings on white: whole, never cropped */
+.canvas--html .c-photos--fit img { object-fit: contain; }
+.canvas--html .c-photos figcaption {
+  font: 400 calc(20 * var(--px)) / 1.4 "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+@media not ((orientation: portrait) and (max-width: 1100px)) {
+  .deck-html .deck-head {
+    position: fixed;
+    z-index: 2;
+    left: calc((100vw - var(--cw)) / 2 + 16 * var(--px));
+    top: calc((100dvh - var(--ch)) / 2 + 16 * var(--px));
+    display: flex;
+    column-gap: calc(32 * var(--px));
+    font: 400 calc(20 * var(--px)) / 1.4 "Inter", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .deck-html.no-head .deck-head { opacity: 0; }
+  /* the progress row sits above the header, clear of it */
+  .deck-html .progress { top: calc((100dvh - var(--ch)) / 2 + 6 * var(--px)); }
+}
+
 /* ---------- phone / portrait ---------- */
 
 @media (orientation: portrait) and (max-width: 1100px) {
@@ -229,6 +344,10 @@ a { color: inherit; }
   .part--section { padding-top: 50dvh; }
   .part--cover .display { font-size: clamp(30px, 8.6vw, 40px); }
   .part--section .display { font-size: clamp(56px, 16vw, 72px); }
+  /* a section title of several words: cover size, so it wraps in two or three lines */
+  .part--section .display--long { font-size: clamp(30px, 8.6vw, 40px); }
+  /* HTML decks: every photo whole on the phone screen, never cropped */
+  .deck-html .part figure img { object-fit: contain; }
   /* closing: muted display line with ink dots, contacts at the foot */
   .part--closing { padding-top: 50dvh; }
   .part--closing .display {
